@@ -17,16 +17,6 @@ export interface MessageResponse {
   message: string;
 }
 
-export type SignupInputRole = typeof SignupInputRole[keyof typeof SignupInputRole];
-
-
-export const SignupInputRole = {
-  MEMBER: 'MEMBER',
-  MODERATOR: 'MODERATOR',
-  ADMIN: 'ADMIN',
-  SUPER_ADMIN: 'SUPER_ADMIN',
-} as const;
-
 export interface SignupInput {
   /** @minLength 2 */
   fullName: string;
@@ -35,24 +25,21 @@ export interface SignupInput {
   email: string;
   /** @minLength 6 */
   password: string;
-  role: SignupInputRole;
-  /** @nullable */
-  phone?: string | null;
-  /** @nullable */
-  whatsapp?: string | null;
   /**
      * Date in YYYY-MM-DD format
-     * @nullable
+     * @minLength 1
      */
-  birthDate?: string | null;
-  /** @nullable */
-  address?: string | null;
-  /** @nullable */
-  professionGroup?: string | null;
-  /** @nullable */
-  specialtyText?: string | null;
-  /** @nullable */
-  bio?: string | null;
+  birthDate: string;
+  /** @minLength 1 */
+  address: string;
+  /** @minLength 1 */
+  phone: string;
+  /** @minLength 1 */
+  whatsapp: string;
+  /** @minLength 1 */
+  professionGroup: string;
+  /** @minLength 1 */
+  specialtyText: string;
 }
 
 export type LoginInputRole = typeof LoginInputRole[keyof typeof LoginInputRole];

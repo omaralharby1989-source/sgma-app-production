@@ -267,7 +267,19 @@ components:
 
     SignupInput:
       type: object
-      required: [fullName, account, email, password, role]
+      required:
+        [
+          fullName,
+          account,
+          email,
+          password,
+          birthDate,
+          address,
+          phone,
+          whatsapp,
+          professionGroup,
+          specialtyText,
+        ]
       properties:
         fullName:
           type: string
@@ -281,24 +293,25 @@ components:
         password:
           type: string
           minLength: 6
-        role:
-          type: string
-          enum: [MEMBER, MODERATOR, ADMIN, SUPER_ADMIN]
-        phone:
-          type: ["string", "null"]
-        whatsapp:
-          type: ["string", "null"]
         birthDate:
-          type: ["string", "null"]
+          type: string
+          minLength: 1
           description: Date in YYYY-MM-DD format
         address:
-          type: ["string", "null"]
+          type: string
+          minLength: 1
+        phone:
+          type: string
+          minLength: 1
+        whatsapp:
+          type: string
+          minLength: 1
         professionGroup:
-          type: ["string", "null"]
+          type: string
+          minLength: 1
         specialtyText:
-          type: ["string", "null"]
-        bio:
-          type: ["string", "null"]
+          type: string
+          minLength: 1
 
     LoginInput:
       type: object

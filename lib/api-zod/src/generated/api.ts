@@ -28,19 +28,23 @@ export const signupBodyPasswordMin = 6;
 
 
 
+
+
+
+
+
+
 export const SignupBody = zod.object({
   "fullName": zod.string().min(signupBodyFullNameMin),
   "account": zod.string().min(signupBodyAccountMin),
   "email": zod.string().email(),
   "password": zod.string().min(signupBodyPasswordMin),
-  "role": zod.enum(['MEMBER', 'MODERATOR', 'ADMIN', 'SUPER_ADMIN']),
-  "phone": zod.string().nullish(),
-  "whatsapp": zod.string().nullish(),
-  "birthDate": zod.string().nullish().describe('Date in YYYY-MM-DD format'),
-  "address": zod.string().nullish(),
-  "professionGroup": zod.string().nullish(),
-  "specialtyText": zod.string().nullish(),
-  "bio": zod.string().nullish()
+  "birthDate": zod.string().min(1).describe('Date in YYYY-MM-DD format'),
+  "address": zod.string().min(1),
+  "phone": zod.string().min(1),
+  "whatsapp": zod.string().min(1),
+  "professionGroup": zod.string().min(1),
+  "specialtyText": zod.string().min(1)
 })
 
 

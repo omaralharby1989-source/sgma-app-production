@@ -5,7 +5,6 @@
  * SGMA APP2 API specification
  * OpenAPI spec version: 0.1.0
  */
-import type { SignupInputRole } from './signupInputRole';
 
 export interface SignupInput {
   /** @minLength 2 */
@@ -15,22 +14,19 @@ export interface SignupInput {
   email: string;
   /** @minLength 6 */
   password: string;
-  role: SignupInputRole;
-  /** @nullable */
-  phone?: string | null;
-  /** @nullable */
-  whatsapp?: string | null;
   /**
      * Date in YYYY-MM-DD format
-     * @nullable
+     * @minLength 1
      */
-  birthDate?: string | null;
-  /** @nullable */
-  address?: string | null;
-  /** @nullable */
-  professionGroup?: string | null;
-  /** @nullable */
-  specialtyText?: string | null;
-  /** @nullable */
-  bio?: string | null;
+  birthDate: string;
+  /** @minLength 1 */
+  address: string;
+  /** @minLength 1 */
+  phone: string;
+  /** @minLength 1 */
+  whatsapp: string;
+  /** @minLength 1 */
+  professionGroup: string;
+  /** @minLength 1 */
+  specialtyText: string;
 }

@@ -22,4 +22,3 @@ export * from './memberStats';
 export * from './messageResponse';
 export * from './passwordUpdate';
 export * from './signupInput';
-export * from './signupInputRole';

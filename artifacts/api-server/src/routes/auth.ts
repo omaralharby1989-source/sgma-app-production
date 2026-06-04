@@ -37,7 +37,7 @@ router.post("/auth/signup", async (req, res): Promise<void> => {
     return;
   }
 
-  const { fullName, account, email, password, role, phone, whatsapp, birthDate, address, professionGroup, specialtyText, bio } = parsed.data;
+  const { fullName, account, email, password, phone, whatsapp, birthDate, address, professionGroup, specialtyText } = parsed.data;
 
   try {
     const existing = await db
@@ -60,15 +60,16 @@ router.post("/auth/signup", async (req, res): Promise<void> => {
         account,
         email,
         passwordHash,
-        role: role as "MEMBER" | "MODERATOR" | "ADMIN" | "SUPER_ADMIN",
+        role: "MEMBER",
         status: "ACTIVE",
-        phone: phone ?? null,
-        whatsapp: whatsapp ?? null,
-        birthDate: birthDate ?? null,
-        address: address ?? null,
-        professionGroup: professionGroup ?? null,
-        specialtyText: specialtyText ?? null,
-        bio: bio ?? null,
+        isDeveloper: false,
+        isActive: true,
+        phone,
+        whatsapp,
+        birthDate,
+        address,
+        professionGroup,
+        specialtyText,
       })
       .returning();
 

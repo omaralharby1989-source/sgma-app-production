@@ -1,0 +1,326 @@
+URGENT PHASE 1 REGISTER FORM REPAIR — DO NOT START PHASE 2
+
+You must repair the SGMA APP2 Register page and Register API now.
+
+The current Register page is not acceptable because:
+
+* It shows a public Role selector.
+* It allows the user to choose MEMBER / MODERATOR / ADMIN / SUPER_ADMIN.
+* Phone is optional.
+* Several required SGMA user fields are missing.
+* The form is generic and not structured clearly.
+* The public registration flow does not match the SGMA APP2 requirements.
+
+This is a Phase 1 repair only.
+Do not start Phase 2.
+Do not add Admin Dashboard.
+Do not add Articles.
+Do not add Chat.
+Do not add News.
+Do not add Broadcast UI.
+Do not add Advertisement UI.
+
+==================================================
+A. SECURITY RULE — REMOVE ROLE FROM PUBLIC REGISTER
+===================================================
+
+1. Completely remove the Role selector from the Register page.
+
+The public user must never be able to choose:
+
+* MEMBER
+* MODERATOR
+* ADMIN
+* SUPER_ADMIN
+
+2. Public registration must always create the user with:
+
+role = MEMBER
+isDeveloper = false
+isActive = true
+
+3. Only ADMIN or SUPER_ADMIN can change user roles later from the Admin Dashboard in a future phase.
+
+4. Remove role from public signup input if it exists in the frontend form.
+
+5. Backend must ignore any submitted role from public signup requests.
+   Even if someone sends role=SUPER_ADMIN manually through API, the backend must still create the account as MEMBER only.
+
+==================================================
+B. REQUIRED REGISTER FORM STRUCTURE
+===================================
+
+Rebuild the Register page as a clear mobile-first RTL Arabic form divided into sections.
+
+Section 1: معلومات الحساب
+Required fields:
+
+* fullName
+  Arabic label: الاسم الكامل
+* account
+  Arabic label: اسم المستخدم
+* email
+  Arabic label: البريد الإلكتروني
+* password
+  Arabic label: كلمة المرور
+* confirmPassword
+  Arabic label: تأكيد كلمة المرور
+
+Section 2: المعلومات الشخصية
+Required fields:
+
+* birthDate
+  Arabic label: تاريخ الميلاد
+* address
+  Arabic label: العنوان الكامل
+* phone
+  Arabic label: رقم الهاتف
+* whatsapp
+  Arabic label: رقم الواتساب
+
+Section 3: المعلومات المهنية
+Required fields:
+
+* professionGroup
+  Arabic label: المجموعة المهنية
+
+Allowed options:
+
+* Arzt / طبيب
+* Pflege / تمريض
+* ATA
+* OTA
+* Physiotherapie / علاج فيزيائي
+* Labor / مخبر
+* Radiologie / أشعة
+* Medizintechnik / هندسة طبية
+* Rettungsdienst / إسعاف
+* Student / طالب
+* Andere / أخرى
+
+Required field:
+
+* specialtyText
+  Arabic label: الاختصاص بالتفصيل
+
+Placeholder:
+اكتب اختصاصك بالتفصيل، مثال: Anästhesie, Intensivpflege, Notaufnahme, Chirurgie, Innere Medizin...
+
+Section 4: الموافقة
+Required checkbox:
+
+* acceptTerms
+
+Arabic text:
+أوافق على شروط الاستخدام وسياسة الخصوصية
+
+==================================================
+C. ALL FIELDS MUST BE REQUIRED
+==============================
+
+The following fields must be mandatory on frontend and backend:
+
+* fullName
+* account
+* email
+* password
+* confirmPassword on frontend
+* birthDate
+* address
+* phone
+* whatsapp
+* professionGroup
+* specialtyText
+* acceptTerms on frontend
+
+Important:
+
+* Phone must NOT be optional.
+* WhatsApp must NOT be optional.
+* Address must NOT be optional.
+* Birth date must NOT be optional.
+* Profession group must NOT be optional.
+* Specialty must NOT be optional.
+* Terms checkbox must be required.
+
+==================================================
+D. FRONTEND VALIDATION
+======================
+
+Add clear Arabic validation messages.
+
+Do not submit the form if:
+
+* Any required field is empty.
+* Email format is invalid.
+* Password is too short.
+* Password and confirmPassword do not match.
+* acceptTerms is not checked.
+* professionGroup is not selected.
+
+Arabic examples:
+
+* الرجاء إدخال الاسم الكامل
+* الرجاء إدخال اسم المستخدم
+* الرجاء إدخال بريد إلكتروني صحيح
+* الرجاء إدخال كلمة المرور
+* كلمة المرور وتأكيد كلمة المرور غير متطابقتين
+* الرجاء إدخال تاريخ الميلاد
+* الرجاء إدخال العنوان الكامل
+* الرجاء إدخال رقم الهاتف
+* الرجاء إدخال رقم الواتساب
+* الرجاء اختيار المجموعة المهنية
+* الرجاء كتابة الاختصاص بالتفصيل
+* يجب الموافقة على شروط الاستخدام وسياسة الخصوصية
+
+==================================================
+E. BACKEND VALIDATION
+=====================
+
+Update the public signup backend validation.
+
+The backend must require:
+
+* fullName
+* account
+* email
+* password
+* birthDate
+* address
+* phone
+* whatsapp
+* professionGroup
+* specialtyText
+
+Backend must NOT accept public role assignment.
+
+Backend must force:
+role = MEMBER
+isDeveloper = false
+isActive = true
+
+If someone sends a role manually in the request body, ignore it.
+
+==================================================
+F. DATABASE / PRISMA CHECK
+==========================
+
+Confirm the User model supports these fields:
+
+* fullName
+* account
+* email
+* passwordHash
+* role
+* isDeveloper
+* isActive
+* birthDate
+* address
+* phone
+* whatsapp
+* professionGroup
+* specialtyText
+* createdAt
+* updatedAt
+
+If any field is missing, add it and apply Prisma migration or db push according to the current project setup.
+
+==================================================
+G. OPENAPI / GENERATED CLIENT
+=============================
+
+Update OpenAPI signup schema if needed.
+
+The public signup input must include the required registration fields.
+
+The public signup input must NOT allow role selection.
+
+After changing OpenAPI:
+
+* Regenerate the API client.
+* Fix any frontend type errors.
+* Run typecheck.
+
+==================================================
+H. UI REQUIREMENTS
+==================
+
+Register page must be:
+
+* Arabic RTL
+* Mobile-first
+* Clean and readable
+* Divided into clear sections
+* Not too cramped
+* Submit button visible clearly
+* Link back to Login must work
+* No broken route links
+
+Required route:
+
+* /register
+
+The old route /signup must not be used.
+
+==================================================
+I. RUNTIME TESTS REQUIRED
+=========================
+
+Do not report completion until you manually verify inside Preview:
+
+1. /register opens.
+2. Role selector is completely gone.
+3. Empty form submission shows Arabic validation errors.
+4. Phone is required.
+5. WhatsApp is required.
+6. Birth date is required.
+7. Address is required.
+8. Profession group is required.
+9. Specialty text is required.
+10. Terms checkbox is required.
+11. Password confirmation must match.
+12. Creating a new account works.
+13. New public user is created as MEMBER only.
+14. Login works after registration.
+15. After login, /home opens.
+16. /more opens.
+17. /developer-info opens.
+18. Preview Panel is operational.
+
+==================================================
+J. REQUIRED REPORT
+==================
+
+After finishing, provide this report:
+
+REGISTER REPAIR REPORT
+
+1. What was wrong before
+2. What was fixed
+3. Files changed
+4. Final Register fields
+5. Removed public role selector confirmation
+6. Backend role security confirmation:
+
+   * public signup always creates MEMBER
+   * submitted role is ignored
+7. Required validation status:
+
+   * frontend
+   * backend
+8. Prisma/User model status
+9. OpenAPI/client generation status
+10. Runtime test results:
+
+* /register
+* validation errors
+* new account registration
+* login after registration
+* /home
+* /more
+* /developer-info
+
+11. Preview status
+12. Confirmation that Phase 2 was not started
+
+Do not move forward until this repair is complete and tested in Preview.
