@@ -1,7 +1,15 @@
 import { Request, Response, NextFunction } from "express";
 import jwt from "jsonwebtoken";
 
-const JWT_SECRET = process.env.JWT_SECRET ?? "sgma-app2-secret-key-change-in-production";
+const SECRET = process.env.JWT_SECRET ?? process.env.SESSION_SECRET;
+
+if (!SECRET) {
+  throw new Error(
+    "Missing JWT signing secret: set JWT_SECRET (or SESSION_SECRET) in the environment",
+  );
+}
+
+const JWT_SECRET: string = SECRET;
 
 export interface JwtPayload {
   userId: number;

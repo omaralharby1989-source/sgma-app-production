@@ -386,18 +386,30 @@ components:
         fullName:
           type: string
           minLength: 2
-        phone:
-          type: ["string", "null"]
-        whatsapp:
-          type: ["string", "null"]
+        account:
+          type: string
+          minLength: 3
+        email:
+          type: string
+          format: email
         birthDate:
-          type: ["string", "null"]
+          type: string
+          minLength: 1
         address:
-          type: ["string", "null"]
+          type: string
+          minLength: 1
+        phone:
+          type: string
+          minLength: 1
+        whatsapp:
+          type: string
+          minLength: 1
         professionGroup:
-          type: ["string", "null"]
+          type: string
+          minLength: 1
         specialtyText:
-          type: ["string", "null"]
+          type: string
+          minLength: 1
         bio:
           type: ["string", "null"]
 

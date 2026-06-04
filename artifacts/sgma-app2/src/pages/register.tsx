@@ -11,20 +11,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
 import { UserPlus, Loader2 } from "lucide-react";
-
-const PROFESSION_GROUPS = [
-  "Arzt / طبيب",
-  "Pflege / تمريض",
-  "ATA",
-  "OTA",
-  "Physiotherapie / علاج فيزيائي",
-  "Labor / مخبر",
-  "Radiologie / أشعة",
-  "Medizintechnik / هندسة طبية",
-  "Rettungsdienst / إسعاف",
-  "Student / طالب",
-  "Andere / أخرى",
-] as const;
+import { PROFESSION_GROUPS } from "@/lib/constants";
 
 const registerSchema = z
   .object({

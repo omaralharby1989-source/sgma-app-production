@@ -1,1 +1,4 @@
-- [Public signup role security](signup-role-security.md) — keep privileged fields (role/flags) out of OpenAPI input schema + assign server-side; contract removal is the real guard.
+- [JWT signing secret](jwt-secret.md) — api-server signs JWTs with JWT_SECRET ?? SESSION_SECRET and fails fast; never reintroduce a hardcoded fallback.
+- [Signup role security](signup-role-security.md) — role/isDeveloper/isActive/status are server-controlled; never accept them from client update/signup bodies.
+- [SGMA APP2 auth system](sgma-app2-auth.md) — JWT auth setup, bcryptjs requirement, role validation at login.
+- [SGMA APP2 frontend import rules](sgma-app2-frontend-imports.md) — frontend must not import from @workspace/api-zod (server-side only).

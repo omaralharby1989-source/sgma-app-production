@@ -1,7 +1,7 @@
 import { Router } from "express";
 import bcrypt from "bcryptjs";
 import { db, usersTable } from "@workspace/db";
-import { eq } from "drizzle-orm";
+import { eq, and, ne } from "drizzle-orm";
 import { UpdateMemberProfileBody, UpdateMemberPasswordBody, UploadMemberAvatarBody } from "@workspace/api-zod";
 import { requireAuth } from "../middlewares/auth";
 
@@ -58,20 +58,48 @@ router.patch("/member/profile", requireAuth, async (req, res): Promise<void> => 
   }
 
   try {
+    const userId = req.user!.userId;
+
+    if (parsed.data.account !== undefined) {
+      const [conflict] = await db
+        .select()
+        .from(usersTable)
+        .where(and(eq(usersTable.account, parsed.data.account), ne(usersTable.id, userId)))
+        .limit(1);
+      if (conflict) {
+        res.status(409).json({ error: "اسم المستخدم مستخدم بالفعل من قبل عضو آخر" });
+        return;
+      }
+    }
+
+    if (parsed.data.email !== undefined) {
+      const [conflict] = await db
+        .select()
+        .from(usersTable)
+        .where(and(eq(usersTable.email, parsed.data.email), ne(usersTable.id, userId)))
+        .limit(1);
+      if (conflict) {
+        res.status(409).json({ error: "البريد الإلكتروني مستخدم بالفعل من قبل عضو آخر" });
+        return;
+      }
+    }
+
     const updates: Partial<typeof usersTable.$inferInsert> = {};
     if (parsed.data.fullName !== undefined) updates.fullName = parsed.data.fullName;
-    if (parsed.data.phone !== undefined) updates.phone = parsed.data.phone ?? undefined;
-    if (parsed.data.whatsapp !== undefined) updates.whatsapp = parsed.data.whatsapp ?? undefined;
-    if (parsed.data.birthDate !== undefined) updates.birthDate = parsed.data.birthDate ?? undefined;
-    if (parsed.data.address !== undefined) updates.address = parsed.data.address ?? undefined;
-    if (parsed.data.professionGroup !== undefined) updates.professionGroup = parsed.data.professionGroup ?? undefined;
-    if (parsed.data.specialtyText !== undefined) updates.specialtyText = parsed.data.specialtyText ?? undefined;
+    if (parsed.data.account !== undefined) updates.account = parsed.data.account;
+    if (parsed.data.email !== undefined) updates.email = parsed.data.email;
+    if (parsed.data.phone !== undefined) updates.phone = parsed.data.phone;
+    if (parsed.data.whatsapp !== undefined) updates.whatsapp = parsed.data.whatsapp;
+    if (parsed.data.birthDate !== undefined) updates.birthDate = parsed.data.birthDate;
+    if (parsed.data.address !== undefined) updates.address = parsed.data.address;
+    if (parsed.data.professionGroup !== undefined) updates.professionGroup = parsed.data.professionGroup;
+    if (parsed.data.specialtyText !== undefined) updates.specialtyText = parsed.data.specialtyText;
     if (parsed.data.bio !== undefined) updates.bio = parsed.data.bio ?? undefined;
 
     const [user] = await db
       .update(usersTable)
       .set(updates)
-      .where(eq(usersTable.id, req.user!.userId))
+      .where(eq(usersTable.id, userId))
       .returning();
 
     res.json(formatUser(user));

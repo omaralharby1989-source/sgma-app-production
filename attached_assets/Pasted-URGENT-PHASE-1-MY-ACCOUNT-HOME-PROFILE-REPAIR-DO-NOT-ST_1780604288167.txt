@@ -1,0 +1,426 @@
+URGENT PHASE 1 MY ACCOUNT / HOME PROFILE REPAIR — DO NOT START PHASE 2
+
+The current /home “حسابي” page is visually acceptable as a first layout, but it is functionally incomplete.
+
+User screenshot review confirmed:
+
+* The page only shows limited information.
+* The user cannot edit all information entered during registration.
+* Personal and professional fields are missing from the profile display/edit flow.
+* The Settings tab only has password change and logout.
+* The page must become the complete “My Account” page for Phase 1.
+
+This is still Phase 1 repair.
+Do not start Phase 2.
+Do not add Admin Dashboard.
+Do not add Articles.
+Do not add Chat.
+Do not add News.
+Do not add Broadcast UI.
+Do not add Advertisement UI.
+
+==================================================
+A. MY ACCOUNT PAGE PURPOSE
+==========================
+
+The /home page is the user’s “حسابي / My Account” page.
+
+It must allow the logged-in user to:
+
+1. View all account information.
+2. Edit all editable information that the user entered during registration.
+3. Change profile image/avatar.
+4. Change password.
+5. Logout.
+
+The design must remain:
+
+* Arabic RTL
+* Mobile-first
+* Clean
+* Sectioned
+* Not crowded
+* Clear save/cancel behavior
+
+==================================================
+B. PROFILE HEADER
+=================
+
+Keep the current profile header but improve it if needed.
+
+It should show:
+
+* Avatar / initials
+* Change avatar button
+* fullName
+* role badge, read-only
+* account status badge, read-only
+* member since date
+* activity days if currently implemented
+
+Important:
+role and account status must be read-only only.
+
+User must NOT be able to edit:
+
+* role
+* isDeveloper
+* isActive
+* status
+
+==================================================
+C. INFORMATION TAB — DISPLAY MODE
+=================================
+
+The “المعلومات” tab must display all user data in clear sections.
+
+Section 1: معلومات الحساب
+Show:
+
+* الاسم الكامل: fullName
+* اسم المستخدم: account
+* البريد الإلكتروني: email
+* تاريخ إنشاء الحساب: createdAt
+* الصلاحية: role, read-only
+* حالة الحساب: active/status, read-only
+
+Section 2: المعلومات الشخصية
+Show:
+
+* تاريخ الميلاد: birthDate
+* العنوان الكامل: address
+* رقم الهاتف: phone
+* رقم الواتساب: whatsapp
+
+Section 3: المعلومات المهنية
+Show:
+
+* المجموعة المهنية: professionGroup
+* الاختصاص بالتفصيل: specialtyText
+
+Section 4: نبذة تعريفية
+Show:
+
+* bio, if the project keeps bio
+  If empty, show a clean placeholder:
+  لم يتم إضافة نبذة تعريفية بعد
+
+==================================================
+D. EDIT PROFILE MODE
+====================
+
+When the user clicks “تعديل”, switch to edit mode.
+
+The user must be able to edit these fields:
+
+Required editable fields:
+
+* fullName
+* account
+* email
+* birthDate
+* address
+* phone
+* whatsapp
+* professionGroup
+* specialtyText
+
+Optional editable field:
+
+* bio
+
+Do NOT allow editing:
+
+* role
+* isDeveloper
+* isActive
+* status
+* createdAt
+
+Buttons:
+
+* حفظ التعديلات
+* إلغاء
+
+After saving:
+
+* Show success message in Arabic.
+* Refresh user data from backend.
+* Keep the user on /home.
+* Do not logout unless absolutely required.
+
+==================================================
+E. VALIDATION RULES
+===================
+
+Frontend validation and backend validation must require:
+
+* fullName required
+* account required
+* email required and valid
+* birthDate required
+* address required
+* phone required
+* whatsapp required
+* professionGroup required
+* specialtyText required
+
+Arabic validation messages:
+
+* الرجاء إدخال الاسم الكامل
+* الرجاء إدخال اسم المستخدم
+* الرجاء إدخال بريد إلكتروني صحيح
+* الرجاء إدخال تاريخ الميلاد
+* الرجاء إدخال العنوان الكامل
+* الرجاء إدخال رقم الهاتف
+* الرجاء إدخال رقم الواتساب
+* الرجاء اختيار المجموعة المهنية
+* الرجاء كتابة الاختصاص بالتفصيل
+
+Email/account uniqueness:
+If email or account is changed, backend must verify they are not already used by another user.
+Return clear Arabic-friendly error if duplicate.
+
+Do not allow the user to update another user’s profile.
+The endpoint must update only the authenticated user from JWT.
+
+==================================================
+F. PROFESSION GROUP OPTIONS
+===========================
+
+Use the same professionGroup options as Register:
+
+* Arzt / طبيب
+* Pflege / تمريض
+* ATA
+* OTA
+* Physiotherapie / علاج فيزيائي
+* Labor / مخبر
+* Radiologie / أشعة
+* Medizintechnik / هندسة طبية
+* Rettungsdienst / إسعاف
+* Student / طالب
+* Andere / أخرى
+
+The profile edit dropdown must match the register dropdown exactly.
+
+==================================================
+G. SETTINGS TAB
+===============
+
+Keep the “الإعدادات” tab.
+
+It must include:
+
+1. تغيير كلمة المرور
+   Fields:
+
+* كلمة المرور الحالية
+* كلمة المرور الجديدة
+* تأكيد كلمة المرور الجديدة
+
+Validation:
+
+* all fields required
+* new password and confirm new password must match
+* show Arabic errors
+* show success/error message
+
+2. تسجيل الخروج
+   Keep logout button.
+
+Do not implement delete account yet unless explicitly requested later.
+
+==================================================
+H. AVATAR / PROFILE IMAGE
+=========================
+
+Keep avatar editing if already implemented.
+
+Requirements:
+
+* User can upload/change avatar.
+* Show preview after upload.
+* Handle error states.
+* Do not break profile page if avatar is empty.
+* If no avatar exists, show initials.
+
+==================================================
+I. BACKEND REQUIREMENTS
+=======================
+
+Update the authenticated profile API if needed.
+
+Required endpoints should support:
+
+GET /api/member/profile
+Returns all fields:
+
+* id
+* fullName
+* account
+* email
+* role
+* isDeveloper
+* isActive
+* status if exists
+* birthDate
+* address
+* phone
+* whatsapp
+* professionGroup
+* specialtyText
+* bio
+* avatarUrl
+* createdAt
+* updatedAt
+
+PATCH /api/member/profile
+Allows updating only:
+
+* fullName
+* account
+* email
+* birthDate
+* address
+* phone
+* whatsapp
+* professionGroup
+* specialtyText
+* bio
+
+Must NOT allow updating:
+
+* role
+* isDeveloper
+* isActive
+* status
+* createdAt
+
+PATCH /api/member/password
+Keep existing endpoint but verify:
+
+* current password is correct
+* new password is hashed
+* new password confirmation is validated in frontend
+
+POST /api/member/avatar
+Keep if already implemented and working.
+
+==================================================
+J. OPENAPI / GENERATED CLIENT
+=============================
+
+If API response/request schemas are missing fields:
+
+* Update OpenAPI.
+* Regenerate generated client.
+* Fix type errors.
+* Run typecheck.
+
+==================================================
+K. UI QUALITY REQUIREMENTS
+==========================
+
+The page must look good in Preview.
+
+Requirements:
+
+* Mobile-first layout
+* Arabic RTL alignment
+* Clear section headers
+* Icons are allowed but not excessive
+* Cards must not be too crowded
+* Bottom navigation must not cover content
+* Add bottom padding so content is not hidden behind bottom nav
+* Tabs must be clear: المعلومات / الإعدادات
+* Edit mode must be easy to understand
+
+==================================================
+L. RUNTIME TESTS REQUIRED
+=========================
+
+Do not report completion until you manually verify inside Preview:
+
+1. Login works.
+2. /home opens.
+3. Profile header displays correct user.
+4. Information tab shows:
+
+   * fullName
+   * account
+   * email
+   * birthDate
+   * address
+   * phone
+   * whatsapp
+   * professionGroup
+   * specialtyText
+5. Edit button opens edit mode.
+6. User can edit and save:
+
+   * fullName
+   * account
+   * email
+   * birthDate
+   * address
+   * phone
+   * whatsapp
+   * professionGroup
+   * specialtyText
+   * bio if available
+7. Required validation works.
+8. Duplicate email/account protection works.
+9. Role/status are visible but read-only.
+10. Role/status cannot be modified through profile update API.
+11. Password change works.
+12. Logout works.
+13. Avatar change works if implemented.
+14. /more still works.
+15. /developer-info still works.
+16. Preview Panel is operational.
+
+==================================================
+M. REQUIRED REPORT
+==================
+
+After finishing, provide this report:
+
+MY ACCOUNT REPAIR REPORT
+
+1. What was missing before
+2. What was fixed
+3. Files changed
+4. Final fields displayed on /home
+5. Final fields editable by the user
+6. Read-only protected fields confirmation:
+
+   * role
+   * isDeveloper
+   * isActive
+   * status
+7. Backend endpoint changes
+8. OpenAPI/client generation status
+9. Validation status:
+
+   * frontend
+   * backend
+10. Runtime test results:
+
+* login
+* /home
+* profile display
+* edit profile
+* save profile
+* validation
+* duplicate email/account protection
+* password change
+* avatar change
+* logout
+* /more
+* /developer-info
+
+11. Preview status
+12. Confirmation that Phase 2 was not started
+
+Do not continue to any other feature until this page is complete and tested in Preview.

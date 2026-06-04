@@ -112,16 +112,26 @@ export const GetMemberProfileResponse = zod.object({
  */
 export const updateMemberProfileBodyFullNameMin = 2;
 
+export const updateMemberProfileBodyAccountMin = 3;
+
+
+
+
+
+
+
 
 
 export const UpdateMemberProfileBody = zod.object({
   "fullName": zod.string().min(updateMemberProfileBodyFullNameMin).optional(),
-  "phone": zod.string().nullish(),
-  "whatsapp": zod.string().nullish(),
-  "birthDate": zod.string().nullish(),
-  "address": zod.string().nullish(),
-  "professionGroup": zod.string().nullish(),
-  "specialtyText": zod.string().nullish(),
+  "account": zod.string().min(updateMemberProfileBodyAccountMin).optional(),
+  "email": zod.string().email().optional(),
+  "birthDate": zod.string().min(1).optional(),
+  "address": zod.string().min(1).optional(),
+  "phone": zod.string().min(1).optional(),
+  "whatsapp": zod.string().min(1).optional(),
+  "professionGroup": zod.string().min(1).optional(),
+  "specialtyText": zod.string().min(1).optional(),
   "bio": zod.string().nullish()
 })
 

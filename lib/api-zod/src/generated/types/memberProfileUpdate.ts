@@ -9,18 +9,21 @@
 export interface MemberProfileUpdate {
   /** @minLength 2 */
   fullName?: string;
-  /** @nullable */
-  phone?: string | null;
-  /** @nullable */
-  whatsapp?: string | null;
-  /** @nullable */
-  birthDate?: string | null;
-  /** @nullable */
-  address?: string | null;
-  /** @nullable */
-  professionGroup?: string | null;
-  /** @nullable */
-  specialtyText?: string | null;
+  /** @minLength 3 */
+  account?: string;
+  email?: string;
+  /** @minLength 1 */
+  birthDate?: string;
+  /** @minLength 1 */
+  address?: string;
+  /** @minLength 1 */
+  phone?: string;
+  /** @minLength 1 */
+  whatsapp?: string;
+  /** @minLength 1 */
+  professionGroup?: string;
+  /** @minLength 1 */
+  specialtyText?: string;
   /** @nullable */
   bio?: string | null;
 }
