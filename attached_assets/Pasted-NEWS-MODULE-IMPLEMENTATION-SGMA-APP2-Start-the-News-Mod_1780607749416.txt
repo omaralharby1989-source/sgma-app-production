@@ -1,0 +1,424 @@
+NEWS MODULE IMPLEMENTATION — SGMA APP2
+
+Start the News Module now.
+
+Important:
+This task is ONLY for the News Module.
+
+Do not add:
+
+* Admin Dashboard full module
+* Articles module
+* Broadcast UI
+* Advertisement UI
+* Member management
+* Any unrelated feature
+
+Do not break existing working pages:
+
+* /login
+* /register
+* /home
+* /chat
+* /chat/public
+* /chat/admin
+* /more
+* /developer-info
+
+Keep current architecture:
+
+* PostgreSQL + Drizzle
+* JWT authentication
+* Existing protected routes
+* Existing bottom navigation
+* Arabic RTL
+* Mobile-first design
+
+No Firebase.
+No old SGMA APP1 routes.
+No route chaos.
+
+==================================================
+A. NEWS MODULE PURPOSE
+======================
+
+The News Module allows users to read SGMA news in a clean, visual, mobile-first interface.
+
+Users should see news as beautiful image-based cards.
+
+When the user taps a news card, the full news article opens on a dedicated detail page.
+
+The design should feel like a professional association/news app, not a basic admin table.
+
+==================================================
+B. REQUIRED ROUTES
+==================
+
+Create and activate these routes:
+
+1. /news
+   News list page.
+
+2. /news/:id
+   News detail page.
+
+Both routes must be JWT protected for now.
+
+Unauthenticated users must be redirected to /login.
+
+Update bottom navigation:
+
+* الأخبار must open /news
+* المحادثات must still open /chat
+* حسابي must still open /home
+* المزيد must still open /more
+
+Do not create broken nav links.
+
+==================================================
+C. DATABASE REQUIREMENTS
+========================
+
+Use the existing News model/table if already created.
+
+The news table should support at minimum:
+
+News:
+
+* id
+* title
+* summary
+* content
+* imageUrl
+* category optional
+* status
+* createdById
+* createdAt
+* updatedAt
+* publishedAt optional
+
+If current schema only has title/content/createdById, extend it safely.
+
+Important:
+
+* Do not delete existing data.
+* Do not create duplicate news tables.
+* Use DB push/migration according to current project setup.
+* Keep it compatible with PostgreSQL + Drizzle.
+
+Recommended status values:
+
+* DRAFT
+* PUBLISHED
+* ARCHIVED
+
+For this phase, users should only see PUBLISHED news.
+
+If there is no admin publishing UI yet, seed a few sample published news items so the page can be tested visually.
+
+==================================================
+D. NEWS LIST PAGE — /news
+=========================
+
+Create a beautiful Arabic RTL mobile-first news list.
+
+Required layout:
+
+Header:
+
+* Title: الأخبار
+* Subtitle: آخر أخبار ونشاطات الجمعية الطبية السورية الألمانية
+
+News cards:
+Each news card should show:
+
+* Main image
+* News title
+* Short summary / excerpt
+* Date
+* Category badge if available
+* Small “اقرأ المزيد” hint or button
+
+Card behavior:
+
+* Clicking the whole card opens /news/:id
+* Cards must look clean and professional
+* Images should have proper aspect ratio
+* If no image exists, show a clean placeholder image/gradient
+* Do not allow broken image icons
+
+Empty state:
+If there are no news:
+لا توجد أخبار منشورة حالياً
+
+Loading state:
+Show a clean skeleton or loading message.
+
+Error state:
+تعذر تحميل الأخبار، يرجى المحاولة لاحقاً
+
+==================================================
+E. NEWS DETAIL PAGE — /news/:id
+===============================
+
+Create a full news reading page.
+
+Required content:
+
+* Main image at top
+* Title
+* Date
+* Category if available
+* Full content
+* Back button to /news
+
+Design:
+
+* Arabic RTL
+* Mobile-first
+* Clean reading typography
+* Comfortable spacing
+* Image should be responsive
+* Long content should be readable
+* Bottom navigation should not cover content
+* Add enough bottom padding
+
+If news item does not exist:
+Show clean 404-style message:
+الخبر غير موجود أو لم يعد متاحاً
+
+==================================================
+F. BACKEND API REQUIREMENTS
+===========================
+
+Create clean JWT-protected APIs.
+
+Required endpoints:
+
+GET /api/news
+Returns list of published news only.
+Sorted newest first.
+
+GET /api/news/:id
+Returns one published news item by id.
+
+For testing and seed only:
+If there is no admin UI yet, create seed/sample news data safely.
+
+Do not create public write endpoints for normal members.
+
+Important:
+Members must NOT be able to create/edit/delete news in this phase.
+
+Optional but acceptable if useful:
+Create staff-only backend endpoints for future admin use, but do not build full admin UI now:
+
+* POST /api/news
+* PATCH /api/news/:id
+* DELETE /api/news/:id
+
+If you add these, they must be protected:
+Only MODERATOR / ADMIN / SUPER_ADMIN can create/edit/archive news.
+MEMBER cannot.
+
+But frontend creation UI is NOT required now unless explicitly asked later.
+
+==================================================
+G. IMAGE HANDLING
+=================
+
+For now, use imageUrl string field.
+
+Do not implement complex upload/storage now unless already available cleanly.
+
+Rules:
+
+* imageUrl optional
+* frontend handles missing image gracefully
+* frontend handles broken image gracefully
+* sample seeded news can use safe placeholder image URLs or local visual fallback
+
+Do not use Firebase Storage.
+
+==================================================
+H. OPENAPI / GENERATED CLIENT
+=============================
+
+Update OpenAPI for news endpoints.
+
+After OpenAPI changes:
+
+* Regenerate generated client.
+* Do not manually edit generated files.
+* Fix type errors.
+* Run typecheck.
+
+Required schemas:
+
+* NewsItem
+* NewsListResponse
+* NewsDetailResponse
+* Error response if current spec uses one
+
+==================================================
+I. FRONTEND UI QUALITY
+======================
+
+The News UI must be:
+
+* Arabic RTL
+* Mobile-first
+* Professional
+* Card-based
+* Image-focused
+* Not crowded
+* Not table-like
+* Not admin-like
+* Smooth navigation from card to detail
+* Compatible with bottom navigation
+* No horizontal scrolling
+* No broken images
+* No overlapping UI
+
+Suggested card style:
+
+* rounded image top
+* title below image
+* summary/excerpt
+* date and category badge
+* subtle shadow/border
+
+==================================================
+J. SEED SAMPLE NEWS
+===================
+
+If the database has no published news, seed 3 sample news items for testing.
+
+Sample ideas:
+
+1. انطلاق الكورس النظري الإلكتروني لكوادر التمريض في ريف دمشق
+2. مشاركة محاضرين من ألمانيا في دعم التعليم الصحي
+3. نشاطات لجنة المساعدين الطبيين والتمريض في SGMA
+
+Each sample should include:
+
+* title
+* summary
+* full content
+* imageUrl or placeholder fallback
+* category
+* published status
+* publishedAt
+
+Do not use misleading real claims beyond simple placeholder/test content unless already present in project data.
+
+Mark sample content clearly as test/seed content if needed.
+
+==================================================
+K. PERMISSIONS
+==============
+
+Current phase:
+All authenticated users can:
+
+* View news list
+* Open full news
+
+Members cannot:
+
+* Create news
+* Edit news
+* Delete news
+
+Staff roles may have backend-only future endpoints if implemented:
+
+* MODERATOR
+* ADMIN
+* SUPER_ADMIN
+
+But do not expose staff news management UI yet.
+
+==================================================
+L. RUNTIME TESTS REQUIRED
+=========================
+
+Do not report completion until tested in Preview.
+
+Required tests:
+
+1. Login works.
+2. /news opens from bottom navigation.
+3. News list loads.
+4. News cards show:
+
+   * image or fallback
+   * title
+   * summary
+   * date
+   * category if available
+5. Clicking a card opens /news/:id.
+6. Full news page shows:
+
+   * image
+   * title
+   * date
+   * full content
+   * back button
+7. Back button returns to /news.
+8. Empty state works if no news.
+9. Broken/missing image does not break UI.
+10. /home still works.
+11. /chat still works.
+12. /chat/public still works.
+13. /chat/admin still works.
+14. /more still works.
+15. /developer-info still works.
+16. Typecheck passes.
+17. Backend starts cleanly.
+18. Preview Panel is operational.
+
+==================================================
+M. REQUIRED REPORT
+==================
+
+After completion, provide:
+
+NEWS MODULE REPORT
+
+1. What was implemented
+2. Files changed
+3. Database/table changes
+4. Backend endpoints added
+5. Frontend routes added
+6. News list UI status
+7. News detail UI status
+8. Image/fallback behavior
+9. Permissions:
+
+   * who can read
+   * who cannot write
+10. Seed/sample news status
+11. OpenAPI/client generation status
+12. Runtime test results:
+
+* /news
+* /news/:id
+* card click
+* full news page
+* back button
+* missing image fallback
+* existing pages regression test
+
+13. Preview status
+14. Known issues, if any
+15. Confirmation:
+
+* No Firebase
+* No old SGMA APP1 routes
+* No Admin Dashboard started
+* No Articles module started
+* No Broadcast/Ads UI started
+
+Important:
+Do not hide runtime failures behind typecheck success.
+If Preview breaks, stop and fix Preview first.

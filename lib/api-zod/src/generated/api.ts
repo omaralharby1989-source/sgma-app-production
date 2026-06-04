@@ -398,3 +398,108 @@ export const DeleteAdminChatMessageResponse = zod.object({
 })
 
 
+/**
+ * @summary List published news (newest first)
+ */
+export const GetNewsListResponseItem = zod.object({
+  "id": zod.number(),
+  "title": zod.string(),
+  "summary": zod.string().nullish(),
+  "content": zod.string(),
+  "imageUrl": zod.string().nullish(),
+  "category": zod.string().nullish(),
+  "status": zod.enum(['DRAFT', 'PUBLISHED', 'ARCHIVED']),
+  "authorId": zod.number().nullish(),
+  "publishedAt": zod.coerce.date().nullish(),
+  "createdAt": zod.coerce.date(),
+  "updatedAt": zod.coerce.date()
+})
+export const GetNewsListResponse = zod.array(GetNewsListResponseItem)
+
+
+/**
+ * @summary Create a news item (staff only)
+ */
+
+
+
+
+export const CreateNewsBody = zod.object({
+  "title": zod.string().min(1),
+  "summary": zod.string().optional(),
+  "content": zod.string().min(1),
+  "imageUrl": zod.string().optional(),
+  "category": zod.string().optional(),
+  "status": zod.enum(['DRAFT', 'PUBLISHED', 'ARCHIVED']).optional()
+})
+
+
+/**
+ * @summary Get one published news item
+ */
+export const GetNewsItemParams = zod.object({
+  "id": zod.coerce.number()
+})
+
+export const GetNewsItemResponse = zod.object({
+  "id": zod.number(),
+  "title": zod.string(),
+  "summary": zod.string().nullish(),
+  "content": zod.string(),
+  "imageUrl": zod.string().nullish(),
+  "category": zod.string().nullish(),
+  "status": zod.enum(['DRAFT', 'PUBLISHED', 'ARCHIVED']),
+  "authorId": zod.number().nullish(),
+  "publishedAt": zod.coerce.date().nullish(),
+  "createdAt": zod.coerce.date(),
+  "updatedAt": zod.coerce.date()
+})
+
+
+/**
+ * @summary Update a news item (staff only)
+ */
+export const UpdateNewsParams = zod.object({
+  "id": zod.coerce.number()
+})
+
+
+
+
+
+export const UpdateNewsBody = zod.object({
+  "title": zod.string().min(1).optional(),
+  "summary": zod.string().optional(),
+  "content": zod.string().min(1).optional(),
+  "imageUrl": zod.string().optional(),
+  "category": zod.string().optional(),
+  "status": zod.enum(['DRAFT', 'PUBLISHED', 'ARCHIVED']).optional()
+})
+
+export const UpdateNewsResponse = zod.object({
+  "id": zod.number(),
+  "title": zod.string(),
+  "summary": zod.string().nullish(),
+  "content": zod.string(),
+  "imageUrl": zod.string().nullish(),
+  "category": zod.string().nullish(),
+  "status": zod.enum(['DRAFT', 'PUBLISHED', 'ARCHIVED']),
+  "authorId": zod.number().nullish(),
+  "publishedAt": zod.coerce.date().nullish(),
+  "createdAt": zod.coerce.date(),
+  "updatedAt": zod.coerce.date()
+})
+
+
+/**
+ * @summary Delete a news item (staff only)
+ */
+export const DeleteNewsParams = zod.object({
+  "id": zod.coerce.number()
+})
+
+export const DeleteNewsResponse = zod.object({
+  "message": zod.string()
+})
+
+

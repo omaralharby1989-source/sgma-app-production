@@ -18,6 +18,8 @@ tags:
     description: Public operations
   - name: chat
     description: Chat operations
+  - name: news
+    description: News operations
 paths:
   /healthz:
     get:
@@ -575,6 +577,183 @@ paths:
               schema:
                 $ref: "#/components/schemas/ErrorResponse"
 
+  /news:
+    get:
+      operationId: getNewsList
+      tags: [news]
+      summary: List published news (newest first)
+      security:
+        - BearerAuth: []
+      responses:
+        "200":
+          description: Published news list
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/NewsListResponse"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+    post:
+      operationId: createNews
+      tags: [news]
+      summary: Create a news item (staff only)
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateNewsInput"
+      responses:
+        "201":
+          description: News created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/NewsItem"
+        "400":
+          description: Validation error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "403":
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /news/{id}:
+    get:
+      operationId: getNewsItem
+      tags: [news]
+      summary: Get one published news item
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: News item
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/NewsDetailResponse"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "404":
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+    patch:
+      operationId: updateNews
+      tags: [news]
+      summary: Update a news item (staff only)
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateNewsInput"
+      responses:
+        "200":
+          description: News updated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/NewsItem"
+        "400":
+          description: Validation error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "403":
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "404":
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+    delete:
+      operationId: deleteNews
+      tags: [news]
+      summary: Delete a news item (staff only)
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: News deleted
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MessageResponse"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "403":
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "404":
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
 components:
   securitySchemes:
     BearerAuth:
@@ -676,6 +855,84 @@ components:
         recipientId:
           type: integer
           description: Required for staff replies; ignored for members
+
+    NewsItem:
+      type: object
+      required: [id, title, content, status, createdAt, updatedAt]
+      properties:
+        id:
+          type: integer
+        title:
+          type: string
+        summary:
+          type: ["string", "null"]
+        content:
+          type: string
+        imageUrl:
+          type: ["string", "null"]
+        category:
+          type: ["string", "null"]
+        status:
+          type: string
+          enum: [DRAFT, PUBLISHED, ARCHIVED]
+        authorId:
+          type: ["integer", "null"]
+        publishedAt:
+          type: ["string", "null"]
+          format: date-time
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+
+    NewsListResponse:
+      type: array
+      items:
+        $ref: "#/components/schemas/NewsItem"
+
+    NewsDetailResponse:
+      $ref: "#/components/schemas/NewsItem"
+
+    CreateNewsInput:
+      type: object
+      required: [title, content]
+      properties:
+        title:
+          type: string
+          minLength: 1
+        summary:
+          type: string
+        content:
+          type: string
+          minLength: 1
+        imageUrl:
+          type: string
+        category:
+          type: string
+        status:
+          type: string
+          enum: [DRAFT, PUBLISHED, ARCHIVED]
+
+    UpdateNewsInput:
+      type: object
+      properties:
+        title:
+          type: string
+          minLength: 1
+        summary:
+          type: string
+        content:
+          type: string
+          minLength: 1
+        imageUrl:
+          type: string
+        category:
+          type: string
+        status:
+          type: string
+          enum: [DRAFT, PUBLISHED, ARCHIVED]
 
     SignupInput:
       type: object

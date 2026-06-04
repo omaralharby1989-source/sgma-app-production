@@ -74,6 +74,21 @@ Chat data model:
 - `admin_direct_chat_messages` — `conversationUserId` (owning member) + `senderId` (author). A message is "from member" when senderId === conversationUserId, else "from admin". Inbox = DISTINCT conversationUserId.
 - Server NEVER trusts client senderId — always uses `req.user.userId`. Staff replies must pass `recipientId`, which must be a non-staff (member) account.
 
+## News Module Status — COMPLETE
+
+Implemented (JWT-protected, members read-only):
+- `/news` — image-card list of PUBLISHED news, newest first (loading skeleton / error / empty states)
+- `/news/:id` — article detail with cover image, category, date, content; back to `/news`
+- `GET /api/news` (published only), `GET /api/news/:id` (published only, 404 if missing)
+- Staff-only writes (MODERATOR/ADMIN/SUPER_ADMIN): `POST/PATCH/DELETE /api/news` (no UI yet — API only)
+- `الأخبار` enabled in bottom nav; 3 sample published items seeded
+
+News data model (`lib/db/src/schema/news.ts`):
+- Visibility is driven by `status` enum (DRAFT/PUBLISHED/ARCHIVED); only PUBLISHED is returned to clients
+- `isPublished` boolean is kept in sync with `status === 'PUBLISHED'` on writes (legacy column, not the source of truth)
+- API maps DB `coverImageUrl` → response field `imageUrl`; server always sets `authorId = req.user.userId`
+- Malformed `:id` → 400; valid-but-missing → 404; empty PATCH body → 400
+
 ## Test Accounts
 
 | account | email | password | role |

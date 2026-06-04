@@ -7,7 +7,7 @@ export function MobileNav() {
   const navItems = [
     { href: "/home", icon: UserCircle, label: "حسابي" },
     { href: "/chat", icon: MessageSquare, label: "المحادثات" },
-    { href: "/news", icon: Newspaper, label: "الأخبار", disabled: true },
+    { href: "/news", icon: Newspaper, label: "الأخبار" },
     { href: "/broadcasts", icon: Radio, label: "البث", disabled: true },
     { href: "/more", icon: Menu, label: "المزيد" },
   ];

@@ -1,3 +1,4 @@
+- [News module visibility](news-module.md) — news visibility is driven by status enum (PUBLISHED only on reads); is_published is a synced legacy column.
 - [JWT signing secret](jwt-secret.md) — api-server signs JWTs with JWT_SECRET ?? SESSION_SECRET and fails fast; never reintroduce a hardcoded fallback.
 - [Signup role security](signup-role-security.md) — role/isDeveloper/isActive/status are server-controlled; never accept them from client update/signup bodies.
 - [SGMA APP2 auth system](sgma-app2-auth.md) — JWT auth setup, bcryptjs requirement, role validation at login.

@@ -4,6 +4,7 @@ import authRouter from "./auth";
 import memberRouter from "./member";
 import publicRouter from "./public";
 import chatRouter from "./chat";
+import newsRouter from "./news";
 
 const router: IRouter = Router();
 
@@ -12,5 +13,6 @@ router.use(authRouter);
 router.use(memberRouter);
 router.use(publicRouter);
 router.use(chatRouter);
+router.use(newsRouter);
 
 export default router;

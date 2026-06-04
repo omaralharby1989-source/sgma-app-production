@@ -64,6 +64,78 @@ export interface SendAdminChatMessageInput {
   recipientId?: number;
 }
 
+export type NewsItemStatus = typeof NewsItemStatus[keyof typeof NewsItemStatus];
+
+
+export const NewsItemStatus = {
+  DRAFT: 'DRAFT',
+  PUBLISHED: 'PUBLISHED',
+  ARCHIVED: 'ARCHIVED',
+} as const;
+
+export interface NewsItem {
+  id: number;
+  title: string;
+  /** @nullable */
+  summary?: string | null;
+  content: string;
+  /** @nullable */
+  imageUrl?: string | null;
+  /** @nullable */
+  category?: string | null;
+  status: NewsItemStatus;
+  /** @nullable */
+  authorId?: number | null;
+  /** @nullable */
+  publishedAt?: string | null;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export type NewsListResponse = NewsItem[];
+
+export type NewsDetailResponse = NewsItem;
+
+export type CreateNewsInputStatus = typeof CreateNewsInputStatus[keyof typeof CreateNewsInputStatus];
+
+
+export const CreateNewsInputStatus = {
+  DRAFT: 'DRAFT',
+  PUBLISHED: 'PUBLISHED',
+  ARCHIVED: 'ARCHIVED',
+} as const;
+
+export interface CreateNewsInput {
+  /** @minLength 1 */
+  title: string;
+  summary?: string;
+  /** @minLength 1 */
+  content: string;
+  imageUrl?: string;
+  category?: string;
+  status?: CreateNewsInputStatus;
+}
+
+export type UpdateNewsInputStatus = typeof UpdateNewsInputStatus[keyof typeof UpdateNewsInputStatus];
+
+
+export const UpdateNewsInputStatus = {
+  DRAFT: 'DRAFT',
+  PUBLISHED: 'PUBLISHED',
+  ARCHIVED: 'ARCHIVED',
+} as const;
+
+export interface UpdateNewsInput {
+  /** @minLength 1 */
+  title?: string;
+  summary?: string;
+  /** @minLength 1 */
+  content?: string;
+  imageUrl?: string;
+  category?: string;
+  status?: UpdateNewsInputStatus;
+}
+
 export interface SignupInput {
   /** @minLength 2 */
   fullName: string;
