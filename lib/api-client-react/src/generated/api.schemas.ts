@@ -17,6 +17,53 @@ export interface MessageResponse {
   message: string;
 }
 
+export interface ChatMessage {
+  id: number;
+  content: string;
+  senderId: number;
+  senderName: string;
+  senderRole: string;
+  /** @nullable */
+  senderAvatarUrl?: string | null;
+  isDeleted: boolean;
+  /** True when the authenticated user is the sender */
+  isMine: boolean;
+  /** True when the authenticated user may delete this message */
+  canModerate?: boolean;
+  /** @nullable */
+  editedAt?: string | null;
+  createdAt: string;
+}
+
+export interface AdminConversation {
+  userId: number;
+  fullName: string;
+  role: string;
+  /** @nullable */
+  avatarUrl?: string | null;
+  /** @nullable */
+  lastMessage?: string | null;
+  lastMessageAt: string;
+}
+
+export interface SendChatMessageInput {
+  /**
+     * @minLength 1
+     * @maxLength 4000
+     */
+  content: string;
+}
+
+export interface SendAdminChatMessageInput {
+  /**
+     * @minLength 1
+     * @maxLength 4000
+     */
+  content: string;
+  /** Required for staff replies; ignored for members */
+  recipientId?: number;
+}
+
 export interface SignupInput {
   /** @minLength 2 */
   fullName: string;
@@ -167,4 +214,11 @@ export interface DeveloperInfo {
   contact: string;
   builtWith?: string[];
 }
+
+export type GetAdminChatMessagesParams = {
+/**
+ * Member conversation to load (staff only)
+ */
+userId?: number;
+};
 

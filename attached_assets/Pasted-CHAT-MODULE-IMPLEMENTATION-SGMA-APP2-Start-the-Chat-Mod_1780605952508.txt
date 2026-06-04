@@ -1,0 +1,531 @@
+CHAT MODULE IMPLEMENTATION — SGMA APP2
+
+Start the Chat Module now.
+
+Important:
+This is NOT Phase 2 Admin Dashboard.
+This is ONLY the Chat Module implementation.
+
+Do not add:
+
+* Admin Dashboard
+* Articles
+* News
+* Broadcast UI
+* Advertisement UI
+* Member management
+* Any unrelated feature
+
+Keep scope strictly limited to Chat.
+
+==================================================
+A. CURRENT PROJECT RULES
+========================
+
+Current project:
+
+* SGMA APP2
+* JWT authentication
+* MySQL database
+* Existing User system
+* Existing protected routes
+* Existing bottom navigation
+
+Important:
+Use the current project architecture.
+Do not introduce Firebase.
+Do not introduce a second authentication system.
+Do not create route chaos.
+Do not use old SGMA APP1 routes.
+Do not break existing pages:
+
+* /login
+* /register
+* /home
+* /more
+* /developer-info
+
+==================================================
+B. CHAT ROUTES REQUIRED
+=======================
+
+Create and activate these routes:
+
+1. /chat
+   Chat Center page.
+
+This page must show two clear cards/buttons:
+
+* دردشة الأعضاء
+  Opens /chat/public
+* دردشة مع الإدارة
+  Opens /chat/admin
+
+2. /chat/public
+   Public Members Chat page.
+
+3. /chat/admin
+   Admin Direct Chat page.
+
+All chat routes must be JWT protected.
+
+Unauthenticated users must be redirected to /login.
+
+Bottom navigation must include chat access correctly.
+
+==================================================
+C. DATABASE REQUIREMENTS
+========================
+
+Use the existing chat database models/tables if already created:
+
+PublicChatMessage:
+
+* id
+* content
+* senderId
+* createdAt
+* updatedAt
+* deletedAt
+
+AdminDirectChatMessage:
+
+* id
+* content
+* senderId
+* receiverId
+* createdAt
+* updatedAt
+* deletedAt
+
+If fields are missing, add them safely.
+
+Do not create duplicate chat tables.
+Do not rename existing tables unless absolutely necessary.
+Do not break existing data.
+
+Recommended additions if not already present:
+
+* editedAt optional
+* isDeleted or deletedAt
+* deletedById optional if current schema supports it cleanly
+
+But do not over-engineer.
+
+==================================================
+D. PUBLIC MEMBERS CHAT FUNCTIONALITY
+====================================
+
+Implement /chat/public fully.
+
+Required behavior:
+
+1. All authenticated users can:
+
+* View messages
+* Send text messages
+* Edit their own messages
+* Delete their own messages
+
+2. MODERATOR / ADMIN / SUPER_ADMIN can:
+
+* Delete any public chat message
+* See moderation action if possible
+
+3. MEMBER cannot:
+
+* Delete messages from other users
+* Edit messages from other users
+
+4. Deleted messages:
+   Do not hard-delete from DB.
+   Use soft delete:
+
+* deletedAt set
+* content hidden or replaced with:
+  تم حذف هذه الرسالة
+
+5. Edited messages:
+   Show small label:
+   تم التعديل
+
+6. Message data shown:
+
+* Sender name
+* Role badge if useful
+* Message content
+* Time
+* Edited status
+* Delete/edit controls only when allowed
+
+7. Message ordering:
+
+* Oldest at top
+* Newest at bottom
+* Automatically scroll to latest message after sending
+* Keep internal scroll stable
+
+8. Input/composer:
+
+* Fixed at bottom of chat page above bottom navigation
+* Text input
+* Send button
+* Disable send if empty
+* Show loading while sending
+* Enter key sends on desktop if reasonable
+* Mobile friendly
+
+==================================================
+E. ADMIN DIRECT CHAT FUNCTIONALITY
+==================================
+
+Implement /chat/admin as a working direct chat with administration.
+
+Purpose:
+A normal member can message the administration team.
+
+Required behavior:
+
+For MEMBER:
+
+* Opens a direct chat conversation with administration.
+* Can send messages.
+* Can view own conversation.
+* Can edit/delete own messages if allowed by current chat rules.
+* Cannot see other members’ admin conversations.
+
+For MODERATOR / ADMIN / SUPER_ADMIN:
+
+* Can access admin direct chat inbox.
+* Can see list of member conversations.
+* Can open a conversation.
+* Can reply to the selected member.
+* Can delete inappropriate direct chat messages if needed.
+
+Implementation should be simple and stable:
+
+* For MEMBER: show one conversation screen.
+* For ADMIN/MODERATOR/SUPER_ADMIN: show inbox list + selected conversation.
+
+Do not overbuild complex real-time support yet.
+
+==================================================
+F. REAL-TIME / REFRESH STRATEGY
+===============================
+
+Do NOT implement WebSocket now unless the project already has a clean real-time system.
+
+For this phase, use a simple reliable approach:
+
+* Fetch messages from backend.
+* Use polling every 5–10 seconds, or manual refresh, preferably polling.
+* Refetch after send/edit/delete.
+
+Goal:
+Stable chat first.
+Real-time WebSocket can be a future improvement.
+
+==================================================
+G. BACKEND API REQUIREMENTS
+===========================
+
+Create clean JWT-protected chat APIs.
+
+Public chat endpoints:
+
+GET /api/chat/public/messages
+
+* Returns latest public messages.
+* Must require JWT.
+* Should limit results reasonably, for example latest 100 messages.
+
+POST /api/chat/public/messages
+
+* Creates message for authenticated user.
+* Requires content.
+* Trims content.
+* Rejects empty messages.
+
+PATCH /api/chat/public/messages/:id
+
+* Allows sender to edit own message.
+* Rejects editing deleted messages.
+* Does not allow editing another user’s message.
+
+DELETE /api/chat/public/messages/:id
+
+* Soft delete.
+* Sender can delete own message.
+* MODERATOR / ADMIN / SUPER_ADMIN can delete any message.
+
+Admin direct chat endpoints:
+
+GET /api/chat/admin/conversations
+
+* For MODERATOR / ADMIN / SUPER_ADMIN only.
+* Returns member conversation list.
+* Must not be available to MEMBER.
+
+GET /api/chat/admin/messages
+
+* For MEMBER: returns own admin conversation.
+* For admin roles: can use userId query to return selected user conversation.
+
+POST /api/chat/admin/messages
+
+* MEMBER sends to administration.
+* Admin roles can reply to selected member.
+* Validate receiver logic carefully.
+
+PATCH /api/chat/admin/messages/:id
+
+* Sender can edit own message only.
+* Deleted messages cannot be edited.
+
+DELETE /api/chat/admin/messages/:id
+
+* Sender can delete own message.
+* MODERATOR / ADMIN / SUPER_ADMIN can delete any direct chat message.
+
+Security:
+
+* Every endpoint must use authenticated user from JWT.
+* Never trust senderId from the frontend.
+* Never allow MEMBER to read another member’s direct chat.
+* Never allow MEMBER to impersonate admin.
+* Never allow role escalation.
+
+==================================================
+H. OPENAPI / GENERATED CLIENT
+=============================
+
+Update OpenAPI for all chat endpoints.
+
+After updating OpenAPI:
+
+* Regenerate generated client.
+* Fix frontend type errors.
+* Run typecheck.
+
+Do not manually hack generated files.
+
+==================================================
+I. FRONTEND UI REQUIREMENTS
+===========================
+
+All chat pages must be:
+
+* Arabic RTL
+* Mobile-first
+* WhatsApp/Messenger-style layout
+* Clear header
+* Internal message scroll area
+* Composer fixed at bottom
+* Bottom navigation must not cover input
+* Add enough bottom padding
+* Messages from current user aligned differently from other users
+* Other users’ messages show sender name
+* Current user messages show edit/delete controls
+* Admin/moderator delete controls must be visible only when allowed
+* Empty state must be friendly:
+  لا توجد رسائل بعد، ابدأ المحادثة الآن
+
+Avoid:
+
+* Desktop-only layout
+* Messages going behind bottom navigation
+* Input disappearing
+* Page-level scroll causing bad chat behavior
+* Messages appearing at the wrong end
+* Huge blank spaces
+* Overlapping controls
+
+==================================================
+J. CHAT CENTER /chat
+====================
+
+The /chat page must show:
+
+Title:
+المحادثات
+
+Cards:
+
+1. دردشة الأعضاء
+   Description:
+   تواصل مع أعضاء الجمعية في الدردشة العامة.
+   Button:
+   فتح دردشة الأعضاء
+
+2. دردشة مع الإدارة
+   Description:
+   أرسل رسالة مباشرة إلى فريق الإدارة.
+   Button:
+   فتح دردشة الإدارة
+
+For admin roles, the second card can mention:
+صندوق رسائل الأعضاء مع الإدارة
+
+==================================================
+K. NAVIGATION
+=============
+
+Update bottom navigation if needed.
+
+Required nav items should include:
+
+* حسابي / /home
+* الأخبار or placeholder if already present
+* المحادثات / /chat
+* البث or placeholder if already present
+* المزيد / /more
+
+Do not create broken nav links.
+If some modules are not implemented yet, clicking them should show a clean placeholder, not 404.
+
+==================================================
+L. ERROR HANDLING
+=================
+
+Show clear Arabic messages for:
+
+* فشل تحميل الرسائل
+* لا يمكن إرسال رسالة فارغة
+* تعذر إرسال الرسالة
+* تعذر تعديل الرسالة
+* تعذر حذف الرسالة
+* ليس لديك صلاحية لهذا الإجراء
+* الرجاء تسجيل الدخول
+
+Backend must return correct status codes:
+
+* 400 for invalid input
+* 401 unauthenticated
+* 403 unauthorized
+* 404 message not found
+
+==================================================
+M. TESTING REQUIREMENTS
+=======================
+
+Do not report completion until you manually test inside Preview.
+
+Required runtime tests:
+
+General:
+
+1. Login works.
+2. /chat opens.
+3. /chat/public opens.
+4. /chat/admin opens.
+5. Bottom navigation opens /chat correctly.
+6. /home still works.
+7. /more still works.
+8. /developer-info still works.
+
+Public chat:
+
+1. Send message as current user.
+2. Message appears immediately.
+3. Refresh page: message remains.
+4. Edit own message.
+5. Edited label appears.
+6. Delete own message.
+7. Deleted message is hidden or replaced with deleted text.
+8. Empty message is rejected.
+9. Internal scroll works.
+10. Composer remains visible and usable on mobile.
+
+Permissions:
+
+1. MEMBER cannot edit/delete messages of others.
+2. ADMIN/SUPER_ADMIN can delete any public message.
+3. Backend enforces these permissions, not only frontend.
+
+Admin direct chat:
+
+1. MEMBER can send message to administration.
+2. MEMBER sees only own admin conversation.
+3. ADMIN/SUPER_ADMIN sees conversation list.
+4. ADMIN/SUPER_ADMIN can open a member conversation.
+5. ADMIN/SUPER_ADMIN can reply.
+6. MEMBER receives admin reply.
+7. MEMBER cannot access another member’s conversation.
+8. Backend blocks unauthorized access.
+
+Type/build:
+
+* Run typecheck.
+* Confirm backend starts.
+* Confirm frontend renders.
+* Confirm Preview Panel works.
+
+==================================================
+N. REQUIRED REPORT
+==================
+
+After completion, provide:
+
+CHAT MODULE REPORT
+
+1. What was implemented
+2. Files changed
+3. Database/tables used
+4. Backend endpoints added
+5. Frontend routes added
+6. Public chat features:
+
+   * send
+   * list
+   * edit
+   * soft delete
+   * permissions
+7. Admin direct chat features:
+
+   * member conversation
+   * admin inbox
+   * admin reply
+   * privacy rules
+8. Security rules confirmed:
+
+   * senderId from JWT only
+   * MEMBER cannot access other conversations
+   * MEMBER cannot delete others’ messages
+   * admin roles can moderate
+9. UI/UX status:
+
+   * mobile layout
+   * internal scroll
+   * fixed composer
+   * bottom nav compatibility
+10. Runtime test results:
+
+* /chat
+* /chat/public
+* /chat/admin
+* send/edit/delete public message
+* member direct message
+* admin reply
+* refresh persistence
+* permission checks
+
+11. Existing pages regression test:
+
+* /login
+* /register
+* /home
+* /more
+* /developer-info
+
+12. Preview status
+13. Known issues, if any
+14. Confirmation:
+
+* No Firebase
+* No old SGMA APP1 routes
+* No Admin Dashboard started
+* No Articles/News/Broadcast/Ads UI started
+
+Important:
+If any chat feature breaks Preview, stop and fix runtime first.
+Do not hide failures behind typecheck success.

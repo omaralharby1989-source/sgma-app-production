@@ -6,11 +6,14 @@
  * OpenAPI spec version: 0.1.0
  */
 
+export * from './adminConversation';
 export * from './authResponse';
 export * from './avatarResponse';
 export * from './avatarUpload';
+export * from './chatMessage';
 export * from './developerInfo';
 export * from './errorResponse';
+export * from './getAdminChatMessagesParams';
 export * from './healthStatus';
 export * from './loginInput';
 export * from './loginInputRole';
@@ -21,4 +24,6 @@ export * from './memberProfileUpdate';
 export * from './memberStats';
 export * from './messageResponse';
 export * from './passwordUpdate';
+export * from './sendAdminChatMessageInput';
+export * from './sendChatMessageInput';
 export * from './signupInput';

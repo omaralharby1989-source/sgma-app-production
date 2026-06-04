@@ -11,6 +11,9 @@ import Login from "./pages/login";
 import Register from "./pages/register";
 import Home from "./pages/home";
 import More from "./pages/more";
+import Chat from "./pages/chat";
+import ChatPublic from "./pages/chat-public";
+import ChatAdmin from "./pages/chat-admin";
 import DeveloperInfo from "./pages/developer-info";
 import Unauthorized from "./pages/unauthorized";
 import { ProtectedLayout } from "./components/layout/ProtectedLayout";
@@ -74,6 +77,15 @@ function Router() {
       </Route>
       <Route path="/more">
         <ProtectedRoute component={More} />
+      </Route>
+      <Route path="/chat">
+        <ProtectedRoute component={Chat} />
+      </Route>
+      <Route path="/chat/public">
+        <ProtectedRoute component={ChatPublic} />
+      </Route>
+      <Route path="/chat/admin">
+        <ProtectedRoute component={ChatAdmin} />
       </Route>
 
       <Route component={NotFound} />

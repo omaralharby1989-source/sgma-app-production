@@ -27,7 +27,7 @@ export default function More() {
     {
       title: "التطبيقات والخدمات",
       items: [
-        { icon: MessageSquare, label: "المحادثات", comingSoon: true },
+        { icon: MessageSquare, label: "المحادثات", href: "/chat" },
         { icon: Newspaper, label: "الأخبار والمقالات", comingSoon: true },
         { icon: Radio, label: "البث والإعلانات", comingSoon: true },
       ]

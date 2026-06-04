@@ -2,3 +2,4 @@
 - [Signup role security](signup-role-security.md) — role/isDeveloper/isActive/status are server-controlled; never accept them from client update/signup bodies.
 - [SGMA APP2 auth system](sgma-app2-auth.md) — JWT auth setup, bcryptjs requirement, role validation at login.
 - [SGMA APP2 frontend import rules](sgma-app2-frontend-imports.md) — frontend must not import from @workspace/api-zod (server-side only).
+- [Drizzle push has no TTY](drizzle-push-no-tty.md) — ambiguous column changes prompt interactively and stall; drop empty tables via SQL first, then push.

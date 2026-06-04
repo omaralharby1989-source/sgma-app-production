@@ -211,3 +211,190 @@ export const GetDeveloperInfoResponse = zod.object({
 })
 
 
+/**
+ * @summary List recent public chat messages
+ */
+export const GetPublicChatMessagesResponseItem = zod.object({
+  "id": zod.number(),
+  "content": zod.string(),
+  "senderId": zod.number(),
+  "senderName": zod.string(),
+  "senderRole": zod.string(),
+  "senderAvatarUrl": zod.string().nullish(),
+  "isDeleted": zod.boolean(),
+  "isMine": zod.boolean().describe('True when the authenticated user is the sender'),
+  "canModerate": zod.boolean().optional().describe('True when the authenticated user may delete this message'),
+  "editedAt": zod.coerce.date().nullish(),
+  "createdAt": zod.coerce.date()
+})
+export const GetPublicChatMessagesResponse = zod.array(GetPublicChatMessagesResponseItem)
+
+
+/**
+ * @summary Send a public chat message
+ */
+export const sendPublicChatMessageBodyContentMax = 4000;
+
+
+
+export const SendPublicChatMessageBody = zod.object({
+  "content": zod.string().min(1).max(sendPublicChatMessageBodyContentMax)
+})
+
+
+/**
+ * @summary Edit own public chat message
+ */
+export const EditPublicChatMessageParams = zod.object({
+  "id": zod.coerce.number()
+})
+
+export const editPublicChatMessageBodyContentMax = 4000;
+
+
+
+export const EditPublicChatMessageBody = zod.object({
+  "content": zod.string().min(1).max(editPublicChatMessageBodyContentMax)
+})
+
+export const EditPublicChatMessageResponse = zod.object({
+  "id": zod.number(),
+  "content": zod.string(),
+  "senderId": zod.number(),
+  "senderName": zod.string(),
+  "senderRole": zod.string(),
+  "senderAvatarUrl": zod.string().nullish(),
+  "isDeleted": zod.boolean(),
+  "isMine": zod.boolean().describe('True when the authenticated user is the sender'),
+  "canModerate": zod.boolean().optional().describe('True when the authenticated user may delete this message'),
+  "editedAt": zod.coerce.date().nullish(),
+  "createdAt": zod.coerce.date()
+})
+
+
+/**
+ * @summary Soft-delete a public chat message
+ */
+export const DeletePublicChatMessageParams = zod.object({
+  "id": zod.coerce.number()
+})
+
+export const DeletePublicChatMessageResponse = zod.object({
+  "id": zod.number(),
+  "content": zod.string(),
+  "senderId": zod.number(),
+  "senderName": zod.string(),
+  "senderRole": zod.string(),
+  "senderAvatarUrl": zod.string().nullish(),
+  "isDeleted": zod.boolean(),
+  "isMine": zod.boolean().describe('True when the authenticated user is the sender'),
+  "canModerate": zod.boolean().optional().describe('True when the authenticated user may delete this message'),
+  "editedAt": zod.coerce.date().nullish(),
+  "createdAt": zod.coerce.date()
+})
+
+
+/**
+ * @summary List member conversations (staff only)
+ */
+export const GetAdminChatConversationsResponseItem = zod.object({
+  "userId": zod.number(),
+  "fullName": zod.string(),
+  "role": zod.string(),
+  "avatarUrl": zod.string().nullish(),
+  "lastMessage": zod.string().nullish(),
+  "lastMessageAt": zod.coerce.date()
+})
+export const GetAdminChatConversationsResponse = zod.array(GetAdminChatConversationsResponseItem)
+
+
+/**
+ * Members get their own conversation. Staff must pass userId to select a member conversation.
+ * @summary Get an admin direct conversation
+ */
+export const GetAdminChatMessagesQueryParams = zod.object({
+  "userId": zod.coerce.number().optional().describe('Member conversation to load (staff only)')
+})
+
+export const GetAdminChatMessagesResponseItem = zod.object({
+  "id": zod.number(),
+  "content": zod.string(),
+  "senderId": zod.number(),
+  "senderName": zod.string(),
+  "senderRole": zod.string(),
+  "senderAvatarUrl": zod.string().nullish(),
+  "isDeleted": zod.boolean(),
+  "isMine": zod.boolean().describe('True when the authenticated user is the sender'),
+  "canModerate": zod.boolean().optional().describe('True when the authenticated user may delete this message'),
+  "editedAt": zod.coerce.date().nullish(),
+  "createdAt": zod.coerce.date()
+})
+export const GetAdminChatMessagesResponse = zod.array(GetAdminChatMessagesResponseItem)
+
+
+/**
+ * Members message the admin team. Staff must pass recipientId to reply to a member.
+ * @summary Send an admin direct message
+ */
+export const sendAdminChatMessageBodyContentMax = 4000;
+
+
+
+export const SendAdminChatMessageBody = zod.object({
+  "content": zod.string().min(1).max(sendAdminChatMessageBodyContentMax),
+  "recipientId": zod.number().optional().describe('Required for staff replies; ignored for members')
+})
+
+
+/**
+ * @summary Edit own admin direct message
+ */
+export const EditAdminChatMessageParams = zod.object({
+  "id": zod.coerce.number()
+})
+
+export const editAdminChatMessageBodyContentMax = 4000;
+
+
+
+export const EditAdminChatMessageBody = zod.object({
+  "content": zod.string().min(1).max(editAdminChatMessageBodyContentMax)
+})
+
+export const EditAdminChatMessageResponse = zod.object({
+  "id": zod.number(),
+  "content": zod.string(),
+  "senderId": zod.number(),
+  "senderName": zod.string(),
+  "senderRole": zod.string(),
+  "senderAvatarUrl": zod.string().nullish(),
+  "isDeleted": zod.boolean(),
+  "isMine": zod.boolean().describe('True when the authenticated user is the sender'),
+  "canModerate": zod.boolean().optional().describe('True when the authenticated user may delete this message'),
+  "editedAt": zod.coerce.date().nullish(),
+  "createdAt": zod.coerce.date()
+})
+
+
+/**
+ * @summary Soft-delete an admin direct message
+ */
+export const DeleteAdminChatMessageParams = zod.object({
+  "id": zod.coerce.number()
+})
+
+export const DeleteAdminChatMessageResponse = zod.object({
+  "id": zod.number(),
+  "content": zod.string(),
+  "senderId": zod.number(),
+  "senderName": zod.string(),
+  "senderRole": zod.string(),
+  "senderAvatarUrl": zod.string().nullish(),
+  "isDeleted": zod.boolean(),
+  "isMine": zod.boolean().describe('True when the authenticated user is the sender'),
+  "canModerate": zod.boolean().optional().describe('True when the authenticated user may delete this message'),
+  "editedAt": zod.coerce.date().nullish(),
+  "createdAt": zod.coerce.date()
+})
+
+

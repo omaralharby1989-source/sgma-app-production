@@ -56,8 +56,23 @@ Implemented:
 NOT IMPLEMENTED (future phases):
 - Admin dashboard (/admin) — Phase 2
 - Articles/news — Phase 3
-- Chat — Phase 4
 - Broadcasts/ads — Phase 5
+
+## Chat Module Status — COMPLETE
+
+Implemented (polling-based, 7–10s refetch; no WebSockets):
+- `/chat` — center page with two cards (public chat, admin-team chat)
+- `/chat/public` — public members chat room (all authenticated users)
+- `/chat/admin` — member↔admin-team direct chat
+  - Member view: single private thread with the admin team
+  - Staff view (MODERATOR/ADMIN/SUPER_ADMIN): inbox of member conversations + reply
+- Edit own messages; soft-delete (own message, or any message if staff)
+- All endpoints JWT-protected; nav `/chat` enabled
+
+Chat data model:
+- `public_chat_messages` — flat room (senderId, content, isDeleted, editedAt)
+- `admin_direct_chat_messages` — `conversationUserId` (owning member) + `senderId` (author). A message is "from member" when senderId === conversationUserId, else "from admin". Inbox = DISTINCT conversationUserId.
+- Server NEVER trusts client senderId — always uses `req.user.userId`. Staff replies must pass `recipientId`, which must be a non-staff (member) account.
 
 ## Test Accounts
 
