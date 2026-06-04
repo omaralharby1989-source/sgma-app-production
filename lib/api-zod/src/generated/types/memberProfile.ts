@@ -15,8 +15,20 @@ export interface MemberProfile {
   fullName: string;
   role: MemberProfileRole;
   status: MemberProfileStatus;
+  isDeveloper: boolean;
+  isActive: boolean;
   /** @nullable */
   phone?: string | null;
+  /** @nullable */
+  whatsapp?: string | null;
+  /** @nullable */
+  birthDate?: string | null;
+  /** @nullable */
+  address?: string | null;
+  /** @nullable */
+  professionGroup?: string | null;
+  /** @nullable */
+  specialtyText?: string | null;
   /** @nullable */
   bio?: string | null;
   /** @nullable */

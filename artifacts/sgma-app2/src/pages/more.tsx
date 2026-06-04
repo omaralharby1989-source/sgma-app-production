@@ -1,9 +1,8 @@
 import { Link, useLocation } from "wouter";
 import { useGetMemberProfile } from "@workspace/api-client-react";
 import { Card } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Info, LogOut, MessageSquare, Newspaper, Radio, Settings, ChevronLeft } from "lucide-react";
+import { Info, LogOut, MessageSquare, Newspaper, Radio, ChevronLeft } from "lucide-react";
 
 export default function More() {
   const [, setLocation] = useLocation();
@@ -15,13 +14,22 @@ export default function More() {
     setLocation("/login");
   };
 
-  const menuGroups = [
+  type MenuItem = {
+    icon: React.ComponentType<{ className?: string }>;
+    label: string;
+    comingSoon?: boolean;
+    href?: string;
+    onClick?: () => void;
+    destructive?: boolean;
+  };
+
+  const menuGroups: { title: string; items: MenuItem[] }[] = [
     {
       title: "التطبيقات والخدمات",
       items: [
         { icon: MessageSquare, label: "المحادثات", comingSoon: true },
         { icon: Newspaper, label: "الأخبار والمقالات", comingSoon: true },
-        { icon: Radio, label: "البث المباشر", comingSoon: true },
+        { icon: Radio, label: "البث والإعلانات", comingSoon: true },
       ]
     },
     {
@@ -35,8 +43,7 @@ export default function More() {
 
   return (
     <div className="p-4 space-y-6 max-w-lg mx-auto bg-muted/20 min-h-[100dvh]">
-      
-      {/* Header */}
+
       <div className="pt-4 pb-2 px-2">
         <h1 className="text-2xl font-bold">المزيد</h1>
         {isLoading ? (
@@ -85,7 +92,7 @@ export default function More() {
                       </Link>
                     );
                   }
-                  
+
                   if (item.onClick) {
                     return (
                       <button key={i} onClick={item.onClick} className="w-full text-right text-inherit">

@@ -286,6 +286,17 @@ components:
           enum: [MEMBER, MODERATOR, ADMIN, SUPER_ADMIN]
         phone:
           type: ["string", "null"]
+        whatsapp:
+          type: ["string", "null"]
+        birthDate:
+          type: ["string", "null"]
+          description: Date in YYYY-MM-DD format
+        address:
+          type: ["string", "null"]
+        professionGroup:
+          type: ["string", "null"]
+        specialtyText:
+          type: ["string", "null"]
         bio:
           type: ["string", "null"]
 
@@ -313,7 +324,7 @@ components:
 
     MemberProfile:
       type: object
-      required: [id, account, email, fullName, role, status, createdAt]
+      required: [id, account, email, fullName, role, status, isDeveloper, isActive, createdAt]
       properties:
         id:
           type: integer
@@ -329,7 +340,21 @@ components:
         status:
           type: string
           enum: [PENDING, ACTIVE, SUSPENDED]
+        isDeveloper:
+          type: boolean
+        isActive:
+          type: boolean
         phone:
+          type: ["string", "null"]
+        whatsapp:
+          type: ["string", "null"]
+        birthDate:
+          type: ["string", "null"]
+        address:
+          type: ["string", "null"]
+        professionGroup:
+          type: ["string", "null"]
+        specialtyText:
           type: ["string", "null"]
         bio:
           type: ["string", "null"]
@@ -349,6 +374,16 @@ components:
           type: string
           minLength: 2
         phone:
+          type: ["string", "null"]
+        whatsapp:
+          type: ["string", "null"]
+        birthDate:
+          type: ["string", "null"]
+        address:
+          type: ["string", "null"]
+        professionGroup:
+          type: ["string", "null"]
+        specialtyText:
           type: ["string", "null"]
         bio:
           type: ["string", "null"]

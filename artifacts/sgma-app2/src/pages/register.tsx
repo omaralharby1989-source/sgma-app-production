@@ -11,7 +11,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { useToast } from "@/hooks/use-toast";
 import { UserPlus, Loader2 } from "lucide-react";
 
-const signupSchema = z.object({
+const registerSchema = z.object({
   fullName: z.string().min(2, "الاسم الكامل مطلوب (على الأقل حرفين)"),
   account: z.string().min(3, "اسم المستخدم مطلوب (على الأقل 3 أحرف)"),
   email: z.string().email("بريد إلكتروني غير صالح"),
@@ -21,13 +21,13 @@ const signupSchema = z.object({
   bio: z.string().optional(),
 });
 
-export default function Signup() {
+export default function Register() {
   const [, setLocation] = useLocation();
   const { toast } = useToast();
   const signupMutation = useSignup();
 
-  const form = useForm<z.infer<typeof signupSchema>>({
-    resolver: zodResolver(signupSchema),
+  const form = useForm<z.infer<typeof registerSchema>>({
+    resolver: zodResolver(registerSchema),
     defaultValues: {
       fullName: "",
       account: "",
@@ -39,13 +39,13 @@ export default function Signup() {
     },
   });
 
-  const onSubmit = (data: z.infer<typeof signupSchema>) => {
+  const onSubmit = (data: z.infer<typeof registerSchema>) => {
     signupMutation.mutate({ data }, {
       onSuccess: (response) => {
         localStorage.setItem("sgma_auth_token", response.token);
         localStorage.setItem("sgma_auth_user", JSON.stringify(response.user));
         toast({ title: "تم التسجيل بنجاح" });
-        setLocation("/member/profile");
+        setLocation("/home");
       },
       onError: (error: any) => {
         toast({
@@ -76,13 +76,13 @@ export default function Signup() {
       <div className="mt-8 sm:mx-auto sm:w-full sm:max-w-md mb-8">
         <div className="bg-card py-8 px-4 shadow sm:rounded-lg sm:px-10 border border-border">
           <form className="space-y-5" onSubmit={form.handleSubmit(onSubmit)}>
-            
+
             <div className="space-y-2">
               <Label htmlFor="fullName">الاسم الكامل</Label>
-              <Input 
-                id="fullName" 
-                type="text" 
-                {...form.register("fullName")} 
+              <Input
+                id="fullName"
+                type="text"
+                {...form.register("fullName")}
                 disabled={signupMutation.isPending}
               />
               {form.formState.errors.fullName && (
@@ -92,10 +92,10 @@ export default function Signup() {
 
             <div className="space-y-2">
               <Label htmlFor="account">اسم المستخدم</Label>
-              <Input 
-                id="account" 
-                type="text" 
-                {...form.register("account")} 
+              <Input
+                id="account"
+                type="text"
+                {...form.register("account")}
                 disabled={signupMutation.isPending}
                 className="text-left"
                 dir="ltr"
@@ -107,10 +107,10 @@ export default function Signup() {
 
             <div className="space-y-2">
               <Label htmlFor="email">البريد الإلكتروني</Label>
-              <Input 
-                id="email" 
-                type="email" 
-                {...form.register("email")} 
+              <Input
+                id="email"
+                type="email"
+                {...form.register("email")}
                 disabled={signupMutation.isPending}
                 className="text-left"
                 dir="ltr"
@@ -122,10 +122,10 @@ export default function Signup() {
 
             <div className="space-y-2">
               <Label htmlFor="password">كلمة المرور</Label>
-              <Input 
-                id="password" 
-                type="password" 
-                {...form.register("password")} 
+              <Input
+                id="password"
+                type="password"
+                {...form.register("password")}
                 disabled={signupMutation.isPending}
                 className="text-left"
                 dir="ltr"
@@ -137,9 +137,9 @@ export default function Signup() {
 
             <div className="space-y-2">
               <Label htmlFor="role">الصلاحية</Label>
-              <Select 
+              <Select
                 disabled={signupMutation.isPending}
-                value={form.watch("role")} 
+                value={form.watch("role")}
                 onValueChange={(val) => form.setValue("role", val as "MEMBER" | "MODERATOR" | "ADMIN" | "SUPER_ADMIN")}
               >
                 <SelectTrigger>
@@ -156,10 +156,10 @@ export default function Signup() {
 
             <div className="space-y-2">
               <Label htmlFor="phone">رقم الهاتف (اختياري)</Label>
-              <Input 
-                id="phone" 
-                type="tel" 
-                {...form.register("phone")} 
+              <Input
+                id="phone"
+                type="tel"
+                {...form.register("phone")}
                 disabled={signupMutation.isPending}
                 className="text-left"
                 dir="ltr"
@@ -168,9 +168,9 @@ export default function Signup() {
 
             <div className="space-y-2">
               <Label htmlFor="bio">نبذة تعريفية (اختياري)</Label>
-              <Textarea 
-                id="bio" 
-                {...form.register("bio")} 
+              <Textarea
+                id="bio"
+                {...form.register("bio")}
                 disabled={signupMutation.isPending}
                 className="resize-none"
                 rows={3}

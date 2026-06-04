@@ -15,7 +15,14 @@ function formatUser(user: typeof usersTable.$inferSelect) {
     fullName: user.fullName,
     role: user.role,
     status: user.status,
+    isDeveloper: user.isDeveloper,
+    isActive: user.isActive,
     phone: user.phone ?? null,
+    whatsapp: user.whatsapp ?? null,
+    birthDate: user.birthDate ?? null,
+    address: user.address ?? null,
+    professionGroup: user.professionGroup ?? null,
+    specialtyText: user.specialtyText ?? null,
     bio: user.bio ?? null,
     avatarUrl: user.avatarUrl ?? null,
     createdAt: user.createdAt.toISOString(),
@@ -30,7 +37,7 @@ router.post("/auth/signup", async (req, res): Promise<void> => {
     return;
   }
 
-  const { fullName, account, email, password, role, phone, bio } = parsed.data;
+  const { fullName, account, email, password, role, phone, whatsapp, birthDate, address, professionGroup, specialtyText, bio } = parsed.data;
 
   try {
     const existing = await db
@@ -56,6 +63,11 @@ router.post("/auth/signup", async (req, res): Promise<void> => {
         role: role as "MEMBER" | "MODERATOR" | "ADMIN" | "SUPER_ADMIN",
         status: "ACTIVE",
         phone: phone ?? null,
+        whatsapp: whatsapp ?? null,
+        birthDate: birthDate ?? null,
+        address: address ?? null,
+        professionGroup: professionGroup ?? null,
+        specialtyText: specialtyText ?? null,
         bio: bio ?? null,
       })
       .returning();

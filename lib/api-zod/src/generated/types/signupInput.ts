@@ -19,5 +19,18 @@ export interface SignupInput {
   /** @nullable */
   phone?: string | null;
   /** @nullable */
+  whatsapp?: string | null;
+  /**
+     * Date in YYYY-MM-DD format
+     * @nullable
+     */
+  birthDate?: string | null;
+  /** @nullable */
+  address?: string | null;
+  /** @nullable */
+  professionGroup?: string | null;
+  /** @nullable */
+  specialtyText?: string | null;
+  /** @nullable */
   bio?: string | null;
 }

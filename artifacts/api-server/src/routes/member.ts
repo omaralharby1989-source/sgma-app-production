@@ -15,7 +15,14 @@ function formatUser(user: typeof usersTable.$inferSelect) {
     fullName: user.fullName,
     role: user.role,
     status: user.status,
+    isDeveloper: user.isDeveloper,
+    isActive: user.isActive,
     phone: user.phone ?? null,
+    whatsapp: user.whatsapp ?? null,
+    birthDate: user.birthDate ?? null,
+    address: user.address ?? null,
+    professionGroup: user.professionGroup ?? null,
+    specialtyText: user.specialtyText ?? null,
     bio: user.bio ?? null,
     avatarUrl: user.avatarUrl ?? null,
     createdAt: user.createdAt.toISOString(),
@@ -54,6 +61,11 @@ router.patch("/member/profile", requireAuth, async (req, res): Promise<void> => 
     const updates: Partial<typeof usersTable.$inferInsert> = {};
     if (parsed.data.fullName !== undefined) updates.fullName = parsed.data.fullName;
     if (parsed.data.phone !== undefined) updates.phone = parsed.data.phone ?? undefined;
+    if (parsed.data.whatsapp !== undefined) updates.whatsapp = parsed.data.whatsapp ?? undefined;
+    if (parsed.data.birthDate !== undefined) updates.birthDate = parsed.data.birthDate ?? undefined;
+    if (parsed.data.address !== undefined) updates.address = parsed.data.address ?? undefined;
+    if (parsed.data.professionGroup !== undefined) updates.professionGroup = parsed.data.professionGroup ?? undefined;
+    if (parsed.data.specialtyText !== undefined) updates.specialtyText = parsed.data.specialtyText ?? undefined;
     if (parsed.data.bio !== undefined) updates.bio = parsed.data.bio ?? undefined;
 
     const [user] = await db

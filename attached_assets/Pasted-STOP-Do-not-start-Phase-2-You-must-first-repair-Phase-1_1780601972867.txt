@@ -1,0 +1,94 @@
+STOP. Do not start Phase 2.
+
+You must first repair Phase 1 to match the original SGMA APP2 foundation requirements exactly.
+
+Current report shows deviations:
+
+1. Routes are not matching the required Phase 1 route architecture.
+   Required clean routes:
+
+* /
+* /login
+* /register
+* /home
+* /more
+* /developer-info
+* /unauthorized
+* not found route
+
+Do not create unnecessary member-specific routes in Phase 1 unless they are clearly mapped and justified. The required route is /more, not only /member/more.
+
+2. Prisma schema is incomplete.
+   Phase 1 must include models for:
+
+* User
+* Article
+* News
+* PublicChatMessage
+* AdminDirectChatMessage
+* BroadcastMessage
+* Advertisement
+* DeveloperInfo
+
+Even if the UI is not implemented yet, these database models must exist now as Phase 1 foundation.
+
+3. User model is incomplete.
+   It must include:
+
+* id
+* fullName
+* email
+* passwordHash
+* role
+* isDeveloper
+* phone
+* whatsapp
+* birthDate
+* address
+* professionGroup
+* specialtyText
+* isActive
+* createdAt
+* updatedAt
+
+4. Broadcast and Advertisement must not be postponed completely.
+   In Phase 1, implement their Prisma models and document their future UI behavior in docs/PHASE_PLAN.md:
+
+* Broadcast appears at the top of all authenticated pages.
+* Only MODERATOR, ADMIN, SUPER_ADMIN can publish.
+* MEMBER cannot publish.
+* Advertisement appears at the bottom of all authenticated pages.
+* Advertisement must not appear on Login or Register.
+
+5. DeveloperInfo must be a real database model and /developer-info route must work.
+
+6. Add or repair docs/PHASE_PLAN.md with clear phases:
+
+* Phase 1: clean foundation, auth, base routes, DB schema, placeholder pages
+* Future chat plan: Public Chat + Admin Direct Chat, mobile-first internal scroll, edit/delete permissions, WhatsApp/Messenger-style UI
+* Future broadcast plan
+* Future ads plan
+* Future admin/member management plan
+* Future articles/news plan
+
+7. Confirm no Firebase.
+   Search the full codebase and remove any Firebase import/config/reference if found.
+
+8. Confirm no old SGMA APP1 routes or route chaos.
+   Keep routing clean and documented.
+
+Do not add new unrelated features.
+Do not start Phase 2.
+Only repair Phase 1 foundation.
+
+After repair, give a strict report:
+
+* What was fixed
+* Updated Prisma models
+* Existing frontend routes
+* Existing backend APIs
+* Existing docs files
+* Test results
+* Confirmation: no Firebase
+* Confirmation: no old routes
+* Confirmation: Phase 2 not started

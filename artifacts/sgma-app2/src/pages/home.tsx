@@ -1,7 +1,7 @@
 import { useLocation } from "wouter";
 import { useQueryClient } from "@tanstack/react-query";
-import { 
-  useGetMemberProfile, 
+import {
+  useGetMemberProfile,
   useGetMemberStats,
   useUpdateMemberProfile,
   useUpdateMemberPassword,
@@ -13,14 +13,15 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/hooks/use-toast";
-import { LogOut, Camera, Loader2, CalendarDays, Activity, ShieldCheck, Mail, Phone, AtSign, Settings, Key } from "lucide-react";
+import { LogOut, Camera, Loader2, CalendarDays, Activity, Mail, Phone, AtSign, Key } from "lucide-react";
 import { useState, useRef } from "react";
+
 const ROLE_ARABIC: Record<string, string> = {
   MEMBER: "عضو",
   MODERATOR: "مشرف",
@@ -34,7 +35,7 @@ const STATUS_INFO: Record<string, { label: string; color: string }> = {
   SUSPENDED: { label: "موقوف", color: "bg-red-500/10 text-red-700 dark:text-red-400 border-red-500/20" },
 };
 
-export default function Profile() {
+export default function Home() {
   const [, setLocation] = useLocation();
   const { toast } = useToast();
   const queryClient = useQueryClient();
@@ -83,10 +84,10 @@ export default function Profile() {
       setIsEditing(false);
       queryClient.invalidateQueries({ queryKey: getGetMemberProfileQueryKey() });
     } catch (err: any) {
-      toast({ 
-        title: "حدث خطأ", 
+      toast({
+        title: "حدث خطأ",
         description: err?.data?.error || "تعذر تحديث الملف الشخصي",
-        variant: "destructive" 
+        variant: "destructive"
       });
     }
   };
@@ -94,10 +95,10 @@ export default function Profile() {
   const handlePasswordUpdate = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!currentPassword || newPassword.length < 6) {
-      toast({ 
-        title: "خطأ", 
+      toast({
+        title: "خطأ",
         description: "كلمة المرور الجديدة يجب أن تكون 6 أحرف على الأقل",
-        variant: "destructive" 
+        variant: "destructive"
       });
       return;
     }
@@ -113,10 +114,10 @@ export default function Profile() {
       setCurrentPassword("");
       setNewPassword("");
     } catch (err: any) {
-      toast({ 
-        title: "حدث خطأ", 
+      toast({
+        title: "حدث خطأ",
         description: err?.data?.error || "تعذر تغيير كلمة المرور",
-        variant: "destructive" 
+        variant: "destructive"
       });
     }
   };
@@ -136,11 +137,12 @@ export default function Profile() {
         });
         toast({ title: "تم تحديث الصورة الشخصية" });
         queryClient.invalidateQueries({ queryKey: getGetMemberProfileQueryKey() });
-      } catch (err: any) {
-        toast({ 
-          title: "حدث خطأ", 
+        queryClient.invalidateQueries({ queryKey: getGetMemberStatsQueryKey() });
+      } catch {
+        toast({
+          title: "حدث خطأ",
           description: "تعذر رفع الصورة",
-          variant: "destructive" 
+          variant: "destructive"
         });
       }
     };
@@ -163,8 +165,7 @@ export default function Profile() {
 
   return (
     <div className="p-4 space-y-6 max-w-lg mx-auto">
-      
-      {/* Header Profile Card */}
+
       <Card className="overflow-hidden border-none shadow-md bg-gradient-to-br from-card to-muted">
         <CardContent className="p-6 flex flex-col items-center text-center">
           <div className="relative mb-4">
@@ -172,22 +173,22 @@ export default function Profile() {
               <AvatarImage src={profile.avatarUrl || ""} />
               <AvatarFallback className="text-2xl">{profile.fullName.substring(0, 2)}</AvatarFallback>
             </Avatar>
-            <button 
+            <button
               onClick={() => fileInputRef.current?.click()}
               disabled={uploadAvatar.isPending}
               className="absolute bottom-0 right-0 bg-primary text-primary-foreground p-1.5 rounded-full shadow-md hover:bg-primary/90 transition-colors"
             >
               {uploadAvatar.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : <Camera className="h-4 w-4" />}
             </button>
-            <input 
-              type="file" 
-              accept="image/*" 
-              className="hidden" 
-              ref={fileInputRef} 
+            <input
+              type="file"
+              accept="image/*"
+              className="hidden"
+              ref={fileInputRef}
               onChange={handleAvatarUpload}
             />
           </div>
-          
+
           <h2 className="text-xl font-bold">{profile.fullName}</h2>
           <div className="flex items-center gap-2 mt-2">
             <Badge variant="outline" className="font-normal bg-background">
@@ -200,7 +201,6 @@ export default function Profile() {
         </CardContent>
       </Card>
 
-      {/* Stats Quick View */}
       {stats && (
         <div className="grid grid-cols-2 gap-3">
           <Card className="shadow-sm">
@@ -228,13 +228,12 @@ export default function Profile() {
         </div>
       )}
 
-      {/* Main Tabs */}
       <Tabs defaultValue="info" className="w-full">
         <TabsList className="grid w-full grid-cols-2 mb-4">
           <TabsTrigger value="info">المعلومات</TabsTrigger>
           <TabsTrigger value="settings">الإعدادات</TabsTrigger>
         </TabsList>
-        
+
         <TabsContent value="info" className="space-y-4">
           <Card className="shadow-sm">
             <CardHeader className="pb-3 border-b border-border/50">
@@ -317,9 +316,9 @@ export default function Profile() {
               <form onSubmit={handlePasswordUpdate} className="space-y-4">
                 <div className="space-y-2">
                   <Label>كلمة المرور الحالية</Label>
-                  <Input 
-                    type="password" 
-                    value={currentPassword} 
+                  <Input
+                    type="password"
+                    value={currentPassword}
                     onChange={e => setCurrentPassword(e.target.value)}
                     dir="ltr" className="text-left"
                     disabled={updatePassword.isPending}
@@ -327,9 +326,9 @@ export default function Profile() {
                 </div>
                 <div className="space-y-2">
                   <Label>كلمة المرور الجديدة</Label>
-                  <Input 
-                    type="password" 
-                    value={newPassword} 
+                  <Input
+                    type="password"
+                    value={newPassword}
                     onChange={e => setNewPassword(e.target.value)}
                     dir="ltr" className="text-left"
                     disabled={updatePassword.isPending}
@@ -342,7 +341,7 @@ export default function Profile() {
               </form>
             </CardContent>
           </Card>
-          
+
           <Button variant="destructive" className="w-full" onClick={handleLogout}>
             <LogOut className="ml-2 h-4 w-4" />
             تسجيل الخروج

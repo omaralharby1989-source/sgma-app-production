@@ -8,18 +8,17 @@ import { useEffect, useState } from "react";
 import { Loader2 } from "lucide-react";
 
 import Login from "./pages/login";
-import Signup from "./pages/signup";
-import Profile from "./pages/member/profile";
-import More from "./pages/member/more";
+import Register from "./pages/register";
+import Home from "./pages/home";
+import More from "./pages/more";
 import DeveloperInfo from "./pages/developer-info";
+import Unauthorized from "./pages/unauthorized";
 import { ProtectedLayout } from "./components/layout/ProtectedLayout";
 
-// Initialize auth token getter
 setAuthTokenGetter(() => localStorage.getItem("sgma_auth_token"));
 
 const queryClient = new QueryClient();
 
-// Protected Route Wrapper
 function ProtectedRoute({ component: Component }: { component: React.ComponentType }) {
   const [isChecking, setIsChecking] = useState(true);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -52,23 +51,28 @@ function ProtectedRoute({ component: Component }: { component: React.ComponentTy
   );
 }
 
+function RootRedirect() {
+  const [, setLocation] = useLocation();
+  useEffect(() => {
+    const token = localStorage.getItem("sgma_auth_token");
+    setLocation(token ? "/home" : "/login");
+  }, [setLocation]);
+  return null;
+}
+
 function Router() {
   return (
     <Switch>
-      <Route path="/" component={() => {
-        const [, setLocation] = useLocation();
-        useEffect(() => setLocation("/login"), [setLocation]);
-        return null;
-      }} />
+      <Route path="/" component={RootRedirect} />
       <Route path="/login" component={Login} />
-      <Route path="/signup" component={Signup} />
+      <Route path="/register" component={Register} />
       <Route path="/developer-info" component={DeveloperInfo} />
-      
-      {/* Protected Routes */}
-      <Route path="/member/profile">
-        <ProtectedRoute component={Profile} />
+      <Route path="/unauthorized" component={Unauthorized} />
+
+      <Route path="/home">
+        <ProtectedRoute component={Home} />
       </Route>
-      <Route path="/member/more">
+      <Route path="/more">
         <ProtectedRoute component={More} />
       </Route>
 

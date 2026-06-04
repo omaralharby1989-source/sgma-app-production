@@ -5,11 +5,11 @@ export function MobileNav() {
   const [location] = useLocation();
 
   const navItems = [
-    { href: "/member/profile", icon: UserCircle, label: "حسابي" },
-    { href: "/member/chat", icon: MessageSquare, label: "المحادثات", disabled: true },
-    { href: "/member/news", icon: Newspaper, label: "الأخبار", disabled: true },
-    { href: "/member/broadcasts", icon: Radio, label: "البث", disabled: true },
-    { href: "/member/more", icon: Menu, label: "المزيد" },
+    { href: "/home", icon: UserCircle, label: "حسابي" },
+    { href: "/chat", icon: MessageSquare, label: "المحادثات", disabled: true },
+    { href: "/news", icon: Newspaper, label: "الأخبار", disabled: true },
+    { href: "/broadcasts", icon: Radio, label: "البث", disabled: true },
+    { href: "/more", icon: Menu, label: "المزيد" },
   ];
 
   return (
