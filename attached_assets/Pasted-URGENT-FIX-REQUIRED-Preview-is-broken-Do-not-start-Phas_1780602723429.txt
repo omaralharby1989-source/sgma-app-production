@@ -1,0 +1,91 @@
+URGENT FIX REQUIRED — Preview is broken.
+
+Do not start Phase 2.
+Do not add new features.
+
+Manual user test failed:
+
+* Login attempt returns 404.
+* Register/signup attempt also returns 404.
+* Nothing works correctly inside the Preview.
+
+You must repair Phase 1 runtime behavior now.
+
+Required investigation:
+
+1. Check whether frontend API calls are pointing to the correct backend paths.
+   Expected backend paths:
+
+* POST /api/auth/login
+* POST /api/auth/signup
+* GET /api/member/profile
+* GET /api/developer-info
+
+2. Check whether the frontend is calling wrong paths such as:
+
+* /auth/login
+* /login
+* /api/login
+* /api/signup
+* /register
+* /member/profile without /api
+
+If any wrong paths exist, fix them.
+
+3. Check Vite dev server proxy configuration.
+   The frontend must correctly proxy /api requests to the backend server.
+   If Preview uses a single exposed port, make sure API requests are routed correctly.
+
+4. Check backend route mounting.
+   Confirm the backend actually mounts:
+
+* /api/auth
+* /api/member
+* /api/developer-info
+* /api/healthz
+
+5. Check OpenAPI generated client configuration.
+   If the generated frontend client uses a wrong base URL, fix it.
+   The frontend must use the same working API base path used by the Preview environment.
+
+6. Check Browser Console and Network tab.
+   Find the exact 404 URL.
+   Report the exact failed request URL and status code.
+
+7. Check login form.
+   The seeded test account must work:
+
+* account: lordhygm
+* password: 123456
+* role: SUPER_ADMIN
+
+8. Check register form.
+   Creating a new account must work and must not return 404.
+
+9. Check frontend routes after successful login:
+
+* /home must load
+* /more must load
+* /developer-info must load
+
+10. Keep the app open in the Preview Panel and verify manually before reporting completion.
+
+Do not rely only on typecheck.
+Do not report success until actual login and actual registration work inside Preview.
+
+Required final report:
+
+RUNTIME FIX REPORT
+
+* Exact cause of the 404
+* Exact failed URL before fix
+* Files changed
+* Backend route status
+* Frontend API base URL/proxy status
+* Login test result
+* Register test result
+* /home test result
+* /more test result
+* /developer-info test result
+* Preview Panel status
+* Confirmation that Phase 2 was not started

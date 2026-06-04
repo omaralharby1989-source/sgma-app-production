@@ -37,7 +37,7 @@ export default function Login() {
         localStorage.setItem("sgma_auth_token", response.token);
         localStorage.setItem("sgma_auth_user", JSON.stringify(response.user));
         toast({ title: "تم تسجيل الدخول بنجاح" });
-        setLocation("/member/profile");
+        setLocation("/home");
       },
       onError: (error: any) => {
         toast({
@@ -124,7 +124,7 @@ export default function Login() {
           </form>
 
           <div className="mt-6 text-center">
-            <Link href="/signup" className="text-sm font-medium text-primary hover:underline">
+            <Link href="/register" className="text-sm font-medium text-primary hover:underline">
               ليس لديك حساب؟ سجل الآن
             </Link>
           </div>
