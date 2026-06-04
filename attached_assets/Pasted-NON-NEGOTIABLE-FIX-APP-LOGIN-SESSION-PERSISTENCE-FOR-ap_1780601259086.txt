@@ -1,0 +1,223 @@
+NON-NEGOTIABLE FIX — APP LOGIN SESSION PERSISTENCE FOR /appeditprofile
+
+Current confirmed user problem:
+The user cleared mobile browser cache, opened the current external Replit URL, logged in successfully through /appfrontlogin, received the success message:
+تم تسجيل الدخول بنجاح
+
+But when opening /appeditprofile/ after login, the app asks for login again.
+
+This proves the problem is NOT mobile cache.
+The problem is session/auth persistence or a mismatch between /appfrontlogin and /appeditprofile.
+
+Critical rule:
+Do not work on the profile page UI now.
+Do not rebuild profile fields now.
+Do not touch image upload now.
+Do not touch password change UI now.
+First fix the session/auth flow so /appeditprofile/ recognizes the logged-in user.
+
+Scope:
+Fix only:
+- /appfrontlogin session storage after login
+- /appeditprofile auth guard/session reading
+- redirect preservation from /appeditprofile/ to /appfrontlogin and back
+
+Do not modify:
+- chat
+- public chat
+- admin dashboard
+- moderator dashboard
+- articles
+- news
+- Firebase config
+- database schema
+- seed data
+- deployment
+- profile form fields/UI except minimal auth marker if needed
+
+Current expected auth system:
+Use MySQL/JWT session.
+Do NOT use Firebase as source of truth.
+The same session created by /appfrontlogin must be readable by /appeditprofile/.
+
+Required investigation first:
+Inspect and report:
+1. app/(app)/appfrontlogin/page.tsx
+2. src/app/hooks/useAppFrontLogin.ts
+3. src/app/actions/AppFrontLogin.ts
+4. src/app/components/AppFrontLoginView.tsx
+5. app/(app)/appeditprofile/page.tsx
+6. src/app/hooks/useAppEditProfile.ts
+7. src/app/actions/AppEditProfile.ts
+8. src/tools/AppSession.tsx or the real app session store
+9. src/tools/storeFactory.ts if used
+10. any app layout/guard that redirects unauthenticated users
+11. rpc-client auth injection for src.app.actions
+
+Required diagnosis:
+You must answer exactly:
+- Which session store does /appfrontlogin write to?
+- Which session store does /appeditprofile read from?
+- What localStorage key is used?
+- What fields are stored after login?
+  token?
+  user_id?
+  account?
+  role?
+  fullName?
+  status?
+  expires?
+- Does /appeditprofile wait for hydration before redirecting?
+- Does /appeditprofile redirect before localStorage has been restored?
+- Does /appeditprofile use Firebase/AppSession fields like firebase_uid, canAccessApp, currentUser, or hasResolvedAuth?
+- Does /appeditprofile action require a token that /appfrontlogin does not provide?
+- Is there a trailing slash redirect issue between /appeditprofile and /appeditprofile/?
+
+Required fix:
+
+1. /appfrontlogin after successful MySQL login must store a complete app session.
+
+Minimum required stored fields:
+- token / auth_token
+- user_id
+- account
+- role
+- fullName
+- status if available
+- isAuthenticated = true if the store uses it
+- any hydration/session flags required by the store
+
+2. /appeditprofile must read the same session store.
+
+3. /appeditprofile must not redirect to login until session hydration is complete.
+
+Correct behavior:
+- While hydration/loading: show loading state, not redirect.
+- If hydrated and no token/session: redirect to /appfrontlogin?redirect=%2Fappeditprofile%2F
+- If hydrated and token/session exists: load profile.
+
+4. Redirect preservation:
+If user opens /appeditprofile/ unauthenticated:
+- redirect to /appfrontlogin?redirect=%2Fappeditprofile%2F
+
+After login:
+- if redirect param exists and is safe internal path, navigate to it.
+- otherwise navigate to default app page.
+
+5. Trailing slash:
+Both must work:
+- /appeditprofile
+- /appeditprofile/
+
+If Next redirects /appeditprofile to /appeditprofile/, it must not lose redirect target or session.
+
+6. App RPC auth:
+If src.app.actions.AppEditProfile requires an auth token:
+- ensure rpc-client injects the token from the same session store that /appfrontlogin writes.
+- ensure the backend action validates the JWT and does not require Firebase uid.
+
+Do not weaken security.
+Do not bypass auth.
+Do not make /appeditprofile public.
+Do not fake a logged-in state.
+
+Required tests:
+
+Test A — Fresh unauthenticated redirect:
+1. Clear localStorage or use incognito.
+2. Open:
+   /appeditprofile/
+Expected:
+- redirects to:
+  /appfrontlogin?redirect=%2Fappeditprofile%2F
+- no infinite redirect loop
+
+Test B — Login redirect:
+1. From that login page, log in with:
+   account/email: lordhygm
+   password: 123456
+   role: SUPER_ADMIN / مدير عام
+Expected:
+- login success
+- automatically lands on:
+  /appeditprofile/
+- no second login required
+
+Test C — Session persistence:
+1. Refresh /appeditprofile/
+Expected:
+- remains logged in
+- profile loads
+- does not redirect to login
+
+Test D — Direct login:
+1. Open /appfrontlogin directly without redirect.
+2. Log in as lordhygm.
+Expected:
+- lands on default app page
+- then manually opening /appeditprofile/ works without another login
+
+Test E — Email login:
+1. Login with:
+   lordhygm@gmail.com
+   123456
+   SUPER_ADMIN
+Expected:
+- PASS
+- /appeditprofile/ works
+
+Test F — Wrong role:
+1. Login with lordhygm but choose MEMBER.
+Expected:
+- rejected
+- no session stored
+
+Mandatory report:
+
+A. Root cause
+Explain exactly why login succeeded but /appeditprofile/ still requested login.
+
+B. Session store diagnosis
+- /appfrontlogin writes to:
+- /appeditprofile reads from:
+- localStorage key:
+- stored fields before fix:
+- stored fields after fix:
+
+C. Files changed
+List every modified file and explain each change.
+
+D. Redirect behavior
+- unauthenticated /appeditprofile/ redirects with redirect param: yes/no
+- after login returns to /appeditprofile/: yes/no
+- /appeditprofile without slash handled: yes/no
+- no infinite redirect loop: yes/no
+
+E. Session behavior
+- session hydration awaited before redirect: yes/no
+- token stored: yes/no
+- role stored: yes/no
+- user_id stored: yes/no
+- session persists after refresh: yes/no
+- no Firebase dependency: yes/no
+
+F. Login tests
+- lordhygm username login: PASS/FAIL
+- lordhygm email login: PASS/FAIL
+- redirect to /appeditprofile after login: PASS/FAIL
+- refresh stays logged in: PASS/FAIL
+- wrong role rejected: PASS/FAIL
+
+G. Restrictions confirmation
+- profile UI changed: yes/no
+- database schema changed: yes/no
+- Firebase config changed: yes/no
+- chat changed: yes/no
+- articles/news/admin changed: yes/no
+
+H. Remaining issues
+- Critical
+- Medium
+- Low
+
+Do not continue to profile UI fixes until this auth/session issue is fully fixed and verified.

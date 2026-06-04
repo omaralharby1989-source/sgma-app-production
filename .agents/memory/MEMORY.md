@@ -1,0 +1,2 @@
+- [SGMA APP2 auth system](sgma-app2-auth.md) — JWT in localStorage, bcryptjs (not bcrypt), role must match DB role at login
+- [SGMA APP2 frontend imports](sgma-app2-frontend-imports.md) — Frontend must NOT import from @workspace/api-zod; use string literals instead of api-zod enums

@@ -1,10 +1,11 @@
-# [Project name]
+# SGMA APP2
 
-_Replace the heading above with the project's name, and this line with one sentence describing what this app does for users._
+A mobile-first bilingual (Arabic/English) member community web app with JWT auth and role-based access control. Built in controlled phases.
 
 ## Run & Operate
 
 - `pnpm --filter @workspace/api-server run dev` — run the API server (port 5000)
+- `pnpm --filter @workspace/sgma-app2 run dev` — run the frontend (mobile-first React app)
 - `pnpm run typecheck` — full typecheck across all packages
 - `pnpm run build` — typecheck + build all packages
 - `pnpm --filter @workspace/api-spec run codegen` — regenerate API hooks and Zod schemas from the OpenAPI spec
@@ -14,31 +15,70 @@ _Replace the heading above with the project's name, and this line with one sente
 ## Stack
 
 - pnpm workspaces, Node.js 24, TypeScript 5.9
+- Frontend: React + Vite (mobile-first, RTL Arabic support)
 - API: Express 5
 - DB: PostgreSQL + Drizzle ORM
+- Auth: JWT (stored in localStorage, no Firebase)
 - Validation: Zod (`zod/v4`), `drizzle-zod`
 - API codegen: Orval (from OpenAPI spec)
 - Build: esbuild (CJS bundle)
+- Password hashing: bcryptjs
 
 ## Where things live
 
-_Populate as you build — short repo map plus pointers to the source-of-truth file for DB schema, API contracts, theme files, etc._
+- DB schema: `lib/db/src/schema/users.ts`
+- OpenAPI spec: `lib/api-spec/openapi.yaml`
+- Generated hooks: `lib/api-client-react/src/generated/`
+- API routes: `artifacts/api-server/src/routes/`
+- Auth middleware: `artifacts/api-server/src/middlewares/auth.ts`
+- Frontend pages: `artifacts/sgma-app2/src/pages/`
 
 ## Architecture decisions
 
-_Populate as you build — non-obvious choices a reader couldn't infer from the code (3-5 bullets)._
+- JWT stored in localStorage (`sgma_auth_token`, `sgma_auth_user`) — no Firebase, no sessions
+- `setAuthTokenGetter` from `@workspace/api-client-react` auto-injects token on all API calls
+- Role validation happens at login — user must select the correct role to match DB role
+- Password hashing uses bcryptjs (pure JS, no native bindings needed)
+- Base64 data URIs stored directly for avatar images (Phase 1 — no object storage yet)
 
-## Product
+## Phase 1 Status — COMPLETE
 
-_Describe the high-level user-facing capabilities of this app once they exist._
+Implemented:
+- `/login` — JWT login with account/email + role selector
+- `/signup` — member registration
+- `/member/profile` — view/edit profile, change avatar, change password
+- `/member/more` — links, logout, coming-soon placeholders
+- `/developer-info` — public app info page
+- Protected layout with JWT auth guard (waits for hydration before redirect)
+- JWT session persists across page refreshes
+- Redirect preservation from protected pages to login and back
+
+NOT IMPLEMENTED (future phases):
+- Admin dashboard (/admin) — Phase 2
+- Articles/news — Phase 3
+- Chat — Phase 4
+- Broadcasts/ads — Phase 5
+
+## Test Accounts
+
+| account | email | password | role |
+|---------|-------|----------|------|
+| lordhygm | lordhygm@gmail.com | 123456 | SUPER_ADMIN |
 
 ## User preferences
 
-_Populate as you build — explicit user instructions worth remembering across sessions._
+- Phased build — do NOT implement future phases without explicit user approval
+- Arabic/English bilingual (Arabic primary)
+- Mobile-first design
+- No Firebase — JWT only
+- No duplicate auth systems
 
 ## Gotchas
 
-_Populate as you build — sharp edges, "always run X before Y" rules._
+- After any `lib/*` change, run `pnpm run typecheck:libs` before typechecking leaf packages
+- After any OpenAPI spec change, run codegen before using updated types
+- bcrypt → use `bcryptjs` (pure JS) instead of `bcrypt` (requires native build approval in Replit)
+- Frontend must NOT import from `@workspace/api-zod` — that package is server-side only
 
 ## Pointers
 

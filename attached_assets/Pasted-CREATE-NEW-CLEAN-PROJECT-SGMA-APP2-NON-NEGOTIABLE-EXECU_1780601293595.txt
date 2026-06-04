@@ -1,0 +1,129 @@
+CREATE NEW CLEAN PROJECT — SGMA APP2
+
+NON-NEGOTIABLE EXECUTION RULES
+
+This project must be built in controlled phases.
+
+Do NOT claim the whole application is complete unless every phase below is implemented and tested.
+
+Do NOT jump between phases automatically.
+
+Do NOT implement future phases unless explicitly instructed by the user.
+
+Do NOT say "done", "complete", or "fully working" for any feature unless it was tested from the running external URL and the test result is reported.
+
+If a phase is only partially implemented, say clearly:
+PARTIAL — not complete
+
+If a feature is planned but not implemented yet, say clearly:
+NOT IMPLEMENTED YET
+
+If a feature is not tested, say clearly:
+NOT TESTED
+
+The user does not want vague success reports.
+
+You must follow this build order:
+
+PHASE 1 — FOUNDATION ONLY
+Implement only:
+
+* project setup
+* Prisma/MySQL schema
+* JWT auth
+* one login page: /login
+* one signup page: /signup
+* one member profile page: /member/profile
+* one member more page: /member/more
+* developer info page: /developer-info
+* protected layout with placeholders for broadcast and ads
+
+Do NOT implement articles, news, chat, broadcasts, or ads functionality in Phase 1 unless explicitly requested.
+
+PHASE 1 is considered complete only if:
+
+* signup works
+* login works
+* role/status protection works
+* profile loads and saves
+* image upload works
+* password change works
+* /member/more works
+* /developer-info works
+* protected pages use one JWT session
+* no Firebase exists
+* no duplicate auth systems exist
+* external URL testing passes
+
+After Phase 1, STOP and report.
+
+PHASE 2 — ADMIN MEMBERSHIP MANAGEMENT
+Implement only after user approval:
+
+* /admin
+* /admin/approvals
+* /admin/users
+* /admin/roles
+* approve/reject users
+* change role
+* block/suspend/reactivate users
+* audit logs for membership actions
+
+After Phase 2, STOP and report.
+
+PHASE 3 — ARTICLES AND NEWS
+Implement only after user approval:
+
+* member articles
+* moderator article review
+* admin article management
+* member news
+* admin news management
+
+After Phase 3, STOP and report.
+
+PHASE 4 — CHAT SYSTEM
+Implement only after user approval:
+
+* /member/chat public member chat
+* /member/admin-chat private admin chat
+* /admin/chat management
+* moderator/admin delete inappropriate messages
+* edit/copy/delete own messages
+* soft delete
+* reports
+* internal mobile chat scroll
+* input fixed at bottom
+
+After Phase 4, STOP and report.
+
+PHASE 5 — BROADCASTS AND ADVERTISEMENTS
+Implement only after user approval:
+
+* live broadcast messages
+* broadcast top banner
+* advertisement bottom window
+* /admin/broadcasts
+* /admin/ads
+
+After Phase 5, STOP and report.
+
+MANDATORY REPORT AFTER EACH PHASE
+
+For every phase, provide:
+
+A. Phase name
+B. Implemented features
+C. Not implemented features
+D. Files created/changed
+E. Database models/migrations created
+F. Routes created
+G. Auth/session behavior
+H. External URL tested: yes/no
+I. Test results PASS/FAIL
+J. Remaining issues
+K. Exact next recommended phase
+
+Important:
+Do not continue automatically after the report.
+Wait for the user’s next instruction.
