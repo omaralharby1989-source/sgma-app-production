@@ -1,0 +1,182 @@
+APP BRANDING UPDATE WITH PROVIDED SGMA LOGO — SGMA APP
+
+Use the uploaded logo image file as the official app logo.
+
+Uploaded file:
+Sgma.jpeg
+
+Required branding changes:
+
+1. Change app name everywhere from:
+   SGMA APP2
+
+To:
+SGMA APP
+
+Apply this in:
+
+* Browser tab title
+* Meta title
+* OpenGraph/social title if present
+* Login page text
+* Register page text
+* Any visible app branding text
+* Any internal page heading that still says SGMA APP2
+
+2. Logo processing
+
+Use the uploaded SGMA logo image and prepare app-ready assets:
+
+A. Login/Register logo
+
+* Use the provided logo image on the Login page above the main title.
+* Replace the current generic shield/orange placeholder logo.
+* Use the logo without stretching or distortion.
+* Make it visually clean on mobile.
+* Suggested display size:
+
+  * width: 160–220px on mobile
+  * max-width: 260px
+  * height: auto
+* Keep the black background if needed, but make it look intentional and elegant.
+
+B. Register page logo
+
+* Also show the same logo above the Register title.
+* Keep it smaller if needed so the form is not pushed too far down.
+
+C. Favicon / app icon
+Create a square app icon from the uploaded logo:
+
+* 512×512 preferred
+* crop/fit center logo cleanly
+* no distortion
+* use it for favicon/app icon where currently configured
+
+D. Optional asset versions
+Create/store these assets if needed:
+
+* public/sgma-logo.png or src/assets/sgma-logo.png
+* public/favicon.svg or favicon.png replacement
+* public/sgma-app-icon.png 512×512 if needed
+
+Do not use external image URLs.
+Do not depend on the uploaded file path at runtime.
+Copy/process the image into the project assets.
+
+3. Login page design
+
+Current login page has a placeholder icon.
+Replace it with the SGMA logo.
+
+The login header should show:
+
+* Logo
+* Title: SGMA APP
+* Subtitle in Arabic:
+  بوابة أعضاء الجمعية الطبية السورية الألمانية
+
+Keep Arabic RTL and mobile-first design.
+
+4. Register page design
+
+Register header should show:
+
+* Logo
+* Title: إنشاء حساب جديد
+* Subtitle:
+  انضم إلى SGMA APP
+
+Do not make the logo too large.
+The form must remain usable on mobile.
+
+5. Metadata
+
+Update:
+
+* index.html title
+* meta description if needed
+* OpenGraph title/image if present
+* favicon reference
+
+Title:
+SGMA APP
+
+Suggested meta description:
+تطبيق الجمعية الطبية السورية الألمانية SGMA لإدارة العضوية، الأخبار، المقالات، المحادثات، والبث الإداري.
+
+6. Do not break existing modules
+
+Do not touch business logic.
+Do not change database.
+Do not change auth.
+Do not change routes.
+
+Do not break:
+
+* /login
+* /register
+* /home
+* /news
+* /articles
+* /chat
+* /broadcast
+* /admin
+* /board
+* /more
+* /developer-info
+* /privacy-policy
+* /terms
+* /about-sgma
+
+7. Technical requirements
+
+* No Firebase
+* No MySQL migration
+* No unrelated feature changes
+* Keep PostgreSQL + Drizzle
+* Keep Arabic RTL
+* Keep mobile-first layout
+* Do not introduce broken image paths
+* Do not use remote image links
+* Ensure assets work after publish
+
+8. Testing required
+
+After implementation, verify:
+
+1. /login shows the SGMA logo correctly.
+2. /register shows the SGMA logo correctly.
+3. Browser tab title says SGMA APP.
+4. Favicon/app icon updated if possible.
+5. No broken image icons.
+6. Logo is not stretched.
+7. Mobile layout remains clean.
+8. Existing pages still work:
+
+   * /home
+   * /news
+   * /articles
+   * /chat
+   * /admin
+   * /board
+   * /more
+9. Typecheck passes.
+10. Preview works.
+11. External link after republish will use the new branding.
+
+Required report:
+
+APP BRANDING UPDATE REPORT
+
+* Files/assets added
+* Files changed
+* App name replacements completed
+* Login logo status
+* Register logo status
+* Favicon/app icon status
+* Metadata status
+* Preview test results
+* Mobile test results
+* Known issues if any
+* Confirmation no unrelated logic was changed

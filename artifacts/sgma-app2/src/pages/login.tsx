@@ -9,7 +9,8 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
-import { ShieldAlert, Loader2 } from "lucide-react";
+import { Loader2 } from "lucide-react";
+import sgmaLogo from "@/assets/sgma-logo.png";
 
 const loginSchema = z.object({
   identifier: z.string().min(1, "مطلوب"),
@@ -53,15 +54,20 @@ export default function Login() {
     <div className="min-h-[100dvh] flex flex-col justify-center px-6 py-12 bg-background">
       <div className="sm:mx-auto sm:w-full sm:max-w-md">
         <div className="flex justify-center mb-6">
-          <div className="h-16 w-16 bg-primary rounded-2xl flex items-center justify-center shadow-lg">
-            <ShieldAlert className="h-8 w-8 text-primary-foreground" />
+          <div className="rounded-2xl bg-black p-4 shadow-lg ring-1 ring-white/10">
+            <img
+              src={sgmaLogo}
+              alt="شعار الجمعية الطبية السورية الألمانية SGMA"
+              className="h-auto w-[180px] max-w-[260px] select-none"
+              draggable={false}
+            />
           </div>
         </div>
         <h2 className="text-center text-2xl font-bold tracking-tight text-foreground">
-          تسجيل الدخول
+          SGMA APP
         </h2>
         <p className="mt-2 text-center text-sm text-muted-foreground">
-          بوابة الأعضاء الخاصة - SGMA APP2
+          بوابة أعضاء الجمعية الطبية السورية الألمانية
         </p>
       </div>
 

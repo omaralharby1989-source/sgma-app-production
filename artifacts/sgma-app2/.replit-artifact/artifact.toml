@@ -1,6 +1,6 @@
 kind = "web"
 previewPath = "/"
-title = "SGMA APP2"
+title = "SGMA APP"
 version = "1.0.0"
 id = "artifacts/sgma-app2"
 router = "path"

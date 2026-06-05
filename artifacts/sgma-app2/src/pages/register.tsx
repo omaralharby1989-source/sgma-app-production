@@ -10,7 +10,8 @@ import { Textarea } from "@/components/ui/textarea";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
-import { UserPlus, Loader2 } from "lucide-react";
+import { Loader2 } from "lucide-react";
+import sgmaLogo from "@/assets/sgma-logo.png";
 import { PROFESSION_GROUPS } from "@/lib/constants";
 
 const registerSchema = z
@@ -105,15 +106,20 @@ export default function Register() {
     <div className="min-h-[100dvh] flex flex-col justify-center px-6 py-12 bg-background">
       <div className="sm:mx-auto sm:w-full sm:max-w-md">
         <div className="flex justify-center mb-6">
-          <div className="h-16 w-16 bg-primary rounded-2xl flex items-center justify-center shadow-lg">
-            <UserPlus className="h-8 w-8 text-primary-foreground" />
+          <div className="rounded-2xl bg-black p-3 shadow-lg ring-1 ring-white/10">
+            <img
+              src={sgmaLogo}
+              alt="شعار الجمعية الطبية السورية الألمانية SGMA"
+              className="h-auto w-[120px] max-w-[160px] select-none"
+              draggable={false}
+            />
           </div>
         </div>
         <h2 className="text-center text-2xl font-bold tracking-tight text-foreground">
-          تسجيل حساب جديد
+          إنشاء حساب جديد
         </h2>
         <p className="mt-2 text-center text-sm text-muted-foreground">
-          انضم إلى مجتمع SGMA APP2
+          انضم إلى SGMA APP
         </p>
       </div>
 
