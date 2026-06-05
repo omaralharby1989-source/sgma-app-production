@@ -24,6 +24,8 @@ import ArticleDetail from "./pages/article-detail";
 import Broadcast from "./pages/broadcast";
 import DeveloperInfo from "./pages/developer-info";
 import StaticPage from "./pages/static-page";
+import VolunteerDelegations from "./pages/volunteer-delegations";
+import AdminVolunteerDelegations from "./pages/admin/volunteer-delegations";
 import Board from "./pages/board";
 import BoardCurrent from "./pages/board-current";
 import BoardPrevious from "./pages/board-previous";
@@ -149,6 +151,9 @@ function Router() {
       <Route path="/articles/:id">
         <ProtectedRoute component={ArticleDetail} />
       </Route>
+      <Route path="/volunteer-delegations">
+        <ProtectedRoute component={VolunteerDelegations} />
+      </Route>
       <Route path="/board">
         <ProtectedRoute component={Board} />
       </Route>
@@ -180,6 +185,9 @@ function Router() {
       </Route>
       <Route path="/admin/broadcasts">
         <ProtectedRoute component={AdminBroadcasts} allowedRoles={["ADMIN", "SUPER_ADMIN"]} />
+      </Route>
+      <Route path="/admin/volunteer-delegations">
+        <ProtectedRoute component={AdminVolunteerDelegations} staffOnly />
       </Route>
 
       <Route component={NotFound} />

@@ -1,0 +1,584 @@
+SUPER ADMIN ADS MANAGEMENT PREPARATION — SGMA APP
+
+Start this task now.
+
+Scope:
+Prepare the Ads Management system so only SUPER_ADMIN can control advertisements.
+
+Important:
+Do NOT connect Google AdSense yet.
+Do NOT add real Google AdSense script now.
+Do NOT ask for AdSense client id now.
+
+This phase is only to prepare:
+
+1. Ads management page for SUPER_ADMIN only.
+2. Internal custom ads system.
+3. Google AdSense settings placeholder/config system for future activation.
+4. Global ad display component at the bottom of selected pages.
+5. Ability for SUPER_ADMIN to enable/disable ads and control where they appear.
+
+Do not add unrelated features.
+Do not break existing modules:
+
+* login
+* register
+* home/my account
+* news
+* articles
+* chat
+* broadcast
+* admin dashboard
+* board
+* volunteer delegations
+* more page
+* developer-info
+* static pages
+* membership approval flow
+* branding/logo
+
+Current architecture:
+
+* PostgreSQL + Drizzle
+* JWT auth
+* Arabic RTL
+* Mobile-first
+* No Firebase
+* No MySQL migration
+* No old SGMA APP1 routes
+
+==================================================
+A. CORE RULE — SUPER_ADMIN ONLY
+===============================
+
+Advertisement management is allowed ONLY for SUPER_ADMIN.
+
+Access:
+
+* SUPER_ADMIN: full ads control
+* ADMIN: no ads control
+* MODERATOR: no ads control
+* MEMBER: no ads control
+
+Important:
+Do not allow ADMIN to manage ads.
+Do not allow MODERATOR to manage ads.
+Do not allow MEMBER to manage ads.
+
+Backend enforcement is mandatory.
+Frontend hiding is not enough.
+
+==================================================
+B. REQUIRED ROUTE
+=================
+
+Create route:
+
+/admin/ads
+
+Access:
+SUPER_ADMIN only.
+
+If ADMIN / MODERATOR / MEMBER tries to open it:
+
+* redirect to /unauthorized
+  or
+* show unauthorized page
+
+Do not expose this route in /more for non-SUPER_ADMIN users.
+
+==================================================
+C. UPDATE /MORE PAGE
+====================
+
+In /more:
+
+For SUPER_ADMIN only, under the admin/control section, add item:
+
+إدارة الإعلانات
+Route:
+/admin/ads
+
+Do not show this item to:
+
+* ADMIN
+* MODERATOR
+* MEMBER
+
+Keep all existing /more items working.
+
+==================================================
+D. ADS SETTINGS MODEL
+=====================
+
+Create a database table for global ads settings.
+
+Suggested table:
+ad_settings
+
+Fields:
+
+* id
+* adsEnabled boolean default false
+* googleAdsEnabled boolean default false
+* googlePublisherId nullable text
+* googleAdSlotBottom nullable text
+* showOnHome boolean default false
+* showOnNews boolean default true
+* showOnArticles boolean default true
+* showOnBoard boolean default true
+* showOnMore boolean default true
+* showOnStaticPages boolean default true
+* showOnChat boolean default false
+* showOnAdmin boolean default false
+* showOnAuthPages boolean default false
+* updatedById nullable
+* updatedAt
+
+Rules:
+
+* There should be only one settings row.
+* Self-seed default row if missing.
+* Default adsEnabled = false.
+* Default googleAdsEnabled = false.
+* showOnAuthPages must remain false by default.
+
+Important:
+Even if googleAdsEnabled is true later, Google script should NOT be loaded until we explicitly add the real AdSense client ID phase.
+
+==================================================
+E. CUSTOM ADS MODEL
+===================
+
+Create a table for internal/custom SGMA ads.
+
+Suggested table:
+custom_ads
+
+Fields:
+
+* id
+* title
+* content
+* imageUrl nullable
+* linkUrl nullable
+* placement
+* isActive boolean default true
+* startAt nullable
+* endAt nullable
+* createdById
+* updatedById nullable
+* createdAt
+* updatedAt
+
+Placement values:
+
+* GLOBAL_BOTTOM
+* HOME_BOTTOM
+* NEWS_BOTTOM
+* ARTICLES_BOTTOM
+* BOARD_BOTTOM
+* MORE_BOTTOM
+* STATIC_PAGES_BOTTOM
+
+For now, keep it simple:
+
+* Display active ads matching GLOBAL_BOTTOM or the current page placement.
+* Hide expired ads.
+* Show newest first or highest priority if priority exists.
+
+Optional field if easy:
+
+* priority integer default 0
+
+==================================================
+F. ADMIN ADS PAGE — /admin/ads
+==============================
+
+Create a clean SUPER_ADMIN-only management page.
+
+Arabic title:
+إدارة الإعلانات
+
+Sections:
+
+1. إعدادات الإعلانات العامة
+   Fields:
+
+* تفعيل الإعلانات في التطبيق
+  adsEnabled toggle
+
+* تفعيل Google AdSense لاحقاً
+  googleAdsEnabled toggle
+
+* Google Publisher ID
+  googlePublisherId input
+  placeholder:
+  ca-pub-xxxxxxxxxxxxxxxx
+
+* Google Ad Slot أسفل الصفحات
+  googleAdSlotBottom input
+
+Important UI note:
+Show informational warning:
+لن يتم ربط Google AdSense فعلياً الآن. سيتم استخدام هذه القيم لاحقاً عند مرحلة النشر والربط مع Google.
+
+2. أماكن ظهور الإعلانات
+   Checkbox/toggle list:
+
+* الصفحة الرئيسية
+* الأخبار
+* المقالات
+* مجلس الإدارة
+* صفحة المزيد
+* صفحات من نحن / الخصوصية / الشروط
+* الشات
+* لوحة الإدارة
+
+Recommended defaults:
+
+* showOnNews = true
+* showOnArticles = true
+* showOnBoard = true
+* showOnMore = true
+* showOnStaticPages = true
+* showOnHome = false
+* showOnChat = false
+* showOnAdmin = false
+* showOnAuthPages = false
+
+Important:
+Do not show ads on:
+
+* /login
+* /register
+
+Even if accidentally enabled, auth pages should remain protected from ads unless explicitly allowed later.
+
+3. الإعلانات الخاصة
+   Allow SUPER_ADMIN to:
+
+* Create custom ad
+* Edit custom ad
+* Activate/deactivate custom ad
+* Archive/delete custom ad if implemented
+
+Fields:
+
+* العنوان
+* النص
+* رابط الصورة أو رفع صورة من الجهاز if reusable ImageInput exists
+* الرابط عند الضغط
+* مكان الظهور
+* تاريخ البداية optional
+* تاريخ النهاية optional
+* تفعيل الإعلان
+
+Use existing image strategy:
+
+* URL or base64 upload if ImageInput component exists.
+* Validate images like News/Articles if using base64.
+
+==================================================
+G. GLOBAL AD DISPLAY COMPONENT
+==============================
+
+Create component:
+AdBanner
+or
+GlobalAdBanner
+
+Purpose:
+Display ads near the bottom of allowed pages.
+
+Behavior:
+
+* Shows nothing if adsEnabled = false.
+* Shows nothing on /login and /register.
+* Shows nothing if current route is not allowed by settings.
+* Shows active custom ad if available.
+* For Google AdSense:
+
+  * For now, show a placeholder only in development/admin preview if needed.
+  * Do NOT load real Google AdSense script yet.
+  * Do NOT use fake AdSense code.
+  * Do NOT hardcode ca-pub value.
+
+Placement:
+
+* Near bottom of page content.
+* Must not cover bottom navigation.
+* Must not cover chat composer.
+* Must not cover forms.
+* Add safe bottom spacing.
+
+Arabic label:
+إعلان
+
+Custom ad display:
+
+* Title
+* Content
+* Image if exists
+* Link button if linkUrl exists:
+  عرض التفاصيل
+
+If no custom ads and Google ads disabled:
+Show nothing.
+
+If Google ads enabled but not connected:
+Do not show fake ads to users.
+Optionally show only to SUPER_ADMIN inside /admin/ads preview:
+Google AdSense غير مربوط بعد
+
+==================================================
+H. GOOGLE ADSENSE PREPARATION ONLY
+==================================
+
+This phase prepares fields/settings only.
+
+Do NOT:
+
+* Load Google AdSense script in index.html
+* Add adsbygoogle script
+* Add real ad units
+* Use fake client id
+* Use external Google code before user explicitly says the app is ready for publishing and provides AdSense details
+
+Later phase will be:
+GOOGLE ADSENSE FINAL CONNECTION
+
+At that time we will add:
+
+* Official AdSense client id
+* Script in index.html
+* Ad unit code
+* Verification after Google approval
+
+==================================================
+I. BACKEND API REQUIREMENTS
+===========================
+
+Create APIs:
+
+Read public/app ad state:
+GET /api/ads/active
+
+* JWT protected
+* Returns:
+
+  * settings relevant for display
+  * active custom ads for current placement if query is provided
+* Normal users can read active ads only.
+* Do not expose sensitive config unnecessarily.
+
+Query:
+placement optional
+
+Super admin management:
+GET /api/admin/ads/settings
+
+* SUPER_ADMIN only
+
+PATCH /api/admin/ads/settings
+
+* SUPER_ADMIN only
+
+GET /api/admin/ads/custom
+
+* SUPER_ADMIN only
+
+POST /api/admin/ads/custom
+
+* SUPER_ADMIN only
+
+PATCH /api/admin/ads/custom/:id
+
+* SUPER_ADMIN only
+
+DELETE /api/admin/ads/custom/:id
+
+* SUPER_ADMIN only
+* Prefer soft deactivate/archive instead of hard delete if current style prefers that.
+
+Security:
+
+* ADMIN must receive 403
+* MODERATOR must receive 403
+* MEMBER must receive 403
+* Unauthenticated gets 401
+
+==================================================
+J. OPENAPI / GENERATED CLIENT
+=============================
+
+Update OpenAPI.
+
+Schemas:
+
+* AdSettings
+* UpdateAdSettingsInput
+* CustomAd
+* CreateCustomAdInput
+* UpdateCustomAdInput
+* ActiveAdsResponse
+
+Endpoints:
+
+* GET /api/ads/active
+* GET /api/admin/ads/settings
+* PATCH /api/admin/ads/settings
+* GET /api/admin/ads/custom
+* POST /api/admin/ads/custom
+* PATCH /api/admin/ads/custom/{id}
+* DELETE /api/admin/ads/custom/{id}
+
+Then:
+
+* Regenerate client
+* Do not manually edit generated files
+* Run typecheck
+
+==================================================
+K. ROUTE PLACEMENT RULES
+========================
+
+Map routes to placement/settings:
+
+/home:
+HOME_BOTTOM
+
+/news and /news/:id:
+NEWS_BOTTOM
+
+/articles and /articles/:id:
+ARTICLES_BOTTOM
+
+/board and /board/current:
+BOARD_BOTTOM
+
+/more:
+MORE_BOTTOM
+
+/privacy-policy, /terms, /about-sgma, /developer-info:
+STATIC_PAGES_BOTTOM
+
+/chat, /chat/public, /chat/admin:
+CHAT_BOTTOM — default disabled
+
+/admin and all /admin/*
+ADMIN_BOTTOM — default disabled
+
+/login, /register:
+Never show ads in this phase.
+
+Volunteer delegation pages:
+Default disabled for now unless cleanly included later.
+
+==================================================
+L. UI QUALITY REQUIREMENTS
+==========================
+
+Ads must be:
+
+* Arabic RTL
+* Mobile-first
+* Small and non-intrusive
+* Not covering bottom navigation
+* Not covering inputs/composer
+* Not causing horizontal scroll
+* Clearly labeled as إعلان
+* Easy to disable
+
+Admin page must be:
+
+* Clean
+* Simple
+* Not overwhelming
+* SUPER_ADMIN-only
+* Clear warning that Google is prepared but not connected yet
+
+==================================================
+M. TESTING REQUIRED
+===================
+
+Do not report completion until tested in Preview.
+
+Super admin:
+
+1. SUPER_ADMIN sees إدارة الإعلانات in /more.
+2. SUPER_ADMIN can open /admin/ads.
+3. SUPER_ADMIN can toggle adsEnabled.
+4. SUPER_ADMIN can configure display locations.
+5. SUPER_ADMIN can create custom ad.
+6. SUPER_ADMIN can activate/deactivate custom ad.
+7. Custom ad appears on enabled pages.
+8. Custom ad does not appear on disabled pages.
+9. Ads do not appear on login/register.
+
+Other roles:
+
+1. ADMIN does not see إدارة الإعلانات.
+2. ADMIN cannot open /admin/ads.
+3. ADMIN API access returns 403.
+4. MODERATOR same.
+5. MEMBER same.
+
+Regression:
+
+1. /login works.
+2. /register works.
+3. /home works.
+4. /news works.
+5. /articles works.
+6. /chat works.
+7. /broadcast works.
+8. /admin works.
+9. /board works.
+10. /more works.
+11. volunteer delegations still works if already implemented.
+12. Typecheck passes.
+13. Backend starts cleanly.
+14. Preview works.
+15. External link still has no removeChild translation error.
+
+==================================================
+N. REQUIRED REPORT
+==================
+
+After completion, provide:
+
+SUPER ADMIN ADS PREPARATION REPORT
+
+1. What was implemented
+2. Files changed
+3. Database/table changes
+4. Routes added
+5. /more update status
+6. Ads settings behavior
+7. Custom ads behavior
+8. Global ad banner behavior
+9. Google AdSense preparation status
+10. Backend API endpoints
+11. OpenAPI/client generation status
+12. Permission test results:
+
+* SUPER_ADMIN
+* ADMIN
+* MODERATOR
+* MEMBER
+
+13. Runtime test results
+14. Preview status
+15. Known issues, if any
+16. Confirmation:
+
+* Only SUPER_ADMIN controls ads
+* Google AdSense is NOT connected yet
+* No Firebase
+* No MySQL migration
+* No unrelated features added
+* Existing modules still work
+
+Do not connect Google AdSense yet.
+Do not report success until SUPER_ADMIN can control custom ads and visibility settings from /admin/ads.

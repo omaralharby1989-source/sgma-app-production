@@ -223,6 +223,15 @@ Board security/validation (`artifacts/api-server/src/routes/board.ts`):
 
 Codegen note: zod bodies are `CreateBoardMemberBody`/`UpdateBoardMemberBody` (NOT ...Input); react types are `CreateBoardMemberInput`/`UpdateBoardMemberInput`/`BoardMember`; hooks `useGetBoardMembers`/`useGetBoardMember`/`useCreateBoardMember`/`useUpdateBoardMember`/`useDeleteBoardMember`/`getGetBoardMembersQueryKey`.
 
+## Volunteer Delegations Module Status — COMPLETE
+
+Additive module for registering volunteer medical delegations (تسجيل للوفود التطوعية). DB: `volunteer_delegation_requests` + `volunteer_delegation_files` (`lib/db/src/schema/volunteerDelegations.ts`); `status` is plain text (SUBMITTED/IN_REVIEW/ACCEPTED/REJECTED/ARCHIVED), dates stored as text.
+- Member routes (`routes/volunteer-delegations.ts`, JWT): `POST /volunteer-delegations` (ACTIVE-only gate via `req.user.status`), `GET /volunteer-delegations/my`, `GET /volunteer-delegations/files/:fileId` (STRICTLY owner-only — staff use the admin endpoint, no staff bypass).
+- Admin routes (`routes/admin/volunteer-delegations.ts`, staff only via `isStaff`): `GET /admin/volunteer-delegations?status=`, `GET /admin/volunteer-delegations/:id`, `PATCH /admin/volunteer-delegations/:id` (status + adminNotes, sets reviewedById), `GET /admin/volunteer-delegations/files/:fileId`. `files/:fileId` is registered BEFORE `:id` to avoid shadowing.
+- Server NEVER trusts client userId/role: `userId`/`reviewedById` always from `req.user`. Backend validation: required-field trim, email regex, from≤to date range, conditional `equipmentDetails`, PDF-only mime + ≤5MB decoded each + ≤5 files (`lib/pdfValidation.ts`).
+- PDF attachments stored as base64 data URIs; file endpoints return JSON `{id,fileName,mimeType,fileSize,fileData}`, client builds a Blob/anchor download. `app.ts` json+urlencoded limit raised 8mb→40mb to fit up to 5×5MB base64 PDFs.
+- Frontend: `/volunteer-delegations` (member 14-field RTL form + conditional equipment details + PDF upload with client type/size/count checks + "حفظ كـ PDF / طباعة" via window.open print, NOT submit + "طلباتي" list); `/admin/volunteer-delegations` (staffOnly: cards, status filter, badges, PDF download, update dialog). Success msg: "تم تسجيل طلب عملك التطوعي، سيتم التواصل معك لترتيب الإجراءات. شكراً جزيلاً." `/more` links: member "تسجيل للوفود التطوعية", staff "طلبات الوفود التطوعية".
+
 ## Test Accounts
 
 | account | email | password | role |

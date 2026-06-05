@@ -410,6 +410,265 @@ paths:
               schema:
                 $ref: "#/components/schemas/ErrorResponse"
 
+  /volunteer-delegations:
+    post:
+      operationId: createVolunteerDelegation
+      tags: [volunteer-delegations]
+      summary: Submit a volunteer delegation registration (authenticated ACTIVE user)
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateVolunteerDelegationRequestInput"
+      responses:
+        "201":
+          description: Created request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/VolunteerDelegationRequest"
+        "400":
+          description: Invalid input
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "403":
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /volunteer-delegations/my:
+    get:
+      operationId: getMyVolunteerDelegations
+      tags: [volunteer-delegations]
+      summary: List the current user's volunteer delegation requests
+      security:
+        - BearerAuth: []
+      responses:
+        "200":
+          description: The user's requests
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MyVolunteerDelegationsResponse"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /volunteer-delegations/files/{fileId}:
+    get:
+      operationId: getMyVolunteerDelegationFile
+      tags: [volunteer-delegations]
+      summary: Download a file from one of the current user's own requests
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: fileId
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: The file (base64)
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/VolunteerDelegationFileData"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "403":
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "404":
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /admin/volunteer-delegations:
+    get:
+      operationId: getAdminVolunteerDelegations
+      tags: [volunteer-delegations]
+      summary: List all volunteer delegation requests (MODERATOR/ADMIN/SUPER_ADMIN)
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: status
+          in: query
+          required: false
+          schema:
+            $ref: "#/components/schemas/VolunteerDelegationStatus"
+      responses:
+        "200":
+          description: All requests
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AdminVolunteerDelegationsResponse"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "403":
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /admin/volunteer-delegations/{id}:
+    get:
+      operationId: getAdminVolunteerDelegation
+      tags: [volunteer-delegations]
+      summary: Get one volunteer delegation request (MODERATOR/ADMIN/SUPER_ADMIN)
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: The request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AdminVolunteerDelegationRequest"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "403":
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "404":
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+    patch:
+      operationId: updateAdminVolunteerDelegation
+      tags: [volunteer-delegations]
+      summary: Update status / admin notes (MODERATOR/ADMIN/SUPER_ADMIN)
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateVolunteerDelegationStatusInput"
+      responses:
+        "200":
+          description: Updated request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AdminVolunteerDelegationRequest"
+        "400":
+          description: Invalid input
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "403":
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "404":
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /admin/volunteer-delegations/files/{fileId}:
+    get:
+      operationId: getAdminVolunteerDelegationFile
+      tags: [volunteer-delegations]
+      summary: Download a request's PDF file (MODERATOR/ADMIN/SUPER_ADMIN)
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: fileId
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: The file (base64)
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/VolunteerDelegationFileData"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "403":
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "404":
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
   /static-pages/{slug}:
     get:
       operationId: getStaticPage
@@ -2563,6 +2822,279 @@ components:
           type: integer
         isActive:
           type: boolean
+
+    VolunteerDelegationStatus:
+      type: string
+      enum: [SUBMITTED, IN_REVIEW, ACCEPTED, REJECTED, ARCHIVED]
+
+    VolunteerDelegationFileMeta:
+      type: object
+      required: [id, requestId, fileName, mimeType, fileSize]
+      properties:
+        id:
+          type: integer
+        requestId:
+          type: integer
+        fileName:
+          type: string
+        mimeType:
+          type: string
+        fileSize:
+          type: integer
+        createdAt:
+          type: ["string", "null"]
+          format: date-time
+
+    VolunteerDelegationFileData:
+      type: object
+      required: [id, fileName, mimeType, fileData]
+      properties:
+        id:
+          type: integer
+        fileName:
+          type: string
+        mimeType:
+          type: string
+        fileSize:
+          type: integer
+        fileData:
+          type: string
+
+    CreateVolunteerDelegationFileInput:
+      type: object
+      required: [fileName, mimeType, fileData]
+      properties:
+        fileName:
+          type: string
+          minLength: 1
+        mimeType:
+          type: string
+          minLength: 1
+        fileData:
+          type: string
+          minLength: 1
+
+    VolunteerDelegationRequest:
+      type: object
+      required:
+        - id
+        - userId
+        - fullNameArabic
+        - fullNameGerman
+        - phone
+        - whatsapp
+        - email
+        - travelToSyriaFrom
+        - travelToSyriaTo
+        - volunteerWorkDateText
+        - volunteerWorkType
+        - professionGroup
+        - specialtyWithCertificate
+        - needsSyrianPracticeLicenseHelp
+        - hasLogisticsEquipment
+        - status
+        - attachments
+      properties:
+        id:
+          type: integer
+        userId:
+          type: integer
+        fullNameArabic:
+          type: string
+        fullNameGerman:
+          type: string
+        phone:
+          type: string
+        whatsapp:
+          type: string
+        email:
+          type: string
+        travelToSyriaFrom:
+          type: string
+        travelToSyriaTo:
+          type: string
+        volunteerWorkDateText:
+          type: string
+        volunteerWorkType:
+          type: string
+        professionGroup:
+          type: string
+        specialtyWithCertificate:
+          type: string
+        needsSyrianPracticeLicenseHelp:
+          type: boolean
+        hasLogisticsEquipment:
+          type: boolean
+        equipmentDetails:
+          type: ["string", "null"]
+        status:
+          $ref: "#/components/schemas/VolunteerDelegationStatus"
+        adminNotes:
+          type: ["string", "null"]
+        createdAt:
+          type: ["string", "null"]
+          format: date-time
+        updatedAt:
+          type: ["string", "null"]
+          format: date-time
+        attachments:
+          type: array
+          items:
+            $ref: "#/components/schemas/VolunteerDelegationFileMeta"
+
+    AdminVolunteerDelegationRequest:
+      type: object
+      required:
+        - id
+        - userId
+        - fullNameArabic
+        - fullNameGerman
+        - phone
+        - whatsapp
+        - email
+        - travelToSyriaFrom
+        - travelToSyriaTo
+        - volunteerWorkDateText
+        - volunteerWorkType
+        - professionGroup
+        - specialtyWithCertificate
+        - needsSyrianPracticeLicenseHelp
+        - hasLogisticsEquipment
+        - status
+        - attachments
+      properties:
+        id:
+          type: integer
+        userId:
+          type: integer
+        userFullName:
+          type: ["string", "null"]
+        userAccount:
+          type: ["string", "null"]
+        fullNameArabic:
+          type: string
+        fullNameGerman:
+          type: string
+        phone:
+          type: string
+        whatsapp:
+          type: string
+        email:
+          type: string
+        travelToSyriaFrom:
+          type: string
+        travelToSyriaTo:
+          type: string
+        volunteerWorkDateText:
+          type: string
+        volunteerWorkType:
+          type: string
+        professionGroup:
+          type: string
+        specialtyWithCertificate:
+          type: string
+        needsSyrianPracticeLicenseHelp:
+          type: boolean
+        hasLogisticsEquipment:
+          type: boolean
+        equipmentDetails:
+          type: ["string", "null"]
+        status:
+          $ref: "#/components/schemas/VolunteerDelegationStatus"
+        adminNotes:
+          type: ["string", "null"]
+        reviewedById:
+          type: ["integer", "null"]
+        createdAt:
+          type: ["string", "null"]
+          format: date-time
+        updatedAt:
+          type: ["string", "null"]
+          format: date-time
+        attachments:
+          type: array
+          items:
+            $ref: "#/components/schemas/VolunteerDelegationFileMeta"
+
+    MyVolunteerDelegationsResponse:
+      type: array
+      items:
+        $ref: "#/components/schemas/VolunteerDelegationRequest"
+
+    AdminVolunteerDelegationsResponse:
+      type: array
+      items:
+        $ref: "#/components/schemas/AdminVolunteerDelegationRequest"
+
+    CreateVolunteerDelegationRequestInput:
+      type: object
+      required:
+        - fullNameArabic
+        - fullNameGerman
+        - phone
+        - whatsapp
+        - email
+        - travelToSyriaFrom
+        - travelToSyriaTo
+        - volunteerWorkDateText
+        - volunteerWorkType
+        - professionGroup
+        - specialtyWithCertificate
+        - needsSyrianPracticeLicenseHelp
+        - hasLogisticsEquipment
+      properties:
+        fullNameArabic:
+          type: string
+          minLength: 1
+        fullNameGerman:
+          type: string
+          minLength: 1
+        phone:
+          type: string
+          minLength: 1
+        whatsapp:
+          type: string
+          minLength: 1
+        email:
+          type: string
+          minLength: 1
+        travelToSyriaFrom:
+          type: string
+          minLength: 1
+        travelToSyriaTo:
+          type: string
+          minLength: 1
+        volunteerWorkDateText:
+          type: string
+          minLength: 1
+        volunteerWorkType:
+          type: string
+          minLength: 1
+        professionGroup:
+          type: string
+          minLength: 1
+        specialtyWithCertificate:
+          type: string
+          minLength: 1
+        needsSyrianPracticeLicenseHelp:
+          type: boolean
+        hasLogisticsEquipment:
+          type: boolean
+        equipmentDetails:
+          type: ["string", "null"]
+        attachments:
+          type: array
+          items:
+            $ref: "#/components/schemas/CreateVolunteerDelegationFileInput"
+
+    UpdateVolunteerDelegationStatusInput:
+      type: object
+      required: [status]
+      properties:
+        status:
+          $ref: "#/components/schemas/VolunteerDelegationStatus"
+        adminNotes:
+          type: ["string", "null"]
 
     StaticPage:
       type: object

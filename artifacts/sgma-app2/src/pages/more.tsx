@@ -2,7 +2,7 @@ import { Link, useLocation } from "wouter";
 import { useGetMemberProfile } from "@workspace/api-client-react";
 import { Card } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Info, LogOut, MessageSquare, Newspaper, FileText, Radio, ChevronLeft, LayoutDashboard, Users, Building2, ShieldCheck, ScrollText, Landmark } from "lucide-react";
+import { Info, LogOut, MessageSquare, Newspaper, FileText, Radio, ChevronLeft, LayoutDashboard, Users, Building2, ShieldCheck, ScrollText, Landmark, HandHeart } from "lucide-react";
 import { getStoredUser, isStaffRole, isAdminOrSuper } from "@/lib/auth";
 
 export default function More() {
@@ -34,6 +34,7 @@ export default function More() {
         { icon: MessageSquare, label: "المحادثات", href: "/chat" },
         { icon: Newspaper, label: "الأخبار", href: "/news" },
         { icon: FileText, label: "المقالات", href: "/articles" },
+        { icon: HandHeart, label: "تسجيل للوفود التطوعية", href: "/volunteer-delegations" },
       ],
     },
     {
@@ -57,6 +58,7 @@ export default function More() {
                 : []),
               { icon: FileText, label: "إدارة المقالات", href: "/admin/articles" },
               { icon: Newspaper, label: "إدارة الأخبار", href: "/admin/news" },
+              { icon: HandHeart, label: "طلبات الوفود التطوعية", href: "/admin/volunteer-delegations" },
               ...(adminOrSuper
                 ? ([{ icon: Radio, label: "إدارة البث", href: "/admin/broadcasts" }] as MenuItem[])
                 : []),

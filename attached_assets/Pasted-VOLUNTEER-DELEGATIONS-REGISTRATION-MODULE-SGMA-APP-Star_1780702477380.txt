@@ -1,0 +1,700 @@
+VOLUNTEER DELEGATIONS REGISTRATION MODULE — SGMA APP
+
+Start this task now.
+
+Scope:
+Add a new page under /more for members to register for volunteer delegations.
+
+Page name:
+تسجيل للوفود
+
+Purpose:
+Any authenticated member can submit volunteer delegation information.
+MODERATOR / ADMIN / SUPER_ADMIN can view submitted registrations as cards, including uploaded PDF files.
+
+Do not add unrelated features.
+Do not break existing modules:
+
+* login
+* register
+* home/my account
+* news
+* articles
+* chat
+* broadcast
+* admin dashboard
+* board
+* more page
+* developer-info
+* static pages
+* membership approval flow
+* branding/logo
+
+Current architecture:
+
+* PostgreSQL + Drizzle
+* JWT auth
+* Arabic RTL
+* Mobile-first
+* No Firebase
+* No MySQL migration
+* No old SGMA APP1 routes
+
+==================================================
+A. REQUIRED ROUTES
+==================
+
+Create and activate these routes:
+
+1. /volunteer-delegations
+   Member registration form page.
+
+Arabic page title:
+تسجيل للوفود
+
+2. /admin/volunteer-delegations
+   Admin/moderator review page.
+
+Arabic page title:
+طلبات التسجيل للوفود التطوعية
+
+Access:
+
+* /volunteer-delegations:
+  All authenticated ACTIVE users can access.
+
+* /admin/volunteer-delegations:
+  MODERATOR / ADMIN / SUPER_ADMIN only.
+
+MEMBER cannot access /admin/volunteer-delegations.
+
+==================================================
+B. UPDATE /MORE PAGE
+====================
+
+In /more, add a new item:
+
+تسجيل للوفود
+Route:
+/volunteer-delegations
+
+Suggested section:
+التطبيقات والخدمات
+or
+الجمعية والخدمات
+
+Keep all existing /more items working.
+
+For MODERATOR / ADMIN / SUPER_ADMIN, add under management/admin section:
+طلبات الوفود التطوعية
+Route:
+/admin/volunteer-delegations
+
+Do not remove existing sections or links.
+
+==================================================
+C. MEMBER FORM FIELDS
+=====================
+
+Create a clean Arabic RTL mobile-first form.
+
+Fields:
+
+1. الاسم الكامل عربي
+   field:
+   fullNameArabic
+   required
+
+2. الاسم الكامل ألماني
+   field:
+   fullNameGerman
+   required
+
+3. رقم الهاتف
+   field:
+   phone
+   required
+
+4. رقم الواتساب
+   field:
+   whatsapp
+   required
+
+5. عنوان الإيميل
+   field:
+   email
+   required, valid email
+
+6. تاريخ النزول إلى سوريا من
+   field:
+   travelToSyriaFrom
+   required, date
+
+7. تاريخ النزول إلى سوريا إلى
+   field:
+   travelToSyriaTo
+   required, date
+
+8. تاريخ العمل التطوعي
+   field:
+   volunteerWorkDateText
+   required, free text
+
+Label:
+تاريخ العمل التطوعي من / إلى
+
+Placeholder:
+مثال: من 01.08.2026 إلى 15.08.2026 أو حسب التنسيق المتفق عليه
+
+9. نوع العمل التطوعي
+   field:
+   volunteerWorkType
+   required, free text
+
+Placeholder:
+مثال: محاضرات، ورشات عمل، عمليات جراحية، تدريب كوادر، دعم لوجستي...
+
+10. الاختصاص
+    field:
+    professionGroup
+    required, dropdown
+
+Use the same options as registration:
+
+* Arzt / طبيب
+* Pflege / تمريض
+* ATA
+* OTA
+* Physiotherapie / علاج فيزيائي
+* Labor / مخبر
+* Radiologie / أشعة
+* Medizintechnik / هندسة طبية
+* Rettungsdienst / إسعاف
+* Student / طالب
+* Andere / أخرى
+
+11. التخصص مع الشهادة
+    field:
+    specialtyWithCertificate
+    required, free text
+
+Placeholder:
+مثال: Fachweiterbildung Anästhesie und Intensivpflege, Chirurgie, Innere Medizin, Pflegefachkraft...
+
+12. هل تحتاج مساعدة في ترخيص مزاولة المهنة في سوريا؟
+    field:
+    needsSyrianPracticeLicenseHelp
+    required boolean yes/no
+
+Options:
+
+* نعم
+* لا
+
+13. هل لديك معدات لوجستية تأخذها معك أثناء السفر؟
+    field:
+    hasLogisticsEquipment
+    required boolean yes/no
+
+Options:
+
+* نعم
+* لا
+
+If yes:
+Show required free-text field:
+equipmentDetails
+
+Label:
+اذكر المعدات
+
+Placeholder:
+اكتب نوع المعدات، الكمية، وهل تحتاج إلى وثائق أو تنسيق خاص...
+
+If no:
+equipmentDetails optional/empty.
+
+14. رفع ملفات PDF
+    field:
+    attachments
+
+Label:
+إرفاق ملفات PDF
+
+Description:
+يمكنك رفع شهادات، فواتير معدات، أو وثائق داعمة بصيغة PDF.
+
+Requirements:
+
+* PDF files only
+* Allow multiple PDFs
+* Max file size: 5 MB per file
+* Max files: 5
+* Show selected file names
+* Allow removing selected files before submit
+
+Arabic errors:
+
+* يسمح برفع ملفات PDF فقط
+* حجم الملف كبير جداً، الحد الأقصى 5MB
+* لا يمكن رفع أكثر من 5 ملفات
+
+==================================================
+D. SAVE AS PDF BUTTON
+=====================
+
+Add button:
+حفظ المعلومات كملف PDF
+
+Behavior:
+
+* Generate a client-side PDF containing the filled form information.
+* The member can download/save it before or after submission.
+* PDF should be Arabic RTL as much as possible.
+* Include title:
+  استمارة تسجيل للوفود التطوعية
+* Include date of generation.
+* Include all form fields.
+* Do not include uploaded PDF file contents inside the generated PDF; list their filenames only.
+
+Important:
+This button is for the member to keep a personal copy.
+It must not submit the form.
+
+If full Arabic PDF generation is technically difficult, generate a clean printable HTML view and call browser print/save as PDF, but prefer direct PDF download if stable.
+
+Button text:
+حفظ المعلومات كملف PDF
+
+==================================================
+E. SUBMIT BUTTON
+================
+
+Add submit button:
+إرسال
+
+On successful submit:
+Show message:
+تم تسجيل طلب عملك التطوعي، سيتم التواصل معك لترتيب الإجراءات. شكراً جزيلاً.
+
+After submit:
+
+* Optionally redirect to /more or stay on page with success state.
+* Clear form only after successful submit.
+* Uploaded PDF files must be saved with the submission.
+
+==================================================
+F. DATABASE MODEL
+=================
+
+Create table:
+
+volunteer_delegation_requests
+
+Fields:
+
+* id
+* userId
+* fullNameArabic
+* fullNameGerman
+* phone
+* whatsapp
+* email
+* travelToSyriaFrom
+* travelToSyriaTo
+* volunteerWorkDateText
+* volunteerWorkType
+* professionGroup
+* specialtyWithCertificate
+* needsSyrianPracticeLicenseHelp
+* hasLogisticsEquipment
+* equipmentDetails
+* status
+* adminNotes optional
+* createdAt
+* updatedAt
+
+Status values:
+
+* SUBMITTED
+* IN_REVIEW
+* ACCEPTED
+* REJECTED
+* ARCHIVED
+
+Default:
+SUBMITTED
+
+Create separate table for PDF attachments:
+
+volunteer_delegation_files
+
+Fields:
+
+* id
+* requestId
+* fileName
+* mimeType
+* fileSize
+* fileData
+* createdAt
+
+Storage strategy:
+For now, store PDF files as base64 data URLs or base64 text in DB.
+
+Do not add:
+
+* Firebase Storage
+* S3
+* external file services
+
+Security:
+
+* Only PDF files accepted.
+* Max 5MB each.
+* Max 5 files per request.
+
+==================================================
+G. BACKEND API REQUIREMENTS
+===========================
+
+Create APIs:
+
+Member submit:
+POST /api/volunteer-delegations
+
+* JWT protected
+* ACTIVE user only
+* validates required fields
+* validates files
+* userId comes from JWT
+* never trust frontend userId
+* creates request and attached files
+
+Member own requests:
+GET /api/volunteer-delegations/my
+
+* JWT protected
+* returns current user’s submitted requests
+* include attachment metadata, not full file data by default
+
+Admin/moderator list:
+GET /api/admin/volunteer-delegations
+
+* MODERATOR / ADMIN / SUPER_ADMIN only
+* returns submitted requests as cards
+* include user info if useful
+* include attachment metadata
+
+Admin/moderator detail:
+GET /api/admin/volunteer-delegations/:id
+
+* MODERATOR / ADMIN / SUPER_ADMIN only
+* returns full details
+
+Download file:
+GET /api/admin/volunteer-delegations/files/:fileId
+
+* MODERATOR / ADMIN / SUPER_ADMIN only
+* returns/downloads the PDF file
+
+Optional member file access:
+GET /api/volunteer-delegations/files/:fileId
+
+* only owner can download their own file
+
+Update status:
+PATCH /api/admin/volunteer-delegations/:id
+
+* MODERATOR / ADMIN / SUPER_ADMIN only
+* update:
+
+  * status
+  * adminNotes
+
+Allowed statuses:
+
+* SUBMITTED
+* IN_REVIEW
+* ACCEPTED
+* REJECTED
+* ARCHIVED
+
+==================================================
+H. ADMIN / MODERATOR VIEW
+=========================
+
+Create /admin/volunteer-delegations.
+
+Design:
+
+* Arabic RTL
+* Mobile-first
+* Cards, not a dense table
+* Professional review dashboard
+
+Each card shows:
+
+* الاسم الكامل عربي
+* الاسم الكامل ألماني
+* رقم الهاتف
+* الواتساب
+* الإيميل
+* تاريخ النزول إلى سوريا
+* نوع العمل التطوعي
+* الاختصاص
+* التخصص مع الشهادة
+* هل يحتاج مساعدة ترخيص
+* هل لديه معدات
+* تفاصيل المعدات if exists
+* status badge
+* createdAt
+* uploaded PDF file list
+
+Actions:
+
+* View details
+* Download PDF attachment(s)
+* Update status
+* Add admin notes
+
+Status Arabic labels:
+
+* SUBMITTED: تم الإرسال
+* IN_REVIEW: قيد المراجعة
+* ACCEPTED: مقبول
+* REJECTED: مرفوض
+* ARCHIVED: مؤرشف
+
+Filters if easy:
+
+* All
+* Submitted
+* In Review
+* Accepted
+* Rejected
+* Archived
+
+==================================================
+I. MEMBER VIEW / MY REQUESTS
+============================
+
+On /volunteer-delegations, after the form or in a separate section, show:
+طلباتي السابقة
+
+Or create route:
+
+* /volunteer-delegations/my
+
+Minimum required:
+Show a simple list/card of the current user’s previous requests:
+
+* date
+* volunteerWorkType
+* status
+* adminNotes if any
+* attachments metadata
+
+This helps the member know the request was submitted.
+
+==================================================
+J. VALIDATION RULES
+===================
+
+Frontend validation:
+
+* Arabic messages
+* required fields
+* valid email
+* travelToSyriaFrom <= travelToSyriaTo
+* if hasLogisticsEquipment = yes, equipmentDetails required
+* PDF file type and size validation
+
+Backend validation:
+Must repeat all important validation:
+
+* required fields
+* valid email
+* date range
+* enum values
+* PDF mime/type/size/count
+* authenticated user from JWT
+
+Do not rely on frontend validation only.
+
+==================================================
+K. OPENAPI / GENERATED CLIENT
+=============================
+
+Update OpenAPI.
+
+Schemas:
+
+* VolunteerDelegationRequest
+* VolunteerDelegationFile
+* CreateVolunteerDelegationRequestInput
+* VolunteerDelegationRequestsResponse
+* AdminVolunteerDelegationRequest
+* UpdateVolunteerDelegationStatusInput
+* VolunteerDelegationStatus
+
+Endpoints:
+
+* POST /api/volunteer-delegations
+* GET /api/volunteer-delegations/my
+* GET /api/admin/volunteer-delegations
+* GET /api/admin/volunteer-delegations/{id}
+* PATCH /api/admin/volunteer-delegations/{id}
+* GET /api/admin/volunteer-delegations/files/{fileId}
+
+Then:
+
+* Regenerate client
+* Do not edit generated files manually
+* Run typecheck
+
+==================================================
+L. UI QUALITY REQUIREMENTS
+==========================
+
+All pages must be:
+
+* Arabic RTL
+* Mobile-first
+* Clean and official
+* Easy to fill from phone
+* Clear section headings
+* BackButton
+* No horizontal scroll
+* Bottom navigation must not cover buttons
+* File list must not overflow
+* PDF button and Submit button must be visually distinct
+
+Suggested form sections:
+
+1. المعلومات الشخصية
+2. مواعيد السفر والعمل التطوعي
+3. نوع العمل والاختصاص
+4. الترخيص والمعدات
+5. الملفات المرفقة
+6. الحفظ والإرسال
+
+==================================================
+M. PERMISSION RULES
+===================
+
+Member:
+
+* Can submit own request
+* Can view own requests
+* Cannot view other requests
+* Cannot access admin list
+
+MODERATOR:
+
+* Can view all submissions
+* Can download attachments
+* Can update status/admin notes
+
+ADMIN:
+
+* Same as moderator
+
+SUPER_ADMIN:
+
+* Same as admin
+
+Backend enforcement mandatory.
+
+==================================================
+N. TESTING REQUIRED
+===================
+
+Do not report completion until tested in Preview.
+
+Member flow:
+
+1. /more shows تسجيل للوفود.
+2. /volunteer-delegations opens.
+3. Empty form shows validation errors.
+4. Filling all required fields works.
+5. If equipment yes and details empty, blocked.
+6. PDF upload accepts PDF.
+7. Non-PDF rejected.
+8. More than 5 files rejected.
+9. File >5MB rejected.
+10. Save as PDF works.
+11. Submit works.
+12. Success message appears.
+13. Request appears in my requests.
+
+Admin/moderator flow:
+
+1. MODERATOR can open /admin/volunteer-delegations.
+2. ADMIN can open /admin/volunteer-delegations.
+3. SUPER_ADMIN can open /admin/volunteer-delegations.
+4. MEMBER cannot open it.
+5. Cards show all submitted data.
+6. PDF attachments are listed.
+7. Admin/moderator can download PDF.
+8. Status update works.
+9. Admin notes work.
+
+Regression:
+
+1. /login works.
+2. /register works.
+3. /home works.
+4. /news works.
+5. /articles works.
+6. /chat works.
+7. /broadcast works.
+8. /admin works.
+9. /board works.
+10. /more works.
+11. /developer-info works.
+12. /privacy-policy works.
+13. /terms works.
+14. /about-sgma works.
+15. Typecheck passes.
+16. Backend starts cleanly.
+17. Preview works.
+18. External link still has no removeChild translation error.
+
+==================================================
+O. REQUIRED REPORT
+==================
+
+After completion, provide:
+
+VOLUNTEER DELEGATIONS MODULE REPORT
+
+1. What was implemented
+2. Files changed
+3. Database/table changes
+4. Routes added
+5. /more update status
+6. Member form fields
+7. PDF upload/storage behavior
+8. Save-as-PDF behavior
+9. Admin/moderator review page
+10. Backend API endpoints
+11. OpenAPI/client generation status
+12. Permission test results:
+
+* MEMBER
+* MODERATOR
+* ADMIN
+* SUPER_ADMIN
+
+13. Runtime test results
+14. Preview status
+15. Known issues, if any
+16. Confirmation:
+
+* No Firebase
+* No MySQL migration
+* No unrelated features added
+* Existing modules still work
+
+Do not report success until member submission, PDF upload, save-as-PDF, and admin/moderator review cards are verified.

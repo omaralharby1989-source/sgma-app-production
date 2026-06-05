@@ -6,3 +6,4 @@ export * from "./broadcasts";
 export * from "./developerInfo";
 export * from "./staticPages";
 export * from "./boardMembers";
+export * from "./volunteerDelegations";

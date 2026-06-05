@@ -555,6 +555,146 @@ export interface UpdateBoardMemberInput {
   isActive?: boolean;
 }
 
+export type VolunteerDelegationStatus = typeof VolunteerDelegationStatus[keyof typeof VolunteerDelegationStatus];
+
+
+export const VolunteerDelegationStatus = {
+  SUBMITTED: 'SUBMITTED',
+  IN_REVIEW: 'IN_REVIEW',
+  ACCEPTED: 'ACCEPTED',
+  REJECTED: 'REJECTED',
+  ARCHIVED: 'ARCHIVED',
+} as const;
+
+export interface VolunteerDelegationFileMeta {
+  id: number;
+  requestId: number;
+  fileName: string;
+  mimeType: string;
+  fileSize: number;
+  /** @nullable */
+  createdAt?: string | null;
+}
+
+export interface VolunteerDelegationFileData {
+  id: number;
+  fileName: string;
+  mimeType: string;
+  fileSize?: number;
+  fileData: string;
+}
+
+export interface CreateVolunteerDelegationFileInput {
+  /** @minLength 1 */
+  fileName: string;
+  /** @minLength 1 */
+  mimeType: string;
+  /** @minLength 1 */
+  fileData: string;
+}
+
+export interface VolunteerDelegationRequest {
+  id: number;
+  userId: number;
+  fullNameArabic: string;
+  fullNameGerman: string;
+  phone: string;
+  whatsapp: string;
+  email: string;
+  travelToSyriaFrom: string;
+  travelToSyriaTo: string;
+  volunteerWorkDateText: string;
+  volunteerWorkType: string;
+  professionGroup: string;
+  specialtyWithCertificate: string;
+  needsSyrianPracticeLicenseHelp: boolean;
+  hasLogisticsEquipment: boolean;
+  /** @nullable */
+  equipmentDetails?: string | null;
+  status: VolunteerDelegationStatus;
+  /** @nullable */
+  adminNotes?: string | null;
+  /** @nullable */
+  createdAt?: string | null;
+  /** @nullable */
+  updatedAt?: string | null;
+  attachments: VolunteerDelegationFileMeta[];
+}
+
+export interface AdminVolunteerDelegationRequest {
+  id: number;
+  userId: number;
+  /** @nullable */
+  userFullName?: string | null;
+  /** @nullable */
+  userAccount?: string | null;
+  fullNameArabic: string;
+  fullNameGerman: string;
+  phone: string;
+  whatsapp: string;
+  email: string;
+  travelToSyriaFrom: string;
+  travelToSyriaTo: string;
+  volunteerWorkDateText: string;
+  volunteerWorkType: string;
+  professionGroup: string;
+  specialtyWithCertificate: string;
+  needsSyrianPracticeLicenseHelp: boolean;
+  hasLogisticsEquipment: boolean;
+  /** @nullable */
+  equipmentDetails?: string | null;
+  status: VolunteerDelegationStatus;
+  /** @nullable */
+  adminNotes?: string | null;
+  /** @nullable */
+  reviewedById?: number | null;
+  /** @nullable */
+  createdAt?: string | null;
+  /** @nullable */
+  updatedAt?: string | null;
+  attachments: VolunteerDelegationFileMeta[];
+}
+
+export type MyVolunteerDelegationsResponse = VolunteerDelegationRequest[];
+
+export type AdminVolunteerDelegationsResponse = AdminVolunteerDelegationRequest[];
+
+export interface CreateVolunteerDelegationRequestInput {
+  /** @minLength 1 */
+  fullNameArabic: string;
+  /** @minLength 1 */
+  fullNameGerman: string;
+  /** @minLength 1 */
+  phone: string;
+  /** @minLength 1 */
+  whatsapp: string;
+  /** @minLength 1 */
+  email: string;
+  /** @minLength 1 */
+  travelToSyriaFrom: string;
+  /** @minLength 1 */
+  travelToSyriaTo: string;
+  /** @minLength 1 */
+  volunteerWorkDateText: string;
+  /** @minLength 1 */
+  volunteerWorkType: string;
+  /** @minLength 1 */
+  professionGroup: string;
+  /** @minLength 1 */
+  specialtyWithCertificate: string;
+  needsSyrianPracticeLicenseHelp: boolean;
+  hasLogisticsEquipment: boolean;
+  /** @nullable */
+  equipmentDetails?: string | null;
+  attachments?: CreateVolunteerDelegationFileInput[];
+}
+
+export interface UpdateVolunteerDelegationStatusInput {
+  status: VolunteerDelegationStatus;
+  /** @nullable */
+  adminNotes?: string | null;
+}
+
 export interface StaticPage {
   id: number;
   slug: string;
@@ -743,6 +883,10 @@ export interface UpdateBroadcastInput {
 
 export type GetBoardMembersParams = {
 boardType?: BoardType;
+};
+
+export type GetAdminVolunteerDelegationsParams = {
+status?: VolunteerDelegationStatus;
 };
 
 export type GetAdminChatMessagesParams = {

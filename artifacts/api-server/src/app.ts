@@ -26,8 +26,10 @@ app.use(
   }),
 );
 app.use(cors());
-app.use(express.json({ limit: "8mb" }));
-app.use(express.urlencoded({ extended: true, limit: "8mb" }));
+// Limit raised to accommodate volunteer-delegation submissions, which may carry
+// up to 5 base64-encoded PDF attachments (≤5MB each ⇒ ~33MB encoded) in one body.
+app.use(express.json({ limit: "40mb" }));
+app.use(express.urlencoded({ extended: true, limit: "40mb" }));
 
 app.use("/api", router);
 
@@ -35,7 +37,7 @@ app.use("/api", router);
 // instead of the default HTML 413 page (e.g. oversized avatar uploads).
 app.use((err: unknown, _req: Request, res: Response, next: NextFunction) => {
   if (err && typeof err === "object" && (err as { type?: string }).type === "entity.too.large") {
-    res.status(413).json({ error: "حجم البيانات كبير جداً، يرجى اختيار صورة أصغر" });
+    res.status(413).json({ error: "حجم البيانات كبير جداً، يرجى تقليل حجم أو عدد الملفات" });
     return;
   }
   next(err);

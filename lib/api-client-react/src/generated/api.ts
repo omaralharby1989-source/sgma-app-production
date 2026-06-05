@@ -26,6 +26,8 @@ import type {
   AdminUpdateUserInput,
   AdminUserDetail,
   AdminUsersListResponse,
+  AdminVolunteerDelegationRequest,
+  AdminVolunteerDelegationsResponse,
   ArticleDetail,
   ArticleListResponse,
   AuthResponse,
@@ -40,12 +42,14 @@ import type {
   CreateBoardMemberInput,
   CreateBroadcastInput,
   CreateNewsInput,
+  CreateVolunteerDelegationRequestInput,
   DeveloperInfo,
   ErrorResponse,
   GetAdminArticlesParams,
   GetAdminChatMessagesParams,
   GetAdminNewsParams,
   GetAdminUsersParams,
+  GetAdminVolunteerDelegationsParams,
   GetBoardMembersParams,
   HealthStatus,
   LoginInput,
@@ -54,6 +58,7 @@ import type {
   MemberStats,
   MessageResponse,
   MyArticlesResponse,
+  MyVolunteerDelegationsResponse,
   NewsItem,
   NewsListResponse,
   PasswordUpdate,
@@ -68,7 +73,10 @@ import type {
   UpdateBroadcastInput,
   UpdateDeveloperInfoInput,
   UpdateNewsInput,
-  UpdateStaticPageInput
+  UpdateStaticPageInput,
+  UpdateVolunteerDelegationStatusInput,
+  VolunteerDelegationFileData,
+  VolunteerDelegationRequest
 } from './api.schemas';
 
 import { customFetch } from '../custom-fetch';
@@ -1043,6 +1051,541 @@ export const useDeleteBoardMember = <TError = ErrorType<ErrorResponse>,
       > => {
       return useMutation(getDeleteBoardMemberMutationOptions(options));
     }
+
+export const getCreateVolunteerDelegationUrl = () => {
+
+
+
+
+  return `/api/volunteer-delegations`
+}
+
+/**
+ * @summary Submit a volunteer delegation registration (authenticated ACTIVE user)
+ */
+export const createVolunteerDelegation = async (createVolunteerDelegationRequestInput: CreateVolunteerDelegationRequestInput, options?: RequestInit): Promise<VolunteerDelegationRequest> => {
+
+  return customFetch<VolunteerDelegationRequest>(getCreateVolunteerDelegationUrl(),
+  {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(
+      createVolunteerDelegationRequestInput,)
+  }
+);}
+
+
+
+
+export const getCreateVolunteerDelegationMutationOptions = <TError = ErrorType<ErrorResponse>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof createVolunteerDelegation>>, TError,{data: BodyType<CreateVolunteerDelegationRequestInput>}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof createVolunteerDelegation>>, TError,{data: BodyType<CreateVolunteerDelegationRequestInput>}, TContext> => {
+
+const mutationKey = ['createVolunteerDelegation'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof createVolunteerDelegation>>, {data: BodyType<CreateVolunteerDelegationRequestInput>}> = (props) => {
+          const {data} = props ?? {};
+
+          return  createVolunteerDelegation(data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type CreateVolunteerDelegationMutationResult = NonNullable<Awaited<ReturnType<typeof createVolunteerDelegation>>>
+    export type CreateVolunteerDelegationMutationBody = BodyType<CreateVolunteerDelegationRequestInput>
+    export type CreateVolunteerDelegationMutationError = ErrorType<ErrorResponse>
+
+    /**
+ * @summary Submit a volunteer delegation registration (authenticated ACTIVE user)
+ */
+export const useCreateVolunteerDelegation = <TError = ErrorType<ErrorResponse>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof createVolunteerDelegation>>, TError,{data: BodyType<CreateVolunteerDelegationRequestInput>}, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof createVolunteerDelegation>>,
+        TError,
+        {data: BodyType<CreateVolunteerDelegationRequestInput>},
+        TContext
+      > => {
+      return useMutation(getCreateVolunteerDelegationMutationOptions(options));
+    }
+
+export const getGetMyVolunteerDelegationsUrl = () => {
+
+
+
+
+  return `/api/volunteer-delegations/my`
+}
+
+/**
+ * @summary List the current user's volunteer delegation requests
+ */
+export const getMyVolunteerDelegations = async ( options?: RequestInit): Promise<MyVolunteerDelegationsResponse> => {
+
+  return customFetch<MyVolunteerDelegationsResponse>(getGetMyVolunteerDelegationsUrl(),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getGetMyVolunteerDelegationsQueryKey = () => {
+    return [
+    `/api/volunteer-delegations/my`
+    ] as const;
+    }
+
+
+export const getGetMyVolunteerDelegationsQueryOptions = <TData = Awaited<ReturnType<typeof getMyVolunteerDelegations>>, TError = ErrorType<ErrorResponse>>( options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getMyVolunteerDelegations>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetMyVolunteerDelegationsQueryKey();
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getMyVolunteerDelegations>>> = ({ signal }) => getMyVolunteerDelegations({ signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getMyVolunteerDelegations>>, TError, TData> & { queryKey: QueryKey }
+}
+
+export type GetMyVolunteerDelegationsQueryResult = NonNullable<Awaited<ReturnType<typeof getMyVolunteerDelegations>>>
+export type GetMyVolunteerDelegationsQueryError = ErrorType<ErrorResponse>
+
+
+/**
+ * @summary List the current user's volunteer delegation requests
+ */
+
+export function useGetMyVolunteerDelegations<TData = Awaited<ReturnType<typeof getMyVolunteerDelegations>>, TError = ErrorType<ErrorResponse>>(
+  options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getMyVolunteerDelegations>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+
+ ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+
+  const queryOptions = getGetMyVolunteerDelegationsQueryOptions(options)
+
+  const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
+
+  return { ...query, queryKey: queryOptions.queryKey };
+}
+
+
+
+
+
+
+
+export const getGetMyVolunteerDelegationFileUrl = (fileId: number,) => {
+
+
+
+
+  return `/api/volunteer-delegations/files/${fileId}`
+}
+
+/**
+ * @summary Download a file from one of the current user's own requests
+ */
+export const getMyVolunteerDelegationFile = async (fileId: number, options?: RequestInit): Promise<VolunteerDelegationFileData> => {
+
+  return customFetch<VolunteerDelegationFileData>(getGetMyVolunteerDelegationFileUrl(fileId),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getGetMyVolunteerDelegationFileQueryKey = (fileId: number,) => {
+    return [
+    `/api/volunteer-delegations/files/${fileId}`
+    ] as const;
+    }
+
+
+export const getGetMyVolunteerDelegationFileQueryOptions = <TData = Awaited<ReturnType<typeof getMyVolunteerDelegationFile>>, TError = ErrorType<ErrorResponse>>(fileId: number, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getMyVolunteerDelegationFile>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetMyVolunteerDelegationFileQueryKey(fileId);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getMyVolunteerDelegationFile>>> = ({ signal }) => getMyVolunteerDelegationFile(fileId, { signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, enabled: !!(fileId), ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getMyVolunteerDelegationFile>>, TError, TData> & { queryKey: QueryKey }
+}
+
+export type GetMyVolunteerDelegationFileQueryResult = NonNullable<Awaited<ReturnType<typeof getMyVolunteerDelegationFile>>>
+export type GetMyVolunteerDelegationFileQueryError = ErrorType<ErrorResponse>
+
+
+/**
+ * @summary Download a file from one of the current user's own requests
+ */
+
+export function useGetMyVolunteerDelegationFile<TData = Awaited<ReturnType<typeof getMyVolunteerDelegationFile>>, TError = ErrorType<ErrorResponse>>(
+ fileId: number, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getMyVolunteerDelegationFile>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+
+ ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+
+  const queryOptions = getGetMyVolunteerDelegationFileQueryOptions(fileId,options)
+
+  const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
+
+  return { ...query, queryKey: queryOptions.queryKey };
+}
+
+
+
+
+
+
+
+export const getGetAdminVolunteerDelegationsUrl = (params?: GetAdminVolunteerDelegationsParams,) => {
+  const normalizedParams = new URLSearchParams();
+
+  Object.entries(params || {}).forEach(([key, value]) => {
+
+    if (value !== undefined) {
+      normalizedParams.append(key, value === null ? 'null' : value.toString())
+    }
+  });
+
+  const stringifiedParams = normalizedParams.toString();
+
+  return stringifiedParams.length > 0 ? `/api/admin/volunteer-delegations?${stringifiedParams}` : `/api/admin/volunteer-delegations`
+}
+
+/**
+ * @summary List all volunteer delegation requests (MODERATOR/ADMIN/SUPER_ADMIN)
+ */
+export const getAdminVolunteerDelegations = async (params?: GetAdminVolunteerDelegationsParams, options?: RequestInit): Promise<AdminVolunteerDelegationsResponse> => {
+
+  return customFetch<AdminVolunteerDelegationsResponse>(getGetAdminVolunteerDelegationsUrl(params),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getGetAdminVolunteerDelegationsQueryKey = (params?: GetAdminVolunteerDelegationsParams,) => {
+    return [
+    `/api/admin/volunteer-delegations`, ...(params ? [params] : [])
+    ] as const;
+    }
+
+
+export const getGetAdminVolunteerDelegationsQueryOptions = <TData = Awaited<ReturnType<typeof getAdminVolunteerDelegations>>, TError = ErrorType<ErrorResponse>>(params?: GetAdminVolunteerDelegationsParams, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getAdminVolunteerDelegations>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetAdminVolunteerDelegationsQueryKey(params);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getAdminVolunteerDelegations>>> = ({ signal }) => getAdminVolunteerDelegations(params, { signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getAdminVolunteerDelegations>>, TError, TData> & { queryKey: QueryKey }
+}
+
+export type GetAdminVolunteerDelegationsQueryResult = NonNullable<Awaited<ReturnType<typeof getAdminVolunteerDelegations>>>
+export type GetAdminVolunteerDelegationsQueryError = ErrorType<ErrorResponse>
+
+
+/**
+ * @summary List all volunteer delegation requests (MODERATOR/ADMIN/SUPER_ADMIN)
+ */
+
+export function useGetAdminVolunteerDelegations<TData = Awaited<ReturnType<typeof getAdminVolunteerDelegations>>, TError = ErrorType<ErrorResponse>>(
+ params?: GetAdminVolunteerDelegationsParams, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getAdminVolunteerDelegations>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+
+ ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+
+  const queryOptions = getGetAdminVolunteerDelegationsQueryOptions(params,options)
+
+  const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
+
+  return { ...query, queryKey: queryOptions.queryKey };
+}
+
+
+
+
+
+
+
+export const getGetAdminVolunteerDelegationUrl = (id: number,) => {
+
+
+
+
+  return `/api/admin/volunteer-delegations/${id}`
+}
+
+/**
+ * @summary Get one volunteer delegation request (MODERATOR/ADMIN/SUPER_ADMIN)
+ */
+export const getAdminVolunteerDelegation = async (id: number, options?: RequestInit): Promise<AdminVolunteerDelegationRequest> => {
+
+  return customFetch<AdminVolunteerDelegationRequest>(getGetAdminVolunteerDelegationUrl(id),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getGetAdminVolunteerDelegationQueryKey = (id: number,) => {
+    return [
+    `/api/admin/volunteer-delegations/${id}`
+    ] as const;
+    }
+
+
+export const getGetAdminVolunteerDelegationQueryOptions = <TData = Awaited<ReturnType<typeof getAdminVolunteerDelegation>>, TError = ErrorType<ErrorResponse>>(id: number, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getAdminVolunteerDelegation>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetAdminVolunteerDelegationQueryKey(id);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getAdminVolunteerDelegation>>> = ({ signal }) => getAdminVolunteerDelegation(id, { signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, enabled: !!(id), ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getAdminVolunteerDelegation>>, TError, TData> & { queryKey: QueryKey }
+}
+
+export type GetAdminVolunteerDelegationQueryResult = NonNullable<Awaited<ReturnType<typeof getAdminVolunteerDelegation>>>
+export type GetAdminVolunteerDelegationQueryError = ErrorType<ErrorResponse>
+
+
+/**
+ * @summary Get one volunteer delegation request (MODERATOR/ADMIN/SUPER_ADMIN)
+ */
+
+export function useGetAdminVolunteerDelegation<TData = Awaited<ReturnType<typeof getAdminVolunteerDelegation>>, TError = ErrorType<ErrorResponse>>(
+ id: number, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getAdminVolunteerDelegation>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+
+ ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+
+  const queryOptions = getGetAdminVolunteerDelegationQueryOptions(id,options)
+
+  const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
+
+  return { ...query, queryKey: queryOptions.queryKey };
+}
+
+
+
+
+
+
+
+export const getUpdateAdminVolunteerDelegationUrl = (id: number,) => {
+
+
+
+
+  return `/api/admin/volunteer-delegations/${id}`
+}
+
+/**
+ * @summary Update status / admin notes (MODERATOR/ADMIN/SUPER_ADMIN)
+ */
+export const updateAdminVolunteerDelegation = async (id: number,
+    updateVolunteerDelegationStatusInput: UpdateVolunteerDelegationStatusInput, options?: RequestInit): Promise<AdminVolunteerDelegationRequest> => {
+
+  return customFetch<AdminVolunteerDelegationRequest>(getUpdateAdminVolunteerDelegationUrl(id),
+  {
+    ...options,
+    method: 'PATCH',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(
+      updateVolunteerDelegationStatusInput,)
+  }
+);}
+
+
+
+
+export const getUpdateAdminVolunteerDelegationMutationOptions = <TError = ErrorType<ErrorResponse>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof updateAdminVolunteerDelegation>>, TError,{id: number;data: BodyType<UpdateVolunteerDelegationStatusInput>}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof updateAdminVolunteerDelegation>>, TError,{id: number;data: BodyType<UpdateVolunteerDelegationStatusInput>}, TContext> => {
+
+const mutationKey = ['updateAdminVolunteerDelegation'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof updateAdminVolunteerDelegation>>, {id: number;data: BodyType<UpdateVolunteerDelegationStatusInput>}> = (props) => {
+          const {id,data} = props ?? {};
+
+          return  updateAdminVolunteerDelegation(id,data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type UpdateAdminVolunteerDelegationMutationResult = NonNullable<Awaited<ReturnType<typeof updateAdminVolunteerDelegation>>>
+    export type UpdateAdminVolunteerDelegationMutationBody = BodyType<UpdateVolunteerDelegationStatusInput>
+    export type UpdateAdminVolunteerDelegationMutationError = ErrorType<ErrorResponse>
+
+    /**
+ * @summary Update status / admin notes (MODERATOR/ADMIN/SUPER_ADMIN)
+ */
+export const useUpdateAdminVolunteerDelegation = <TError = ErrorType<ErrorResponse>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof updateAdminVolunteerDelegation>>, TError,{id: number;data: BodyType<UpdateVolunteerDelegationStatusInput>}, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof updateAdminVolunteerDelegation>>,
+        TError,
+        {id: number;data: BodyType<UpdateVolunteerDelegationStatusInput>},
+        TContext
+      > => {
+      return useMutation(getUpdateAdminVolunteerDelegationMutationOptions(options));
+    }
+
+export const getGetAdminVolunteerDelegationFileUrl = (fileId: number,) => {
+
+
+
+
+  return `/api/admin/volunteer-delegations/files/${fileId}`
+}
+
+/**
+ * @summary Download a request's PDF file (MODERATOR/ADMIN/SUPER_ADMIN)
+ */
+export const getAdminVolunteerDelegationFile = async (fileId: number, options?: RequestInit): Promise<VolunteerDelegationFileData> => {
+
+  return customFetch<VolunteerDelegationFileData>(getGetAdminVolunteerDelegationFileUrl(fileId),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getGetAdminVolunteerDelegationFileQueryKey = (fileId: number,) => {
+    return [
+    `/api/admin/volunteer-delegations/files/${fileId}`
+    ] as const;
+    }
+
+
+export const getGetAdminVolunteerDelegationFileQueryOptions = <TData = Awaited<ReturnType<typeof getAdminVolunteerDelegationFile>>, TError = ErrorType<ErrorResponse>>(fileId: number, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getAdminVolunteerDelegationFile>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetAdminVolunteerDelegationFileQueryKey(fileId);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getAdminVolunteerDelegationFile>>> = ({ signal }) => getAdminVolunteerDelegationFile(fileId, { signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, enabled: !!(fileId), ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getAdminVolunteerDelegationFile>>, TError, TData> & { queryKey: QueryKey }
+}
+
+export type GetAdminVolunteerDelegationFileQueryResult = NonNullable<Awaited<ReturnType<typeof getAdminVolunteerDelegationFile>>>
+export type GetAdminVolunteerDelegationFileQueryError = ErrorType<ErrorResponse>
+
+
+/**
+ * @summary Download a request's PDF file (MODERATOR/ADMIN/SUPER_ADMIN)
+ */
+
+export function useGetAdminVolunteerDelegationFile<TData = Awaited<ReturnType<typeof getAdminVolunteerDelegationFile>>, TError = ErrorType<ErrorResponse>>(
+ fileId: number, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getAdminVolunteerDelegationFile>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+
+ ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+
+  const queryOptions = getGetAdminVolunteerDelegationFileQueryOptions(fileId,options)
+
+  const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
+
+  return { ...query, queryKey: queryOptions.queryKey };
+}
+
+
+
+
+
+
 
 export const getGetStaticPageUrl = (slug: string,) => {
 

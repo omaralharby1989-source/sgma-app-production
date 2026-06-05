@@ -335,6 +335,248 @@ export const DeleteBoardMemberResponse = zod.object({
 
 
 /**
+ * @summary Submit a volunteer delegation registration (authenticated ACTIVE user)
+ */
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+export const CreateVolunteerDelegationBody = zod.object({
+  "fullNameArabic": zod.string().min(1),
+  "fullNameGerman": zod.string().min(1),
+  "phone": zod.string().min(1),
+  "whatsapp": zod.string().min(1),
+  "email": zod.string().min(1),
+  "travelToSyriaFrom": zod.string().min(1),
+  "travelToSyriaTo": zod.string().min(1),
+  "volunteerWorkDateText": zod.string().min(1),
+  "volunteerWorkType": zod.string().min(1),
+  "professionGroup": zod.string().min(1),
+  "specialtyWithCertificate": zod.string().min(1),
+  "needsSyrianPracticeLicenseHelp": zod.boolean(),
+  "hasLogisticsEquipment": zod.boolean(),
+  "equipmentDetails": zod.string().nullish(),
+  "attachments": zod.array(zod.object({
+  "fileName": zod.string().min(1),
+  "mimeType": zod.string().min(1),
+  "fileData": zod.string().min(1)
+})).optional()
+})
+
+
+/**
+ * @summary List the current user's volunteer delegation requests
+ */
+export const GetMyVolunteerDelegationsResponseItem = zod.object({
+  "id": zod.number(),
+  "userId": zod.number(),
+  "fullNameArabic": zod.string(),
+  "fullNameGerman": zod.string(),
+  "phone": zod.string(),
+  "whatsapp": zod.string(),
+  "email": zod.string(),
+  "travelToSyriaFrom": zod.string(),
+  "travelToSyriaTo": zod.string(),
+  "volunteerWorkDateText": zod.string(),
+  "volunteerWorkType": zod.string(),
+  "professionGroup": zod.string(),
+  "specialtyWithCertificate": zod.string(),
+  "needsSyrianPracticeLicenseHelp": zod.boolean(),
+  "hasLogisticsEquipment": zod.boolean(),
+  "equipmentDetails": zod.string().nullish(),
+  "status": zod.enum(['SUBMITTED', 'IN_REVIEW', 'ACCEPTED', 'REJECTED', 'ARCHIVED']),
+  "adminNotes": zod.string().nullish(),
+  "createdAt": zod.coerce.date().nullish(),
+  "updatedAt": zod.coerce.date().nullish(),
+  "attachments": zod.array(zod.object({
+  "id": zod.number(),
+  "requestId": zod.number(),
+  "fileName": zod.string(),
+  "mimeType": zod.string(),
+  "fileSize": zod.number(),
+  "createdAt": zod.coerce.date().nullish()
+}))
+})
+export const GetMyVolunteerDelegationsResponse = zod.array(GetMyVolunteerDelegationsResponseItem)
+
+
+/**
+ * @summary Download a file from one of the current user's own requests
+ */
+export const GetMyVolunteerDelegationFileParams = zod.object({
+  "fileId": zod.coerce.number()
+})
+
+export const GetMyVolunteerDelegationFileResponse = zod.object({
+  "id": zod.number(),
+  "fileName": zod.string(),
+  "mimeType": zod.string(),
+  "fileSize": zod.number().optional(),
+  "fileData": zod.string()
+})
+
+
+/**
+ * @summary List all volunteer delegation requests (MODERATOR/ADMIN/SUPER_ADMIN)
+ */
+export const GetAdminVolunteerDelegationsQueryParams = zod.object({
+  "status": zod.enum(['SUBMITTED', 'IN_REVIEW', 'ACCEPTED', 'REJECTED', 'ARCHIVED']).optional()
+})
+
+export const GetAdminVolunteerDelegationsResponseItem = zod.object({
+  "id": zod.number(),
+  "userId": zod.number(),
+  "userFullName": zod.string().nullish(),
+  "userAccount": zod.string().nullish(),
+  "fullNameArabic": zod.string(),
+  "fullNameGerman": zod.string(),
+  "phone": zod.string(),
+  "whatsapp": zod.string(),
+  "email": zod.string(),
+  "travelToSyriaFrom": zod.string(),
+  "travelToSyriaTo": zod.string(),
+  "volunteerWorkDateText": zod.string(),
+  "volunteerWorkType": zod.string(),
+  "professionGroup": zod.string(),
+  "specialtyWithCertificate": zod.string(),
+  "needsSyrianPracticeLicenseHelp": zod.boolean(),
+  "hasLogisticsEquipment": zod.boolean(),
+  "equipmentDetails": zod.string().nullish(),
+  "status": zod.enum(['SUBMITTED', 'IN_REVIEW', 'ACCEPTED', 'REJECTED', 'ARCHIVED']),
+  "adminNotes": zod.string().nullish(),
+  "reviewedById": zod.number().nullish(),
+  "createdAt": zod.coerce.date().nullish(),
+  "updatedAt": zod.coerce.date().nullish(),
+  "attachments": zod.array(zod.object({
+  "id": zod.number(),
+  "requestId": zod.number(),
+  "fileName": zod.string(),
+  "mimeType": zod.string(),
+  "fileSize": zod.number(),
+  "createdAt": zod.coerce.date().nullish()
+}))
+})
+export const GetAdminVolunteerDelegationsResponse = zod.array(GetAdminVolunteerDelegationsResponseItem)
+
+
+/**
+ * @summary Get one volunteer delegation request (MODERATOR/ADMIN/SUPER_ADMIN)
+ */
+export const GetAdminVolunteerDelegationParams = zod.object({
+  "id": zod.coerce.number()
+})
+
+export const GetAdminVolunteerDelegationResponse = zod.object({
+  "id": zod.number(),
+  "userId": zod.number(),
+  "userFullName": zod.string().nullish(),
+  "userAccount": zod.string().nullish(),
+  "fullNameArabic": zod.string(),
+  "fullNameGerman": zod.string(),
+  "phone": zod.string(),
+  "whatsapp": zod.string(),
+  "email": zod.string(),
+  "travelToSyriaFrom": zod.string(),
+  "travelToSyriaTo": zod.string(),
+  "volunteerWorkDateText": zod.string(),
+  "volunteerWorkType": zod.string(),
+  "professionGroup": zod.string(),
+  "specialtyWithCertificate": zod.string(),
+  "needsSyrianPracticeLicenseHelp": zod.boolean(),
+  "hasLogisticsEquipment": zod.boolean(),
+  "equipmentDetails": zod.string().nullish(),
+  "status": zod.enum(['SUBMITTED', 'IN_REVIEW', 'ACCEPTED', 'REJECTED', 'ARCHIVED']),
+  "adminNotes": zod.string().nullish(),
+  "reviewedById": zod.number().nullish(),
+  "createdAt": zod.coerce.date().nullish(),
+  "updatedAt": zod.coerce.date().nullish(),
+  "attachments": zod.array(zod.object({
+  "id": zod.number(),
+  "requestId": zod.number(),
+  "fileName": zod.string(),
+  "mimeType": zod.string(),
+  "fileSize": zod.number(),
+  "createdAt": zod.coerce.date().nullish()
+}))
+})
+
+
+/**
+ * @summary Update status / admin notes (MODERATOR/ADMIN/SUPER_ADMIN)
+ */
+export const UpdateAdminVolunteerDelegationParams = zod.object({
+  "id": zod.coerce.number()
+})
+
+export const UpdateAdminVolunteerDelegationBody = zod.object({
+  "status": zod.enum(['SUBMITTED', 'IN_REVIEW', 'ACCEPTED', 'REJECTED', 'ARCHIVED']),
+  "adminNotes": zod.string().nullish()
+})
+
+export const UpdateAdminVolunteerDelegationResponse = zod.object({
+  "id": zod.number(),
+  "userId": zod.number(),
+  "userFullName": zod.string().nullish(),
+  "userAccount": zod.string().nullish(),
+  "fullNameArabic": zod.string(),
+  "fullNameGerman": zod.string(),
+  "phone": zod.string(),
+  "whatsapp": zod.string(),
+  "email": zod.string(),
+  "travelToSyriaFrom": zod.string(),
+  "travelToSyriaTo": zod.string(),
+  "volunteerWorkDateText": zod.string(),
+  "volunteerWorkType": zod.string(),
+  "professionGroup": zod.string(),
+  "specialtyWithCertificate": zod.string(),
+  "needsSyrianPracticeLicenseHelp": zod.boolean(),
+  "hasLogisticsEquipment": zod.boolean(),
+  "equipmentDetails": zod.string().nullish(),
+  "status": zod.enum(['SUBMITTED', 'IN_REVIEW', 'ACCEPTED', 'REJECTED', 'ARCHIVED']),
+  "adminNotes": zod.string().nullish(),
+  "reviewedById": zod.number().nullish(),
+  "createdAt": zod.coerce.date().nullish(),
+  "updatedAt": zod.coerce.date().nullish(),
+  "attachments": zod.array(zod.object({
+  "id": zod.number(),
+  "requestId": zod.number(),
+  "fileName": zod.string(),
+  "mimeType": zod.string(),
+  "fileSize": zod.number(),
+  "createdAt": zod.coerce.date().nullish()
+}))
+})
+
+
+/**
+ * @summary Download a request's PDF file (MODERATOR/ADMIN/SUPER_ADMIN)
+ */
+export const GetAdminVolunteerDelegationFileParams = zod.object({
+  "fileId": zod.coerce.number()
+})
+
+export const GetAdminVolunteerDelegationFileResponse = zod.object({
+  "id": zod.number(),
+  "fileName": zod.string(),
+  "mimeType": zod.string(),
+  "fileSize": zod.number().optional(),
+  "fileData": zod.string()
+})
+
+
+/**
  * @summary Get a static page by slug
  */
 export const GetStaticPageParams = zod.object({
