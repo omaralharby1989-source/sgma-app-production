@@ -520,7 +520,7 @@ export const GetActiveBroadcastsResponse = zod.array(GetActiveBroadcastsResponse
 
 
 /**
- * @summary Create a broadcast (staff only)
+ * @summary Create a broadcast (admin/super only)
  */
 export const createBroadcastBodyTitleMax = 200;
 
@@ -734,6 +734,290 @@ export const RejectArticleResponse = zod.object({
   "publishedAt": zod.coerce.date().nullish(),
   "createdAt": zod.coerce.date(),
   "updatedAt": zod.coerce.date()
+})
+
+
+/**
+ * @summary Dashboard statistics (staff only; user/role counts gated to admin/super)
+ */
+export const GetAdminStatsResponse = zod.object({
+  "pendingArticles": zod.number(),
+  "publishedNews": zod.number(),
+  "totalUsers": zod.number().nullish(),
+  "activeUsers": zod.number().nullish(),
+  "moderatorCount": zod.number().nullish(),
+  "adminCount": zod.number().nullish(),
+  "superAdminCount": zod.number().nullish()
+})
+
+
+/**
+ * @summary List users (admin/super only)
+ */
+export const GetAdminUsersQueryParams = zod.object({
+  "q": zod.coerce.string().optional(),
+  "role": zod.enum(['MEMBER', 'MODERATOR', 'ADMIN', 'SUPER_ADMIN']).optional()
+})
+
+export const GetAdminUsersResponseItem = zod.object({
+  "id": zod.number(),
+  "fullName": zod.string(),
+  "account": zod.string(),
+  "email": zod.string(),
+  "role": zod.enum(['MEMBER', 'MODERATOR', 'ADMIN', 'SUPER_ADMIN']),
+  "status": zod.enum(['PENDING', 'ACTIVE', 'SUSPENDED']),
+  "isActive": zod.boolean(),
+  "professionGroup": zod.string().nullish(),
+  "createdAt": zod.coerce.date()
+})
+export const GetAdminUsersResponse = zod.array(GetAdminUsersResponseItem)
+
+
+/**
+ * @summary Get one user (admin/super only)
+ */
+export const GetAdminUserParams = zod.object({
+  "id": zod.coerce.number()
+})
+
+export const GetAdminUserResponse = zod.object({
+  "id": zod.number(),
+  "fullName": zod.string(),
+  "account": zod.string(),
+  "email": zod.string(),
+  "role": zod.enum(['MEMBER', 'MODERATOR', 'ADMIN', 'SUPER_ADMIN']),
+  "status": zod.enum(['PENDING', 'ACTIVE', 'SUSPENDED']),
+  "isActive": zod.boolean(),
+  "isDeveloper": zod.boolean(),
+  "phone": zod.string().nullish(),
+  "whatsapp": zod.string().nullish(),
+  "birthDate": zod.string().nullish(),
+  "address": zod.string().nullish(),
+  "professionGroup": zod.string().nullish(),
+  "specialtyText": zod.string().nullish(),
+  "bio": zod.string().nullish(),
+  "avatarUrl": zod.string().nullish(),
+  "createdAt": zod.coerce.date(),
+  "updatedAt": zod.coerce.date()
+})
+
+
+/**
+ * @summary Update a user's profile/role/status (admin/super only, permission-checked)
+ */
+export const UpdateAdminUserParams = zod.object({
+  "id": zod.coerce.number()
+})
+
+
+
+
+
+export const UpdateAdminUserBody = zod.object({
+  "fullName": zod.string().min(1).optional(),
+  "account": zod.string().min(1).optional(),
+  "email": zod.string().optional(),
+  "phone": zod.string().nullish(),
+  "whatsapp": zod.string().nullish(),
+  "address": zod.string().nullish(),
+  "birthDate": zod.string().nullish(),
+  "professionGroup": zod.string().nullish(),
+  "specialtyText": zod.string().nullish(),
+  "bio": zod.string().nullish(),
+  "role": zod.enum(['MEMBER', 'MODERATOR', 'ADMIN', 'SUPER_ADMIN']).optional(),
+  "status": zod.enum(['PENDING', 'ACTIVE', 'SUSPENDED']).optional(),
+  "isActive": zod.boolean().optional()
+})
+
+export const UpdateAdminUserResponse = zod.object({
+  "id": zod.number(),
+  "fullName": zod.string(),
+  "account": zod.string(),
+  "email": zod.string(),
+  "role": zod.enum(['MEMBER', 'MODERATOR', 'ADMIN', 'SUPER_ADMIN']),
+  "status": zod.enum(['PENDING', 'ACTIVE', 'SUSPENDED']),
+  "isActive": zod.boolean(),
+  "isDeveloper": zod.boolean(),
+  "phone": zod.string().nullish(),
+  "whatsapp": zod.string().nullish(),
+  "birthDate": zod.string().nullish(),
+  "address": zod.string().nullish(),
+  "professionGroup": zod.string().nullish(),
+  "specialtyText": zod.string().nullish(),
+  "bio": zod.string().nullish(),
+  "avatarUrl": zod.string().nullish(),
+  "createdAt": zod.coerce.date(),
+  "updatedAt": zod.coerce.date()
+})
+
+
+/**
+ * @summary List articles of all statuses (staff only)
+ */
+export const GetAdminArticlesQueryParams = zod.object({
+  "status": zod.enum(['DRAFT', 'PENDING', 'APPROVED', 'REJECTED', 'ARCHIVED']).optional()
+})
+
+export const GetAdminArticlesResponseItem = zod.object({
+  "id": zod.number(),
+  "title": zod.string(),
+  "summary": zod.string().nullish(),
+  "imageUrl": zod.string().nullish(),
+  "category": zod.string().nullish(),
+  "status": zod.enum(['DRAFT', 'PENDING', 'APPROVED', 'REJECTED', 'ARCHIVED']),
+  "authorId": zod.number().nullish(),
+  "authorName": zod.string().nullish(),
+  "rejectionReason": zod.string().nullish(),
+  "publishedAt": zod.coerce.date().nullish(),
+  "createdAt": zod.coerce.date(),
+  "updatedAt": zod.coerce.date()
+})
+export const GetAdminArticlesResponse = zod.array(GetAdminArticlesResponseItem)
+
+
+/**
+ * @summary Archive an article (staff only)
+ */
+export const ArchiveArticleParams = zod.object({
+  "id": zod.coerce.number()
+})
+
+export const ArchiveArticleResponse = zod.object({
+  "id": zod.number(),
+  "title": zod.string(),
+  "summary": zod.string().nullish(),
+  "content": zod.string(),
+  "imageUrl": zod.string().nullish(),
+  "category": zod.string().nullish(),
+  "status": zod.enum(['DRAFT', 'PENDING', 'APPROVED', 'REJECTED', 'ARCHIVED']),
+  "authorId": zod.number().nullish(),
+  "authorName": zod.string().nullish(),
+  "reviewedById": zod.number().nullish(),
+  "rejectionReason": zod.string().nullish(),
+  "publishedAt": zod.coerce.date().nullish(),
+  "createdAt": zod.coerce.date(),
+  "updatedAt": zod.coerce.date()
+})
+
+
+/**
+ * @summary List news of all statuses (staff only)
+ */
+export const GetAdminNewsQueryParams = zod.object({
+  "status": zod.enum(['DRAFT', 'PUBLISHED', 'ARCHIVED']).optional()
+})
+
+export const GetAdminNewsResponseItem = zod.object({
+  "id": zod.number(),
+  "title": zod.string(),
+  "summary": zod.string().nullish(),
+  "content": zod.string(),
+  "imageUrl": zod.string().nullish(),
+  "category": zod.string().nullish(),
+  "status": zod.enum(['DRAFT', 'PUBLISHED', 'ARCHIVED']),
+  "authorId": zod.number().nullish(),
+  "publishedAt": zod.coerce.date().nullish(),
+  "createdAt": zod.coerce.date(),
+  "updatedAt": zod.coerce.date()
+})
+export const GetAdminNewsResponse = zod.array(GetAdminNewsResponseItem)
+
+
+/**
+ * @summary Get one news item of any status (staff only)
+ */
+export const GetAdminNewsItemParams = zod.object({
+  "id": zod.coerce.number()
+})
+
+export const GetAdminNewsItemResponse = zod.object({
+  "id": zod.number(),
+  "title": zod.string(),
+  "summary": zod.string().nullish(),
+  "content": zod.string(),
+  "imageUrl": zod.string().nullish(),
+  "category": zod.string().nullish(),
+  "status": zod.enum(['DRAFT', 'PUBLISHED', 'ARCHIVED']),
+  "authorId": zod.number().nullish(),
+  "publishedAt": zod.coerce.date().nullish(),
+  "createdAt": zod.coerce.date(),
+  "updatedAt": zod.coerce.date()
+})
+
+
+/**
+ * @summary List all broadcasts (admin/super only)
+ */
+export const GetAdminBroadcastsResponseItem = zod.object({
+  "id": zod.number(),
+  "title": zod.string(),
+  "content": zod.string(),
+  "authorId": zod.number().nullish(),
+  "isActive": zod.boolean(),
+  "expiresAt": zod.coerce.date().nullish(),
+  "createdAt": zod.coerce.date(),
+  "updatedAt": zod.coerce.date()
+})
+export const GetAdminBroadcastsResponse = zod.array(GetAdminBroadcastsResponseItem)
+
+
+/**
+ * @summary Create a broadcast (admin/super only)
+ */
+export const createAdminBroadcastBodyTitleMax = 200;
+
+export const createAdminBroadcastBodyContentMax = 2000;
+
+
+
+export const CreateAdminBroadcastBody = zod.object({
+  "title": zod.string().min(1).max(createAdminBroadcastBodyTitleMax),
+  "content": zod.string().min(1).max(createAdminBroadcastBodyContentMax),
+  "expiresAt": zod.string().optional().describe('Optional expiry timestamp (ISO date or date-time)')
+})
+
+
+/**
+ * @summary Update / activate / deactivate a broadcast (admin/super only)
+ */
+export const UpdateAdminBroadcastParams = zod.object({
+  "id": zod.coerce.number()
+})
+
+export const updateAdminBroadcastBodyTitleMax = 200;
+
+export const updateAdminBroadcastBodyContentMax = 2000;
+
+
+
+export const UpdateAdminBroadcastBody = zod.object({
+  "title": zod.string().min(1).max(updateAdminBroadcastBodyTitleMax).optional(),
+  "content": zod.string().min(1).max(updateAdminBroadcastBodyContentMax).optional(),
+  "expiresAt": zod.string().nullish().describe('Optional expiry timestamp (ISO date or date-time), or null to clear'),
+  "isActive": zod.boolean().optional()
+})
+
+export const UpdateAdminBroadcastResponse = zod.object({
+  "id": zod.number(),
+  "title": zod.string(),
+  "content": zod.string(),
+  "authorId": zod.number().nullish(),
+  "isActive": zod.boolean(),
+  "expiresAt": zod.coerce.date().nullish(),
+  "createdAt": zod.coerce.date(),
+  "updatedAt": zod.coerce.date()
+})
+
+
+/**
+ * @summary Delete a broadcast (admin/super only)
+ */
+export const DeleteAdminBroadcastParams = zod.object({
+  "id": zod.coerce.number()
+})
+
+export const DeleteAdminBroadcastResponse = zod.object({
+  "message": zod.string()
 })
 
 

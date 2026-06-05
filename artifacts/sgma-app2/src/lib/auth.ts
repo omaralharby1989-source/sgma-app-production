@@ -22,3 +22,7 @@ export function getStoredUser(): StoredUser | null {
 export function isStaffRole(role: string | undefined | null): boolean {
   return !!role && STAFF_ROLES.includes(role);
 }
+
+export function isAdminOrSuper(role: string | undefined | null): boolean {
+  return role === "ADMIN" || role === "SUPER_ADMIN";
+}

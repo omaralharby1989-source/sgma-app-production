@@ -26,6 +26,11 @@ import DeveloperInfo from "./pages/developer-info";
 import Unauthorized from "./pages/unauthorized";
 import { ProtectedLayout } from "./components/layout/ProtectedLayout";
 import { getStoredUser, isStaffRole } from "./lib/auth";
+import AdminDashboard from "./pages/admin/dashboard";
+import AdminUsers from "./pages/admin/users";
+import AdminArticles from "./pages/admin/articles";
+import AdminNews from "./pages/admin/news";
+import AdminBroadcasts from "./pages/admin/broadcasts";
 
 setAuthTokenGetter(() => localStorage.getItem("sgma_auth_token"));
 
@@ -34,9 +39,11 @@ const queryClient = new QueryClient();
 function ProtectedRoute({
   component: Component,
   staffOnly = false,
+  allowedRoles,
 }: {
   component: React.ComponentType;
   staffOnly?: boolean;
+  allowedRoles?: string[];
 }) {
   const [isChecking, setIsChecking] = useState(true);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -44,15 +51,18 @@ function ProtectedRoute({
 
   useEffect(() => {
     const token = localStorage.getItem("sgma_auth_token");
+    const role = getStoredUser()?.role;
     if (!token) {
       setLocation("/login");
-    } else if (staffOnly && !isStaffRole(getStoredUser()?.role)) {
+    } else if (staffOnly && !isStaffRole(role)) {
+      setLocation("/unauthorized");
+    } else if (allowedRoles && !(role && allowedRoles.includes(role))) {
       setLocation("/unauthorized");
     } else {
       setIsAuthenticated(true);
     }
     setIsChecking(false);
-  }, [setLocation, staffOnly]);
+  }, [setLocation, staffOnly, allowedRoles]);
 
   if (isChecking) {
     return (
@@ -126,7 +136,23 @@ function Router() {
         <ProtectedRoute component={ArticleDetail} />
       </Route>
       <Route path="/broadcast">
-        <ProtectedRoute component={Broadcast} staffOnly />
+        <ProtectedRoute component={Broadcast} allowedRoles={["ADMIN", "SUPER_ADMIN"]} />
+      </Route>
+
+      <Route path="/admin">
+        <ProtectedRoute component={AdminDashboard} staffOnly />
+      </Route>
+      <Route path="/admin/users">
+        <ProtectedRoute component={AdminUsers} allowedRoles={["ADMIN", "SUPER_ADMIN"]} />
+      </Route>
+      <Route path="/admin/articles">
+        <ProtectedRoute component={AdminArticles} staffOnly />
+      </Route>
+      <Route path="/admin/news">
+        <ProtectedRoute component={AdminNews} staffOnly />
+      </Route>
+      <Route path="/admin/broadcasts">
+        <ProtectedRoute component={AdminBroadcasts} allowedRoles={["ADMIN", "SUPER_ADMIN"]} />
       </Route>
 
       <Route component={NotFound} />

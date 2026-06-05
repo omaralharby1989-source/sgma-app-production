@@ -1,5 +1,5 @@
 import { Link, useLocation } from "wouter";
-import { UserCircle, Menu, MessageSquare, Newspaper, Radio } from "lucide-react";
+import { UserCircle, Menu, MessageSquare, Newspaper, LayoutDashboard } from "lucide-react";
 import { getStoredUser, isStaffRole } from "@/lib/auth";
 
 export function MobileNav() {
@@ -10,7 +10,7 @@ export function MobileNav() {
     { href: "/home", icon: UserCircle, label: "حسابي" },
     { href: "/chat", icon: MessageSquare, label: "المحادثات" },
     { href: "/news", icon: Newspaper, label: "الأخبار" },
-    ...(isStaff ? [{ href: "/broadcast", icon: Radio, label: "البث" }] : []),
+    ...(isStaff ? [{ href: "/admin", icon: LayoutDashboard, label: "الإدارة" }] : []),
     { href: "/more", icon: Menu, label: "المزيد" },
   ];
 

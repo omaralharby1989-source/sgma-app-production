@@ -2,13 +2,15 @@ import { Link, useLocation } from "wouter";
 import { useGetMemberProfile } from "@workspace/api-client-react";
 import { Card } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Info, LogOut, MessageSquare, Newspaper, FileText, Radio, ChevronLeft } from "lucide-react";
-import { getStoredUser, isStaffRole } from "@/lib/auth";
+import { Info, LogOut, MessageSquare, Newspaper, FileText, Radio, ChevronLeft, LayoutDashboard, Users } from "lucide-react";
+import { getStoredUser, isStaffRole, isAdminOrSuper } from "@/lib/auth";
 
 export default function More() {
   const [, setLocation] = useLocation();
   const { data: profile, isLoading } = useGetMemberProfile();
-  const isStaff = isStaffRole(getStoredUser()?.role);
+  const role = getStoredUser()?.role;
+  const isStaff = isStaffRole(role);
+  const adminOrSuper = isAdminOrSuper(role);
 
   const handleLogout = () => {
     localStorage.removeItem("sgma_auth_token");
@@ -38,8 +40,18 @@ export default function More() {
     ...(isStaff
       ? [
           {
-            title: "الإدارة والإشراف",
-            items: [{ icon: Radio, label: "إرسال بث", href: "/broadcast" }] as MenuItem[],
+            title: "لوحة التحكم",
+            items: [
+              { icon: LayoutDashboard, label: "لوحة الإدارة", href: "/admin" },
+              ...(adminOrSuper
+                ? ([{ icon: Users, label: "إدارة الأعضاء", href: "/admin/users" }] as MenuItem[])
+                : []),
+              { icon: FileText, label: "إدارة المقالات", href: "/admin/articles" },
+              { icon: Newspaper, label: "إدارة الأخبار", href: "/admin/news" },
+              ...(adminOrSuper
+                ? ([{ icon: Radio, label: "إدارة البث", href: "/admin/broadcasts" }] as MenuItem[])
+                : []),
+            ] as MenuItem[],
           },
         ]
       : []),

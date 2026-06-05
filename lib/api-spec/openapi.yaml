@@ -22,6 +22,8 @@ tags:
     description: News operations
   - name: broadcasts
     description: Broadcast operations
+  - name: admin
+    description: Admin dashboard operations
 paths:
   /healthz:
     get:
@@ -781,7 +783,7 @@ paths:
     post:
       operationId: createBroadcast
       tags: [broadcasts]
-      summary: Create a broadcast (staff only)
+      summary: Create a broadcast (admin/super only)
       security:
         - BearerAuth: []
       requestBody:
@@ -1073,6 +1075,457 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/ArticleDetail"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "403":
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "404":
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /admin/stats:
+    get:
+      operationId: getAdminStats
+      tags: [admin]
+      summary: Dashboard statistics (staff only; user/role counts gated to admin/super)
+      security:
+        - BearerAuth: []
+      responses:
+        "200":
+          description: Dashboard stats
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AdminDashboardStats"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "403":
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /admin/users:
+    get:
+      operationId: getAdminUsers
+      tags: [admin]
+      summary: List users (admin/super only)
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: q
+          in: query
+          required: false
+          schema:
+            type: string
+        - name: role
+          in: query
+          required: false
+          schema:
+            type: string
+            enum: [MEMBER, MODERATOR, ADMIN, SUPER_ADMIN]
+      responses:
+        "200":
+          description: Users list
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AdminUsersListResponse"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "403":
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /admin/users/{id}:
+    get:
+      operationId: getAdminUser
+      tags: [admin]
+      summary: Get one user (admin/super only)
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: User detail
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AdminUserDetail"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "403":
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "404":
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+    patch:
+      operationId: updateAdminUser
+      tags: [admin]
+      summary: Update a user's profile/role/status (admin/super only, permission-checked)
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/AdminUpdateUserInput"
+      responses:
+        "200":
+          description: User updated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AdminUserDetail"
+        "400":
+          description: Validation error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "403":
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "404":
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /admin/articles:
+    get:
+      operationId: getAdminArticles
+      tags: [admin]
+      summary: List articles of all statuses (staff only)
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: status
+          in: query
+          required: false
+          schema:
+            $ref: "#/components/schemas/ArticleStatus"
+      responses:
+        "200":
+          description: Articles list
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ArticleListResponse"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "403":
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /admin/articles/{id}/archive:
+    post:
+      operationId: archiveArticle
+      tags: [admin]
+      summary: Archive an article (staff only)
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Article archived
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ArticleDetail"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "403":
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "404":
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /admin/news:
+    get:
+      operationId: getAdminNews
+      tags: [admin]
+      summary: List news of all statuses (staff only)
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: status
+          in: query
+          required: false
+          schema:
+            type: string
+            enum: [DRAFT, PUBLISHED, ARCHIVED]
+      responses:
+        "200":
+          description: News list
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/NewsListResponse"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "403":
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /admin/news/{id}:
+    get:
+      operationId: getAdminNewsItem
+      tags: [admin]
+      summary: Get one news item of any status (staff only)
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: News item
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/NewsItem"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "403":
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "404":
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /admin/broadcasts:
+    get:
+      operationId: getAdminBroadcasts
+      tags: [admin]
+      summary: List all broadcasts (admin/super only)
+      security:
+        - BearerAuth: []
+      responses:
+        "200":
+          description: Broadcasts list
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/BroadcastListResponse"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "403":
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+    post:
+      operationId: createAdminBroadcast
+      tags: [admin]
+      summary: Create a broadcast (admin/super only)
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateBroadcastInput"
+      responses:
+        "201":
+          description: Broadcast created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/BroadcastItem"
+        "400":
+          description: Validation error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "403":
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /admin/broadcasts/{id}:
+    patch:
+      operationId: updateAdminBroadcast
+      tags: [admin]
+      summary: Update / activate / deactivate a broadcast (admin/super only)
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateBroadcastInput"
+      responses:
+        "200":
+          description: Broadcast updated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/BroadcastItem"
+        "400":
+          description: Validation error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "403":
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "404":
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+    delete:
+      operationId: deleteAdminBroadcast
+      tags: [admin]
+      summary: Delete a broadcast (admin/super only)
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Broadcast deleted
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MessageResponse"
         "401":
           description: Unauthorized
           content:
@@ -1663,3 +2116,154 @@ components:
           type: array
           items:
             type: string
+
+    AdminDashboardStats:
+      type: object
+      required: [pendingArticles, publishedNews]
+      properties:
+        pendingArticles:
+          type: integer
+        publishedNews:
+          type: integer
+        totalUsers:
+          type: ["integer", "null"]
+        activeUsers:
+          type: ["integer", "null"]
+        moderatorCount:
+          type: ["integer", "null"]
+        adminCount:
+          type: ["integer", "null"]
+        superAdminCount:
+          type: ["integer", "null"]
+
+    AdminUserItem:
+      type: object
+      required: [id, fullName, account, email, role, status, isActive, createdAt]
+      properties:
+        id:
+          type: integer
+        fullName:
+          type: string
+        account:
+          type: string
+        email:
+          type: string
+        role:
+          type: string
+          enum: [MEMBER, MODERATOR, ADMIN, SUPER_ADMIN]
+        status:
+          type: string
+          enum: [PENDING, ACTIVE, SUSPENDED]
+        isActive:
+          type: boolean
+        professionGroup:
+          type: ["string", "null"]
+        createdAt:
+          type: string
+          format: date-time
+
+    AdminUsersListResponse:
+      type: array
+      items:
+        $ref: "#/components/schemas/AdminUserItem"
+
+    AdminUserDetail:
+      type: object
+      required: [id, fullName, account, email, role, status, isActive, isDeveloper, createdAt, updatedAt]
+      properties:
+        id:
+          type: integer
+        fullName:
+          type: string
+        account:
+          type: string
+        email:
+          type: string
+        role:
+          type: string
+          enum: [MEMBER, MODERATOR, ADMIN, SUPER_ADMIN]
+        status:
+          type: string
+          enum: [PENDING, ACTIVE, SUSPENDED]
+        isActive:
+          type: boolean
+        isDeveloper:
+          type: boolean
+        phone:
+          type: ["string", "null"]
+        whatsapp:
+          type: ["string", "null"]
+        birthDate:
+          type: ["string", "null"]
+        address:
+          type: ["string", "null"]
+        professionGroup:
+          type: ["string", "null"]
+        specialtyText:
+          type: ["string", "null"]
+        bio:
+          type: ["string", "null"]
+        avatarUrl:
+          type: ["string", "null"]
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+
+    AdminUpdateUserInput:
+      type: object
+      properties:
+        fullName:
+          type: string
+          minLength: 1
+        account:
+          type: string
+          minLength: 1
+        email:
+          type: string
+        phone:
+          type: ["string", "null"]
+        whatsapp:
+          type: ["string", "null"]
+        address:
+          type: ["string", "null"]
+        birthDate:
+          type: ["string", "null"]
+        professionGroup:
+          type: ["string", "null"]
+        specialtyText:
+          type: ["string", "null"]
+        bio:
+          type: ["string", "null"]
+        role:
+          type: string
+          enum: [MEMBER, MODERATOR, ADMIN, SUPER_ADMIN]
+        status:
+          type: string
+          enum: [PENDING, ACTIVE, SUSPENDED]
+        isActive:
+          type: boolean
+
+    BroadcastListResponse:
+      type: array
+      items:
+        $ref: "#/components/schemas/BroadcastItem"
+
+    UpdateBroadcastInput:
+      type: object
+      properties:
+        title:
+          type: string
+          minLength: 1
+          maxLength: 200
+        content:
+          type: string
+          minLength: 1
+          maxLength: 2000
+        expiresAt:
+          type: ["string", "null"]
+          description: Optional expiry timestamp (ISO date or date-time), or null to clear
+        isActive:
+          type: boolean

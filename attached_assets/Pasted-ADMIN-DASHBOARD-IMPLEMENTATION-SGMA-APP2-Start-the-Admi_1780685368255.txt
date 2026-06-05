@@ -1,0 +1,764 @@
+ADMIN DASHBOARD IMPLEMENTATION — SGMA APP2
+
+Start the Admin Dashboard Module now.
+
+This is the final major management phase.
+
+Important:
+Build the Admin Dashboard carefully and incrementally inside one module.
+Do not rewrite existing working modules.
+Do not break:
+
+* /login
+* /register
+* /home
+* /news
+* /news/:id
+* /articles
+* /articles/:id
+* /articles/new
+* /articles/my
+* /chat
+* /chat/public
+* /chat/admin
+* /broadcast
+* /more
+* /developer-info
+
+Current architecture:
+
+* PostgreSQL + Drizzle
+* JWT authentication
+* Arabic RTL
+* Mobile-first
+* Existing bottom navigation
+* Existing broadcast banner
+* No Firebase
+* No MySQL migration
+* No old SGMA APP1 routes
+
+==================================================
+A. ADMIN DASHBOARD PURPOSE
+==========================
+
+Create a complete management dashboard with role-based access.
+
+Roles:
+
+1. SUPER_ADMIN
+   Full application management:
+
+* Users/members management
+* Roles management
+* Articles management
+* News management
+* Broadcast management
+* App overview/statistics
+* Developer/app information visibility if useful
+* Future settings placeholders if needed
+
+2. ADMIN
+   Can manage:
+
+* Members/users, but with restrictions
+* Articles
+* News
+* Broadcast
+
+ADMIN must NOT:
+
+* Promote anyone to SUPER_ADMIN
+* Modify SUPER_ADMIN accounts
+* Delete or deactivate SUPER_ADMIN accounts
+* Remove SUPER_ADMIN role
+* Change isDeveloper
+
+3. MODERATOR
+   Can manage only:
+
+* News
+* Articles
+
+MODERATOR must NOT manage:
+
+* Users/members
+* Roles
+* Broadcast
+* SUPER_ADMIN/ADMIN settings
+
+4. MEMBER
+   Cannot access Admin Dashboard at all.
+
+==================================================
+B. REQUIRED ROUTES
+==================
+
+Create these routes:
+
+Main:
+
+* /admin
+
+Subpages:
+
+* /admin/users
+* /admin/articles
+* /admin/news
+* /admin/broadcasts
+
+Optional clean placeholders:
+
+* /admin/settings
+  Only visible to SUPER_ADMIN if created.
+
+All /admin routes must be JWT protected and role protected.
+
+Access:
+
+* SUPER_ADMIN: all admin routes
+* ADMIN: /admin, /admin/users, /admin/articles, /admin/news, /admin/broadcasts
+* MODERATOR: /admin, /admin/articles, /admin/news only
+* MEMBER: no access, redirect to /unauthorized or show unauthorized page
+
+Do not create route chaos.
+Do not use old SGMA APP1 admin routes.
+
+==================================================
+C. NAVIGATION / MORE PAGE
+=========================
+
+Update /more.
+
+Visible only for MODERATOR / ADMIN / SUPER_ADMIN:
+
+Section:
+الإدارة والإشراف
+
+Items by role:
+
+SUPER_ADMIN:
+
+* لوحة الإدارة
+* إدارة الأعضاء
+* إدارة المقالات
+* إدارة الأخبار
+* إدارة البث
+
+ADMIN:
+
+* لوحة الإدارة
+* إدارة الأعضاء
+* إدارة المقالات
+* إدارة الأخبار
+* إدارة البث
+
+MODERATOR:
+
+* لوحة الإدارة
+* إدارة المقالات
+* إدارة الأخبار
+
+MEMBER:
+Must not see any admin management item.
+
+Do not expose hidden links to MEMBER.
+Backend must still enforce permissions.
+
+==================================================
+D. ADMIN DASHBOARD HOME — /admin
+================================
+
+Create a clean dashboard overview page.
+
+Arabic title:
+لوحة الإدارة
+
+Show cards based on role:
+
+Common for MODERATOR/ADMIN/SUPER_ADMIN:
+
+* المقالات قيد المراجعة
+* الأخبار المنشورة
+* آخر نشاطات الإدارة if easy
+
+ADMIN/SUPER_ADMIN only:
+
+* عدد الأعضاء
+* الأعضاء النشطون
+* إدارة البث
+
+SUPER_ADMIN extra:
+
+* عدد المشرفين
+* عدد المدراء
+* حسابات السوبر أدمن
+* النظام / صلاحيات التطبيق if useful
+
+Each card should link to the relevant admin section.
+
+Design:
+
+* Arabic RTL
+* Mobile-first
+* Professional
+* Not too crowded
+* Cards/grid
+* Clear role badge
+* BackButton or navigation where appropriate
+
+==================================================
+E. USERS MANAGEMENT — /admin/users
+==================================
+
+Access:
+
+* SUPER_ADMIN
+* ADMIN
+
+MODERATOR and MEMBER forbidden.
+
+Features:
+
+1. List users
+   Show:
+
+* fullName
+* account
+* email
+* role
+* isActive/status
+* professionGroup
+* createdAt
+
+2. Search/filter
+   At minimum:
+
+* Search by name/account/email if easy
+* Filter by role if easy
+
+3. User detail/edit panel or modal
+   Allow editing:
+
+* fullName
+* account
+* email
+* phone
+* whatsapp
+* address
+* birthDate
+* professionGroup
+* specialtyText
+* isActive/status where allowed
+* role where allowed
+
+4. Role management rules
+
+SUPER_ADMIN can:
+
+* Change MEMBER ↔ MODERATOR ↔ ADMIN
+* Create/assign ADMIN
+* Create/assign MODERATOR
+* Deactivate/reactivate users
+* Edit normal users
+* Edit ADMIN/MODERATOR/MEMBER
+* View SUPER_ADMIN accounts
+
+SUPER_ADMIN must be protected:
+
+* Prevent removing the last SUPER_ADMIN.
+* Prevent deactivating the last active SUPER_ADMIN.
+* Prevent accidental self-demotion unless explicitly guarded. Prefer disallow self-demotion.
+
+ADMIN can:
+
+* Change MEMBER ↔ MODERATOR
+* Deactivate/reactivate MEMBER and MODERATOR
+* Edit MEMBER and MODERATOR profiles
+* View users
+
+ADMIN cannot:
+
+* Promote anyone to ADMIN
+* Promote anyone to SUPER_ADMIN
+* Edit SUPER_ADMIN
+* Edit another ADMIN role/status
+* Deactivate ADMIN
+* Deactivate SUPER_ADMIN
+* Change isDeveloper
+
+MODERATOR cannot access user management.
+
+Backend must enforce all of these rules.
+Frontend hiding is not enough.
+
+Required API:
+
+* GET /api/admin/users
+* GET /api/admin/users/:id
+* PATCH /api/admin/users/:id
+* Optional: PATCH /api/admin/users/:id/role
+* Optional: PATCH /api/admin/users/:id/status
+
+Use whichever structure is clean, but permissions must be correct.
+
+==================================================
+F. ARTICLES MANAGEMENT — /admin/articles
+========================================
+
+Access:
+
+* MODERATOR
+* ADMIN
+* SUPER_ADMIN
+
+Purpose:
+Review and manage submitted articles.
+
+Show list with filters:
+
+* PENDING
+* APPROVED
+* REJECTED
+* ARCHIVED
+* All
+
+Each article card/row:
+
+* title
+* authorName
+* category
+* status
+* createdAt
+* summary
+
+Actions:
+For PENDING:
+
+* View
+* Approve
+* Reject with reason
+
+For APPROVED:
+
+* View
+* Archive
+
+For REJECTED:
+
+* View
+* Show rejection reason
+* Optional approve again if safe
+
+For DRAFT:
+
+* Usually author-owned only; admin can view if needed, but do not publish drafts unless policy says so.
+
+Required behavior:
+
+* Approving sets status APPROVED, reviewedById, publishedAt.
+* Rejecting sets status REJECTED, reviewedById, rejectionReason.
+* Archiving sets status ARCHIVED.
+* Approved articles appear in public /articles.
+* Pending/rejected/archived do not appear publicly.
+
+Use existing article backend endpoints if already available:
+
+* approve/reject endpoints exist backend-only from Articles Module.
+  If missing admin list endpoints, add them.
+
+Required API if needed:
+
+* GET /api/admin/articles
+* GET /api/admin/articles/:id
+* POST /api/admin/articles/:id/approve
+* POST /api/admin/articles/:id/reject
+* POST /api/admin/articles/:id/archive
+
+Do not duplicate article logic if existing endpoints already work.
+
+==================================================
+G. NEWS MANAGEMENT — /admin/news
+================================
+
+Access:
+
+* MODERATOR
+* ADMIN
+* SUPER_ADMIN
+
+Purpose:
+Create, edit, publish, archive news.
+
+Features:
+
+1. List news
+   Show:
+
+* title
+* category
+* status
+* publishedAt
+* createdAt
+
+2. Create news
+   Fields:
+
+* title required
+* summary required
+* content required
+* imageUrl optional
+* category optional or required if current schema expects it
+* status: DRAFT or PUBLISHED
+
+3. Edit news
+   Allow:
+
+* title
+* summary
+* content
+* imageUrl
+* category
+* status
+
+4. Publish/archive
+
+* PUBLISHED appears in /news
+* DRAFT/ARCHIVED do not appear in /news
+
+Required API:
+Use existing staff-only news endpoints if already implemented:
+
+* POST /api/news
+* PATCH /api/news/:id
+* DELETE /api/news/:id
+
+If admin listing needs all statuses, add:
+
+* GET /api/admin/news
+* GET /api/admin/news/:id
+
+Important:
+Members cannot create/edit/delete news.
+Backend must enforce MODERATOR/ADMIN/SUPER_ADMIN only.
+
+==================================================
+H. BROADCAST MANAGEMENT — /admin/broadcasts
+===========================================
+
+Access:
+
+* ADMIN
+* SUPER_ADMIN only
+
+MODERATOR must NOT manage broadcast from Admin Dashboard.
+MEMBER forbidden.
+
+Purpose:
+Manage broadcast messages.
+
+Features:
+
+* List current and previous broadcasts
+* Create broadcast
+* Activate/deactivate broadcast if schema supports isActive
+* Expiry date
+* Show title/content/createdAt/expiresAt/isActive
+* Optional archive/deactivate
+
+Existing /broadcast send page already exists.
+You may either:
+
+* Reuse /broadcast as a create page and make /admin/broadcasts the list/manage page
+  or
+* Implement management directly in /admin/broadcasts
+
+Required:
+
+* Broadcast banner behavior must remain unchanged.
+* Active non-expired broadcasts appear at top of authenticated pages.
+* No banner on /login and /register.
+
+Required API if missing:
+
+* GET /api/admin/broadcasts
+* PATCH /api/admin/broadcasts/:id
+* DELETE or POST /api/admin/broadcasts/:id/deactivate
+
+Backend permissions:
+
+* ADMIN/SUPER_ADMIN only.
+* MODERATOR forbidden.
+* MEMBER forbidden.
+
+==================================================
+I. SUPER ADMIN FULL CONTROL RULES
+=================================
+
+SUPER_ADMIN must have complete application management, but with safety protections:
+
+Must be able to:
+
+* View all admin sections
+* Manage users
+* Assign ADMIN/MODERATOR/MEMBER
+* Manage articles
+* Manage news
+* Manage broadcast
+* View dashboard stats
+
+Must NOT be allowed to accidentally break the system:
+
+* Cannot delete/deactivate the last active SUPER_ADMIN.
+* Cannot demote the last SUPER_ADMIN.
+* Prefer preventing self-demotion.
+* Prefer preventing self-deactivation.
+
+If these cases occur, return clear Arabic-friendly error.
+
+==================================================
+J. OPENAPI / GENERATED CLIENT
+=============================
+
+Update OpenAPI for all new admin endpoints.
+
+After changes:
+
+* Regenerate generated client.
+* Do not manually edit generated files.
+* Fix type errors.
+* Run typecheck.
+
+Required schemas:
+
+* AdminDashboardStats
+* AdminUserItem
+* AdminUserDetail
+* AdminUpdateUserInput
+* AdminArticleItem
+* AdminNewsItem
+* AdminBroadcastItem
+* RejectArticleInput if missing
+* UpdateNewsInput if missing
+* UpdateBroadcastInput if needed
+
+==================================================
+K. UI/UX REQUIREMENTS
+=====================
+
+All admin pages must be:
+
+* Arabic RTL
+* Mobile-first
+* Professional
+* Clean cards or responsive tables
+* Clear role-based labels
+* Clear action buttons
+* Confirmation dialogs for dangerous actions:
+
+  * deactivate user
+  * change role
+  * reject article
+  * archive article/news/broadcast
+* No desktop-only layout
+* No horizontal overflow on mobile
+* Bottom navigation must not cover content
+* Broadcast banner must not break admin layout
+* BackButton reusable where appropriate
+
+Admin pages should feel like a management console, but simple enough for mobile.
+
+==================================================
+L. PERMISSION ENFORCEMENT
+=========================
+
+Do not rely only on frontend.
+
+Backend must enforce:
+
+* MEMBER cannot access admin APIs.
+* MODERATOR cannot access user management.
+* MODERATOR cannot manage broadcast.
+* ADMIN cannot modify SUPER_ADMIN.
+* ADMIN cannot promote to ADMIN or SUPER_ADMIN.
+* ADMIN cannot edit/deactivate ADMIN or SUPER_ADMIN.
+* Only SUPER_ADMIN can assign ADMIN.
+* No one can remove/deactivate last active SUPER_ADMIN.
+* All protected admin actions must use req.user from JWT.
+
+Return:
+
+* 401 for unauthenticated
+* 403 for unauthorized
+* 400 for invalid input
+* 404 for not found
+
+==================================================
+M. TESTING REQUIREMENTS
+=======================
+
+Do not report completion until tested in Preview and via API.
+
+Required runtime tests:
+
+General:
+
+1. Login as SUPER_ADMIN works.
+2. /admin opens.
+3. /admin/users opens for SUPER_ADMIN.
+4. /admin/articles opens.
+5. /admin/news opens.
+6. /admin/broadcasts opens for SUPER_ADMIN.
+7. /more shows correct admin section for SUPER_ADMIN.
+
+Admin role:
+
+1. ADMIN can access users/articles/news/broadcasts.
+2. ADMIN cannot edit SUPER_ADMIN.
+3. ADMIN cannot promote user to ADMIN/SUPER_ADMIN.
+4. ADMIN cannot deactivate SUPER_ADMIN.
+
+Moderator role:
+
+1. MODERATOR can access /admin.
+2. MODERATOR can access /admin/articles.
+3. MODERATOR can access /admin/news.
+4. MODERATOR cannot access /admin/users.
+5. MODERATOR cannot access /admin/broadcasts.
+6. MODERATOR does not see user/broadcast management links.
+
+Member role:
+
+1. MEMBER cannot access /admin.
+2. MEMBER cannot access admin APIs.
+3. MEMBER does not see admin links in /more.
+
+Users management:
+
+1. List users works.
+2. Search/filter works if implemented.
+3. Role update works according to permissions.
+4. Active/status update works according to permissions.
+5. Last SUPER_ADMIN protection works.
+
+Articles management:
+
+1. Pending article appears in admin articles.
+2. Approve article works.
+3. Approved article appears in public /articles.
+4. Reject article with reason works.
+5. Rejected article appears in author’s /articles/my with reason.
+6. Archived article disappears from public list.
+
+News management:
+
+1. Create news works.
+2. Published news appears in /news.
+3. Edit news works.
+4. Archive news hides it from /news.
+
+Broadcast management:
+
+1. ADMIN/SUPER_ADMIN can create/manage broadcast.
+2. Active broadcast appears in global banner.
+3. Deactivated/expired broadcast does not show.
+4. MODERATOR forbidden from broadcast management.
+
+Regression:
+
+1. /login works.
+2. /register works.
+3. /home works.
+4. /news and /news/:id work.
+5. /articles user pages work.
+6. /chat pages work.
+7. /broadcast existing page still works for staff if kept.
+8. /more works.
+9. /developer-info works.
+10. Typecheck passes.
+11. Backend starts cleanly.
+12. Preview Panel operational.
+
+==================================================
+N. IMPLEMENTATION STRATEGY
+==========================
+
+Because this is a large module, implement in safe internal steps:
+
+Step 1:
+Backend admin permission helpers and /api/admin/stats.
+
+Step 2:
+Admin route shell and dashboard home /admin.
+
+Step 3:
+Users management.
+
+Step 4:
+Articles management.
+
+Step 5:
+News management.
+
+Step 6:
+Broadcast management.
+
+Step 7:
+Role-based /more links and navigation.
+
+Step 8:
+Full regression testing.
+
+Important:
+Do not move to the next step if the app is broken.
+If Preview breaks, stop and fix runtime first.
+
+==================================================
+O. REQUIRED REPORT
+==================
+
+After completion, provide:
+
+ADMIN DASHBOARD REPORT
+
+1. What was implemented
+2. Files changed
+3. Backend endpoints added/changed
+4. Frontend routes added
+5. Role permissions implemented:
+
+   * SUPER_ADMIN
+   * ADMIN
+   * MODERATOR
+   * MEMBER
+6. Users management status
+7. Articles management status
+8. News management status
+9. Broadcast management status
+10. Last SUPER_ADMIN protection status
+11. OpenAPI/client generation status
+12. Runtime test results:
+
+* SUPER_ADMIN
+* ADMIN
+* MODERATOR
+* MEMBER
+* users management
+* articles approval/rejection
+* news create/edit/archive
+* broadcast create/deactivate
+* global banner
+* existing pages regression
+
+13. Preview status
+14. Known issues, if any
+15. Confirmation:
+
+* No Firebase
+* No MySQL migration
+* No old SGMA APP1 routes
+* No unrelated modules added
+* Existing user pages still work
+* Existing news/articles/chat/broadcast pages still work
+
+Do not hide runtime failures behind typecheck success.
+Do not report completion until the dashboard actually works in Preview.

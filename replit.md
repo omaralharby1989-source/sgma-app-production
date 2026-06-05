@@ -131,11 +131,39 @@ Articles security (`artifacts/api-server/src/routes/articles.ts`):
 - `POST /api/articles/:id/approve` `/reject` — staff only (403 for MEMBER), backend-only (no UI); sets reviewedById + rejectionReason
 - 3 sample APPROVED articles seeded
 
+## Admin Dashboard Module Status — COMPLETE
+
+Role-based admin module; backend is the source of truth for ALL permissions (UI gating is convenience only):
+- `/admin` — dashboard with stats cards (staff: MODERATOR/ADMIN/SUPER_ADMIN). User/role counts gated to ADMIN/SUPER_ADMIN only.
+- `/admin/users` — ADMIN/SUPER_ADMIN only; search + role filter, edit profile/role/status
+- `/admin/articles` — staff; status filter, approve/reject/archive
+- `/admin/news` — staff; status filter, create/edit
+- `/admin/broadcasts` — ADMIN/SUPER_ADMIN only; create/edit/delete
+
+Role matrix:
+- SUPER_ADMIN: everything
+- ADMIN: everything EXCEPT cannot act on SUPER_ADMIN targets, cannot assign ADMIN/SUPER_ADMIN (can assign up to MODERATOR)
+- MODERATOR: ONLY articles + news (NOT users, NOT broadcasts)
+- MEMBER: no access → redirected to /unauthorized
+
+Permission helpers (`artifacts/api-server/src/lib/permissions.ts`): isStaff, isAdminOrSuper, isSuperAdmin, canActOnUser, canChangeRole, assignableRoles.
+
+Critical safety rules (enforced in `routes/admin/users.ts` PATCH):
+- Cannot change your OWN role; cannot deactivate/suspend your OWN account
+- Cannot demote the last ACTIVE super admin; cannot deactivate the last ACTIVE super admin (both count `role=SUPER_ADMIN AND is_active=true` — active-only, not total)
+- Server never trusts client role/authorId — uses req.user
+
+Regression note: `POST /api/broadcasts` was TIGHTENED from staff (incl. MODERATOR) to ADMIN/SUPER_ADMIN only. Frontend `/broadcast` route + nav restricted to ADMIN/SUPER_ADMIN accordingly.
+
+Admin routes live in `artifacts/api-server/src/routes/admin/` (index, stats, users, articles, news, broadcasts), registered via `routes/index.ts`. Frontend pages in `artifacts/sgma-app2/src/pages/admin/`. ProtectedRoute supports `allowedRoles?: string[]`.
+
 ## Test Accounts
 
 | account | email | password | role |
 |---------|-------|----------|------|
 | lordhygm | lordhygm@gmail.com | 123456 | SUPER_ADMIN |
+| testadmin | (signup) | 123456 | ADMIN |
+| testmod | (signup) | 123456 | MODERATOR |
 | testmember | testmember@example.com | 123456 | MEMBER |
 
 ## User preferences

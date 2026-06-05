@@ -446,10 +446,204 @@ export interface DeveloperInfo {
   builtWith?: string[];
 }
 
+export interface AdminDashboardStats {
+  pendingArticles: number;
+  publishedNews: number;
+  /** @nullable */
+  totalUsers?: number | null;
+  /** @nullable */
+  activeUsers?: number | null;
+  /** @nullable */
+  moderatorCount?: number | null;
+  /** @nullable */
+  adminCount?: number | null;
+  /** @nullable */
+  superAdminCount?: number | null;
+}
+
+export type AdminUserItemRole = typeof AdminUserItemRole[keyof typeof AdminUserItemRole];
+
+
+export const AdminUserItemRole = {
+  MEMBER: 'MEMBER',
+  MODERATOR: 'MODERATOR',
+  ADMIN: 'ADMIN',
+  SUPER_ADMIN: 'SUPER_ADMIN',
+} as const;
+
+export type AdminUserItemStatus = typeof AdminUserItemStatus[keyof typeof AdminUserItemStatus];
+
+
+export const AdminUserItemStatus = {
+  PENDING: 'PENDING',
+  ACTIVE: 'ACTIVE',
+  SUSPENDED: 'SUSPENDED',
+} as const;
+
+export interface AdminUserItem {
+  id: number;
+  fullName: string;
+  account: string;
+  email: string;
+  role: AdminUserItemRole;
+  status: AdminUserItemStatus;
+  isActive: boolean;
+  /** @nullable */
+  professionGroup?: string | null;
+  createdAt: string;
+}
+
+export type AdminUsersListResponse = AdminUserItem[];
+
+export type AdminUserDetailRole = typeof AdminUserDetailRole[keyof typeof AdminUserDetailRole];
+
+
+export const AdminUserDetailRole = {
+  MEMBER: 'MEMBER',
+  MODERATOR: 'MODERATOR',
+  ADMIN: 'ADMIN',
+  SUPER_ADMIN: 'SUPER_ADMIN',
+} as const;
+
+export type AdminUserDetailStatus = typeof AdminUserDetailStatus[keyof typeof AdminUserDetailStatus];
+
+
+export const AdminUserDetailStatus = {
+  PENDING: 'PENDING',
+  ACTIVE: 'ACTIVE',
+  SUSPENDED: 'SUSPENDED',
+} as const;
+
+export interface AdminUserDetail {
+  id: number;
+  fullName: string;
+  account: string;
+  email: string;
+  role: AdminUserDetailRole;
+  status: AdminUserDetailStatus;
+  isActive: boolean;
+  isDeveloper: boolean;
+  /** @nullable */
+  phone?: string | null;
+  /** @nullable */
+  whatsapp?: string | null;
+  /** @nullable */
+  birthDate?: string | null;
+  /** @nullable */
+  address?: string | null;
+  /** @nullable */
+  professionGroup?: string | null;
+  /** @nullable */
+  specialtyText?: string | null;
+  /** @nullable */
+  bio?: string | null;
+  /** @nullable */
+  avatarUrl?: string | null;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export type AdminUpdateUserInputRole = typeof AdminUpdateUserInputRole[keyof typeof AdminUpdateUserInputRole];
+
+
+export const AdminUpdateUserInputRole = {
+  MEMBER: 'MEMBER',
+  MODERATOR: 'MODERATOR',
+  ADMIN: 'ADMIN',
+  SUPER_ADMIN: 'SUPER_ADMIN',
+} as const;
+
+export type AdminUpdateUserInputStatus = typeof AdminUpdateUserInputStatus[keyof typeof AdminUpdateUserInputStatus];
+
+
+export const AdminUpdateUserInputStatus = {
+  PENDING: 'PENDING',
+  ACTIVE: 'ACTIVE',
+  SUSPENDED: 'SUSPENDED',
+} as const;
+
+export interface AdminUpdateUserInput {
+  /** @minLength 1 */
+  fullName?: string;
+  /** @minLength 1 */
+  account?: string;
+  email?: string;
+  /** @nullable */
+  phone?: string | null;
+  /** @nullable */
+  whatsapp?: string | null;
+  /** @nullable */
+  address?: string | null;
+  /** @nullable */
+  birthDate?: string | null;
+  /** @nullable */
+  professionGroup?: string | null;
+  /** @nullable */
+  specialtyText?: string | null;
+  /** @nullable */
+  bio?: string | null;
+  role?: AdminUpdateUserInputRole;
+  status?: AdminUpdateUserInputStatus;
+  isActive?: boolean;
+}
+
+export type BroadcastListResponse = BroadcastItem[];
+
+export interface UpdateBroadcastInput {
+  /**
+     * @minLength 1
+     * @maxLength 200
+     */
+  title?: string;
+  /**
+     * @minLength 1
+     * @maxLength 2000
+     */
+  content?: string;
+  /**
+     * Optional expiry timestamp (ISO date or date-time), or null to clear
+     * @nullable
+     */
+  expiresAt?: string | null;
+  isActive?: boolean;
+}
+
 export type GetAdminChatMessagesParams = {
 /**
  * Member conversation to load (staff only)
  */
 userId?: number;
 };
+
+export type GetAdminUsersParams = {
+q?: string;
+role?: GetAdminUsersRole;
+};
+
+export type GetAdminUsersRole = typeof GetAdminUsersRole[keyof typeof GetAdminUsersRole];
+
+
+export const GetAdminUsersRole = {
+  MEMBER: 'MEMBER',
+  MODERATOR: 'MODERATOR',
+  ADMIN: 'ADMIN',
+  SUPER_ADMIN: 'SUPER_ADMIN',
+} as const;
+
+export type GetAdminArticlesParams = {
+status?: ArticleStatus;
+};
+
+export type GetAdminNewsParams = {
+status?: GetAdminNewsStatus;
+};
+
+export type GetAdminNewsStatus = typeof GetAdminNewsStatus[keyof typeof GetAdminNewsStatus];
+
+
+export const GetAdminNewsStatus = {
+  DRAFT: 'DRAFT',
+  PUBLISHED: 'PUBLISHED',
+  ARCHIVED: 'ARCHIVED',
+} as const;
 
