@@ -34,6 +34,7 @@ export const signupBodyPasswordMin = 6;
 
 
 
+
 export const SignupBody = zod.object({
   "fullName": zod.string().min(signupBodyFullNameMin),
   "account": zod.string().min(signupBodyAccountMin),
@@ -45,7 +46,7 @@ export const SignupBody = zod.object({
   "whatsapp": zod.string().min(1),
   "professionGroup": zod.string().min(1),
   "specialtyText": zod.string().min(1),
-  "membershipNumber": zod.string().optional().describe('Optional SGMA membership number')
+  "membershipNumber": zod.string().min(1).describe('Required SGMA membership number')
 })
 
 
@@ -135,8 +136,7 @@ export const UpdateMemberProfileBody = zod.object({
   "whatsapp": zod.string().min(1).optional(),
   "professionGroup": zod.string().min(1).optional(),
   "specialtyText": zod.string().min(1).optional(),
-  "bio": zod.string().nullish(),
-  "membershipNumber": zod.string().nullish()
+  "bio": zod.string().nullish()
 })
 
 export const UpdateMemberProfileResponse = zod.object({
@@ -761,7 +761,8 @@ export const GetAdminStatsResponse = zod.object({
  */
 export const GetAdminUsersQueryParams = zod.object({
   "q": zod.coerce.string().optional(),
-  "role": zod.enum(['MEMBER', 'MODERATOR', 'ADMIN', 'SUPER_ADMIN']).optional()
+  "role": zod.enum(['MEMBER', 'MODERATOR', 'ADMIN', 'SUPER_ADMIN']).optional(),
+  "status": zod.enum(['PENDING', 'ACTIVE', 'SUSPENDED']).optional()
 })
 
 export const GetAdminUsersResponseItem = zod.object({

@@ -48,12 +48,20 @@ Avatar upload fix:
 - Root cause was `express.json()` default 100kb limit → 413 before the route. Fixed in `artifacts/api-server/src/app.ts` (limits → 8mb + Arabic 413 handler)
 - `home.tsx` avatar upload: client-side type (jpeg/png/webp) + 2MB validation with Arabic toasts; reads server error from `err.data.error` (NOT `err.response.data` — this fetch client puts the payload on `ApiError.data`); resets `input.value`; `reader.onerror` handled
 
-Membership Number (`membershipNumber` / رقم العضوية) — OPTIONAL, nullable:
-- DB: nullable `membership_number` text column on `users`
-- OpenAPI: added to SignupInput (optional), MemberProfile, MemberProfileUpdate, AdminUserItem, AdminUserDetail, AdminUpdateUserInput
-- Backend: signup inserts `trim() || null`; member PATCH + admin PATCH allow it; respects existing role protections (admin edits still blocked by canActOnUser etc.)
-- Frontend: register form (optional field, sends `undefined` when empty), `/home` profile (shows "غير مضاف" when empty, editable), `/admin/users` edit dialog
-- Null vs undefined: signup sends `undefined` when empty (SignupInput type), profile/admin updates send `null` when empty (nullable update types)
+Membership Number (`membershipNumber` / رقم العضوية) — REQUIRED at signup, UNIQUE, read-only for members:
+- DB: `membership_number` text column on `users` with a UNIQUE constraint (`users_membership_number_unique`). Still nullable (Postgres allows multiple NULLs; admin-created/edited values may be cleared to null).
+- OpenAPI: `SignupInput.membershipNumber` is REQUIRED (minLength 1); present on MemberProfile, AdminUserItem, AdminUserDetail, AdminUpdateUserInput. REMOVED from MemberProfileUpdate (members can no longer edit it).
+- Backend signup: rejects empty membership with Arabic 400 ("الرجاء إدخال رقم العضوية"); duplicate → Arabic 409 ("رقم العضوية مستخدم بالفعل"); 23505 unique-violation also mapped to 409 as a race-condition fallback.
+- Backend member PATCH: does NOT accept membershipNumber (read-only). Backend admin PATCH: accepts it with a duplicate check excluding the target (`ne(id)`) → 409.
+- Frontend: register form required field; `/home` profile shows it READ-ONLY (display "غير مضاف" when empty, no edit input); `/admin/users` edit dialog still edits it.
+
+## Account Approval Flow — COMPLETE
+
+New signups are NOT auto-activated. They must be approved by an admin before they can log in.
+- Signup (`POST /auth/signup`): inserts `status=PENDING`, `isActive=false`, role MEMBER; issues NO JWT. Returns `SignupResponse { message, status }` (201) — NOT AuthResponse. Frontend shows an Arabic "request submitted, pending approval" toast and redirects to `/login` (does not store any token).
+- Login (`POST /auth/login`) status gate, in order: password → role match → PENDING blocked ("حسابك قيد المراجعة. سيتم تفعيله بعد التحقق من رقم العضوية من قبل الإدارة.") → SUSPENDED or `!isActive` blocked ("تم إيقاف حسابك، يرجى التواصل مع الإدارة.") → only ACTIVE + isActive get a JWT.
+- Admin `/admin/users`: `status` query-param filter (All/Pending/Active/Suspended); status badges; membershipNumber shown per row; one-tap "تفعيل الحساب" button (PATCH `status=ACTIVE, isActive=true`) for PENDING/inactive users.
+- SAFETY: because PENDING now blocks login, admin guards treat ANY non-login-eligible result (`isActive=false` OR `status !== ACTIVE`) as "deactivation". Last-super-admin guards count only LOGIN-ELIGIBLE supers (`role=SUPER_ADMIN AND status=ACTIVE AND is_active=true`) via `countLoginEligibleSupers()`. Cannot self-deactivate (incl. self→PENDING) or demote/deactivate the last login-eligible super admin.
 
 ## Phase 1 Status — COMPLETE
 

@@ -40,6 +40,12 @@ router.post("/auth/signup", async (req, res): Promise<void> => {
 
   const { fullName, account, email, password, phone, whatsapp, birthDate, address, professionGroup, specialtyText, membershipNumber } = parsed.data;
 
+  const trimmedMembership = membershipNumber?.trim() ?? "";
+  if (!trimmedMembership) {
+    res.status(400).json({ error: "الرجاء إدخال رقم العضوية" });
+    return;
+  }
+
   try {
     const existing = await db
       .select()
@@ -48,13 +54,24 @@ router.post("/auth/signup", async (req, res): Promise<void> => {
       .limit(1);
 
     if (existing.length > 0) {
-      res.status(409).json({ error: "Account or email already exists" });
+      res.status(409).json({ error: "اسم المستخدم أو البريد الإلكتروني مستخدم بالفعل" });
+      return;
+    }
+
+    const [membershipConflict] = await db
+      .select()
+      .from(usersTable)
+      .where(eq(usersTable.membershipNumber, trimmedMembership))
+      .limit(1);
+
+    if (membershipConflict) {
+      res.status(409).json({ error: "رقم العضوية مستخدم بالفعل" });
       return;
     }
 
     const passwordHash = await bcrypt.hash(password, 10);
 
-    const [user] = await db
+    await db
       .insert(usersTable)
       .values({
         fullName,
@@ -62,28 +79,34 @@ router.post("/auth/signup", async (req, res): Promise<void> => {
         email,
         passwordHash,
         role: "MEMBER",
-        status: "ACTIVE",
+        status: "PENDING",
         isDeveloper: false,
-        isActive: true,
+        isActive: false,
         phone,
         whatsapp,
         birthDate,
         address,
         professionGroup,
         specialtyText,
-        membershipNumber: membershipNumber?.trim() || null,
+        membershipNumber: trimmedMembership,
       })
       .returning();
 
-    const token = signToken({
-      userId: user.id,
-      account: user.account,
-      role: user.role,
-      status: user.status,
+    res.status(201).json({
+      message:
+        "تم إرسال طلب التسجيل بنجاح. سيتم تفعيل حسابك بعد التحقق من رقم العضوية من قبل الإدارة.",
+      status: "PENDING",
     });
-
-    res.status(201).json({ token, user: formatUser(user) });
   } catch (err) {
+    if ((err as { code?: string })?.code === "23505") {
+      const detail = (err as { detail?: string })?.detail ?? "";
+      if (detail.includes("membership_number")) {
+        res.status(409).json({ error: "رقم العضوية مستخدم بالفعل" });
+        return;
+      }
+      res.status(409).json({ error: "اسم المستخدم أو البريد الإلكتروني مستخدم بالفعل" });
+      return;
+    }
     req.log.error({ err }, "Signup error");
     res.status(500).json({ error: "Internal server error" });
   }
@@ -121,8 +144,13 @@ router.post("/auth/login", async (req, res): Promise<void> => {
       return;
     }
 
-    if (user.status === "SUSPENDED") {
-      res.status(403).json({ error: "Your account has been suspended. Contact an administrator." });
+    if (user.status === "PENDING") {
+      res.status(403).json({ error: "حسابك قيد المراجعة. سيتم تفعيله بعد التحقق من رقم العضوية من قبل الإدارة." });
+      return;
+    }
+
+    if (user.status === "SUSPENDED" || !user.isActive) {
+      res.status(403).json({ error: "تم إيقاف حسابك، يرجى التواصل مع الإدارة." });
       return;
     }
 

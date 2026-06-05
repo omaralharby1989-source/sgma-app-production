@@ -318,8 +318,11 @@ export interface SignupInput {
   professionGroup: string;
   /** @minLength 1 */
   specialtyText: string;
-  /** Optional SGMA membership number */
-  membershipNumber?: string;
+  /**
+     * Required SGMA membership number
+     * @minLength 1
+     */
+  membershipNumber: string;
 }
 
 export type LoginInputRole = typeof LoginInputRole[keyof typeof LoginInputRole];
@@ -395,6 +398,20 @@ export interface AuthResponse {
   user: MemberProfile;
 }
 
+export type SignupResponseStatus = typeof SignupResponseStatus[keyof typeof SignupResponseStatus];
+
+
+export const SignupResponseStatus = {
+  PENDING: 'PENDING',
+  ACTIVE: 'ACTIVE',
+  SUSPENDED: 'SUSPENDED',
+} as const;
+
+export interface SignupResponse {
+  message: string;
+  status: SignupResponseStatus;
+}
+
 export interface MemberProfileUpdate {
   /** @minLength 2 */
   fullName?: string;
@@ -415,8 +432,6 @@ export interface MemberProfileUpdate {
   specialtyText?: string;
   /** @nullable */
   bio?: string | null;
-  /** @nullable */
-  membershipNumber?: string | null;
 }
 
 export interface PasswordUpdate {
@@ -630,6 +645,7 @@ userId?: number;
 export type GetAdminUsersParams = {
 q?: string;
 role?: GetAdminUsersRole;
+status?: GetAdminUsersStatus;
 };
 
 export type GetAdminUsersRole = typeof GetAdminUsersRole[keyof typeof GetAdminUsersRole];
@@ -640,6 +656,15 @@ export const GetAdminUsersRole = {
   MODERATOR: 'MODERATOR',
   ADMIN: 'ADMIN',
   SUPER_ADMIN: 'SUPER_ADMIN',
+} as const;
+
+export type GetAdminUsersStatus = typeof GetAdminUsersStatus[keyof typeof GetAdminUsersStatus];
+
+
+export const GetAdminUsersStatus = {
+  PENDING: 'PENDING',
+  ACTIVE: 'ACTIVE',
+  SUSPENDED: 'SUSPENDED',
 } as const;
 
 export type GetAdminArticlesParams = {

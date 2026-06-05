@@ -1,0 +1,152 @@
+STOP. Membership Number implementation is incomplete and does not match the requirement.
+
+Avatar upload fix is accepted.
+
+But Membership Number must NOT be optional.
+
+The user requirement is:
+Only SGMA members should be able to register and access the app.
+
+Current incorrect behavior:
+
+* Register shows: رقم العضوية (اختياري)
+* User can register without membershipNumber
+* New user can apparently complete normal registration flow
+* membershipNumber can be edited/cleared from My Account
+* No pending approval flow was implemented
+
+You must repair this now.
+
+Required behavior:
+
+1. Registration
+   membershipNumber must be REQUIRED.
+
+Label:
+رقم العضوية
+
+Do NOT write:
+اختياري
+
+Validation message:
+الرجاء إدخال رقم العضوية
+
+Frontend must block submission without membershipNumber.
+Backend must reject signup without membershipNumber.
+
+2. New account approval flow
+   New public registrations must not become active immediately.
+
+On signup:
+
+* role = MEMBER
+* isDeveloper = false
+* status = PENDING
+* isActive = false
+* membershipNumber required
+
+Do not issue a JWT token after signup if account is pending.
+
+After successful registration, show:
+تم إرسال طلب التسجيل بنجاح. سيتم تفعيل حسابك بعد التحقق من رقم العضوية من قبل الإدارة.
+
+3. Login behavior
+   Only ACTIVE + isActive users can log in.
+
+If status = PENDING or isActive = false:
+Do not issue token.
+Show:
+حسابك قيد المراجعة. سيتم تفعيله بعد التحقق من رقم العضوية.
+
+If status = SUSPENDED or INACTIVE:
+Show:
+تم إيقاف حسابك، يرجى التواصل مع الإدارة.
+
+Existing active users, especially SUPER_ADMIN, must continue working.
+
+4. My Account
+   membershipNumber must be displayed but read-only for normal users.
+
+Do not allow a normal user to edit or clear membershipNumber from /home.
+
+Reason:
+membershipNumber is used for verification.
+
+Only ADMIN/SUPER_ADMIN may edit membershipNumber from /admin/users according to the existing user-management permissions.
+
+5. Admin Users Management
+   /admin/users must show:
+
+* membershipNumber
+* status/isActive badge
+
+Pending users should be clearly visible.
+
+ADMIN/SUPER_ADMIN must be able to activate pending MEMBER accounts after checking membershipNumber.
+
+Button/action:
+تفعيل الحساب
+
+Activation sets:
+
+* status = ACTIVE
+* isActive = true
+
+Keep all existing protections:
+
+* ADMIN cannot modify SUPER_ADMIN
+* MODERATOR cannot access users
+* MEMBER cannot activate themselves
+* cannot deactivate/demote last active SUPER_ADMIN
+* cannot self-deactivate/self-demote
+
+6. OpenAPI/client
+   Update all affected schemas:
+
+* SignupInput: membershipNumber required
+* Signup response if needed
+* Login error handling if needed
+* MemberProfile: includes membershipNumber
+* MemberProfileUpdate: must NOT allow normal users to update membershipNumber
+* AdminUserItem/AdminUserDetail/AdminUpdateUserInput: includes membershipNumber and status/isActive
+
+Regenerate client.
+Run typecheck.
+
+7. Runtime tests required
+   Do not report completion until verified:
+
+* /register shows رقم العضوية without “اختياري”
+* registration without membershipNumber is blocked in frontend
+* backend rejects signup without membershipNumber
+* registration with membershipNumber succeeds but creates PENDING inactive account
+* pending account cannot log in
+* admin users page shows pending account + membershipNumber
+* ADMIN/SUPER_ADMIN can activate pending account
+* activated user can log in
+* My Account shows membershipNumber read-only
+* normal user cannot clear or edit membershipNumber
+* existing SUPER_ADMIN can still log in
+* avatar upload still works
+* admin dashboard still works
+* news/articles/chat/broadcast still work
+* Preview works
+
+Required report:
+MEMBERSHIP APPROVAL REPAIR REPORT
+
+Include:
+
+1. What was wrong before
+2. What was fixed
+3. Registration required membershipNumber status
+4. New account pending/activation behavior
+5. Login blocking behavior
+6. My Account read-only behavior
+7. Admin activation behavior
+8. Backend permission checks
+9. OpenAPI/client generation status
+10. Runtime test results
+11. Preview status
+12. Confirmation that avatar fix still works
+13. Confirmation no unrelated features were added

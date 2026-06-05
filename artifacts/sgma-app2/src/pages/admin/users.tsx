@@ -8,6 +8,7 @@ import type {
   AdminUserItem,
   AdminUpdateUserInput,
   GetAdminUsersRole,
+  GetAdminUsersStatus,
 } from "@workspace/api-client-react";
 import { useQueryClient } from "@tanstack/react-query";
 import { Card } from "@/components/ui/card";
@@ -44,10 +45,16 @@ const ROLE_LABELS: Record<string, string> = {
 };
 
 const STATUS_LABELS: Record<string, string> = {
-  PENDING: "قيد الانتظار",
+  PENDING: "قيد المراجعة",
   ACTIVE: "نشط",
   SUSPENDED: "موقوف",
 };
+
+function statusBadgeVariant(status: string): "default" | "secondary" | "outline" | "destructive" {
+  if (status === "ACTIVE") return "default";
+  if (status === "SUSPENDED") return "destructive";
+  return "secondary";
+}
 
 export default function AdminUsers() {
   const { toast } = useToast();
@@ -58,6 +65,7 @@ export default function AdminUsers() {
 
   const [q, setQ] = useState("");
   const [roleFilter, setRoleFilter] = useState<string>("ALL");
+  const [statusFilter, setStatusFilter] = useState<string>("ALL");
   const [editing, setEditing] = useState<AdminUserItem | null>(null);
   const [form, setForm] = useState<{ role: string; status: string; isActive: boolean; membershipNumber: string }>({
     role: "MEMBER",
@@ -69,6 +77,7 @@ export default function AdminUsers() {
   const params = {
     ...(q.trim() ? { q: q.trim() } : {}),
     ...(roleFilter !== "ALL" ? { role: roleFilter as GetAdminUsersRole } : {}),
+    ...(statusFilter !== "ALL" ? { status: statusFilter as GetAdminUsersStatus } : {}),
   };
 
   const { data: users, isLoading, isError } = useGetAdminUsers(params, {
@@ -94,6 +103,23 @@ export default function AdminUsers() {
     if (u.id === me?.id) return true;
     if (!isSuper && u.role === "SUPER_ADMIN") return false;
     return true;
+  }
+
+  function handleActivate(u: AdminUserItem) {
+    updateUser.mutate(
+      { id: u.id, data: { status: "ACTIVE", isActive: true } },
+      {
+        onSuccess: () => {
+          toast({ title: "تم تفعيل الحساب بنجاح" });
+          queryClient.invalidateQueries({ queryKey: getGetAdminUsersQueryKey(params) });
+        },
+        onError: (err) => {
+          const msg =
+            (err as { data?: { error?: string } })?.data?.error ?? "تعذر تفعيل الحساب";
+          toast({ title: msg, variant: "destructive" });
+        },
+      },
+    );
   }
 
   function handleSave() {
@@ -142,7 +168,7 @@ export default function AdminUsers() {
           />
         </div>
         <Select value={roleFilter} onValueChange={setRoleFilter}>
-          <SelectTrigger className="w-32">
+          <SelectTrigger className="w-28">
             <SelectValue />
           </SelectTrigger>
           <SelectContent>
@@ -151,6 +177,20 @@ export default function AdminUsers() {
             <SelectItem value="MODERATOR">مشرف</SelectItem>
             <SelectItem value="ADMIN">مدير</SelectItem>
             <SelectItem value="SUPER_ADMIN">مدير عام</SelectItem>
+          </SelectContent>
+        </Select>
+      </div>
+
+      <div className="flex gap-2">
+        <Select value={statusFilter} onValueChange={setStatusFilter}>
+          <SelectTrigger className="flex-1">
+            <SelectValue />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="ALL">كل الحالات</SelectItem>
+            <SelectItem value="PENDING">قيد المراجعة</SelectItem>
+            <SelectItem value="ACTIVE">نشط</SelectItem>
+            <SelectItem value="SUSPENDED">موقوف</SelectItem>
           </SelectContent>
         </Select>
       </div>
@@ -177,22 +217,36 @@ export default function AdminUsers() {
                   <div className="font-semibold truncate">{u.fullName}</div>
                   <div className="text-xs text-muted-foreground truncate">@{u.account}</div>
                   <div className="text-xs text-muted-foreground truncate">{u.email}</div>
+                  <div className="text-xs text-muted-foreground truncate" dir="ltr">
+                    رقم العضوية: {u.membershipNumber || "غير مضاف"}
+                  </div>
                   <div className="flex gap-2 mt-2 flex-wrap">
                     <Badge variant="secondary">{ROLE_LABELS[u.role] ?? u.role}</Badge>
-                    <Badge variant={u.status === "ACTIVE" ? "default" : "outline"}>
+                    <Badge variant={statusBadgeVariant(u.status)}>
                       {STATUS_LABELS[u.status] ?? u.status}
                     </Badge>
                     {!u.isActive && <Badge variant="destructive">معطل</Badge>}
                   </div>
                 </div>
-                <Button
-                  size="sm"
-                  variant="outline"
-                  disabled={!canEdit(u)}
-                  onClick={() => openEdit(u)}
-                >
-                  تعديل
-                </Button>
+                <div className="flex flex-col gap-2 shrink-0">
+                  {(u.status === "PENDING" || !u.isActive) && (
+                    <Button
+                      size="sm"
+                      disabled={!canEdit(u) || updateUser.isPending}
+                      onClick={() => handleActivate(u)}
+                    >
+                      تفعيل الحساب
+                    </Button>
+                  )}
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    disabled={!canEdit(u)}
+                    onClick={() => openEdit(u)}
+                  >
+                    تعديل
+                  </Button>
+                </div>
               </div>
             </Card>
           ))}

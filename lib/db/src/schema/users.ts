@@ -23,7 +23,7 @@ export const usersTable = pgTable("users", {
   specialtyText: text("specialty_text"),
   bio: text("bio"),
   avatarUrl: text("avatar_url"),
-  membershipNumber: text("membership_number"),
+  membershipNumber: text("membership_number").unique(),
   createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
   updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow().$onUpdate(() => new Date()),
 });

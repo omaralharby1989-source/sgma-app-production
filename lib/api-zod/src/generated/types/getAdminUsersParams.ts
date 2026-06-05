@@ -6,8 +6,10 @@
  * OpenAPI spec version: 0.1.0
  */
 import type { GetAdminUsersRole } from './getAdminUsersRole';
+import type { GetAdminUsersStatus } from './getAdminUsersStatus';
 
 export type GetAdminUsersParams = {
 q?: string;
 role?: GetAdminUsersRole;
+status?: GetAdminUsersStatus;
 };

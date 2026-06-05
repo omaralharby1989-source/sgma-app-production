@@ -26,7 +26,7 @@ const registerSchema = z
     whatsapp: z.string().min(1, "الرجاء إدخال رقم الواتساب"),
     professionGroup: z.string().min(1, "الرجاء اختيار المجموعة المهنية"),
     specialtyText: z.string().min(1, "الرجاء كتابة الاختصاص بالتفصيل"),
-    membershipNumber: z.string().optional(),
+    membershipNumber: z.string().min(1, "الرجاء إدخال رقم العضوية"),
     acceptTerms: z.literal(true, {
       errorMap: () => ({ message: "يجب الموافقة على شروط الاستخدام وسياسة الخصوصية" }),
     }),
@@ -76,15 +76,17 @@ export default function Register() {
           whatsapp: data.whatsapp,
           professionGroup: data.professionGroup,
           specialtyText: data.specialtyText,
-          membershipNumber: data.membershipNumber?.trim() || undefined,
+          membershipNumber: data.membershipNumber.trim(),
         },
       },
       {
-        onSuccess: (response) => {
-          localStorage.setItem("sgma_auth_token", response.token);
-          localStorage.setItem("sgma_auth_user", JSON.stringify(response.user));
-          toast({ title: "تم التسجيل بنجاح" });
-          setLocation("/home");
+        onSuccess: () => {
+          toast({
+            title: "تم إرسال طلب التسجيل بنجاح",
+            description:
+              "سيتم تفعيل حسابك بعد التحقق من رقم العضوية من قبل الإدارة.",
+          });
+          setLocation("/login");
         },
         onError: (error: any) => {
           toast({
@@ -203,8 +205,8 @@ export default function Register() {
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="membershipNumber">رقم العضوية (اختياري)</Label>
-                <Input id="membershipNumber" type="text" {...form.register("membershipNumber")} disabled={isPending} className="text-left" dir="ltr" placeholder="أدخل رقم عضويتك في SGMA إن وجد" />
+                <Label htmlFor="membershipNumber">رقم العضوية</Label>
+                <Input id="membershipNumber" type="text" {...form.register("membershipNumber")} disabled={isPending} className="text-left" dir="ltr" placeholder="أدخل رقم عضويتك في SGMA" />
                 {form.formState.errors.membershipNumber && (
                   <p className="text-xs text-destructive">{form.formState.errors.membershipNumber.message}</p>
                 )}

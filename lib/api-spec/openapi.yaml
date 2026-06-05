@@ -52,11 +52,11 @@ paths:
               $ref: "#/components/schemas/SignupInput"
       responses:
         "201":
-          description: Registered successfully
+          description: Registration submitted; account pending admin approval
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/AuthResponse"
+                $ref: "#/components/schemas/SignupResponse"
         "400":
           description: Validation error
           content:
@@ -1140,6 +1140,12 @@ paths:
           schema:
             type: string
             enum: [MEMBER, MODERATOR, ADMIN, SUPER_ADMIN]
+        - name: status
+          in: query
+          required: false
+          schema:
+            type: string
+            enum: [PENDING, ACTIVE, SUSPENDED]
       responses:
         "200":
           description: Users list
@@ -1922,6 +1928,7 @@ components:
           whatsapp,
           professionGroup,
           specialtyText,
+          membershipNumber,
         ]
       properties:
         fullName:
@@ -1957,7 +1964,8 @@ components:
           minLength: 1
         membershipNumber:
           type: string
-          description: Optional SGMA membership number
+          minLength: 1
+          description: Required SGMA membership number
 
     LoginInput:
       type: object
@@ -1980,6 +1988,16 @@ components:
           type: string
         user:
           $ref: "#/components/schemas/MemberProfile"
+
+    SignupResponse:
+      type: object
+      required: [message, status]
+      properties:
+        message:
+          type: string
+        status:
+          type: string
+          enum: [PENDING, ACTIVE, SUSPENDED]
 
     MemberProfile:
       type: object
@@ -2059,8 +2077,6 @@ components:
           type: string
           minLength: 1
         bio:
-          type: ["string", "null"]
-        membershipNumber:
           type: ["string", "null"]
 
     PasswordUpdate:

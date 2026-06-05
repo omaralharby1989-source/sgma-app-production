@@ -38,7 +38,6 @@ const profileSchema = z.object({
   professionGroup: z.string().min(1, "الرجاء اختيار المجموعة المهنية"),
   specialtyText: z.string().min(1, "الرجاء كتابة الاختصاص بالتفصيل"),
   bio: z.string().optional(),
-  membershipNumber: z.string().optional(),
 });
 
 type ProfileForm = z.infer<typeof profileSchema>;
@@ -102,7 +101,6 @@ export default function Home() {
       professionGroup: "",
       specialtyText: "",
       bio: "",
-      membershipNumber: "",
     },
   });
 
@@ -130,7 +128,6 @@ export default function Home() {
       professionGroup: profile.professionGroup || "",
       specialtyText: profile.specialtyText || "",
       bio: profile.bio || "",
-      membershipNumber: profile.membershipNumber || "",
     });
     setIsEditing(true);
   };
@@ -149,7 +146,6 @@ export default function Home() {
           professionGroup: data.professionGroup,
           specialtyText: data.specialtyText,
           bio: data.bio ?? null,
-          membershipNumber: data.membershipNumber?.trim() || null,
         },
       });
       toast({ title: "تم تحديث الملف الشخصي بنجاح" });
@@ -369,11 +365,6 @@ export default function Home() {
                     <Label>رقم الواتساب</Label>
                     <Input type="tel" {...form.register("whatsapp")} disabled={isPending} dir="ltr" className="text-left" />
                     {form.formState.errors.whatsapp && <p className="text-xs text-destructive">{form.formState.errors.whatsapp.message}</p>}
-                  </div>
-                  <div className="space-y-2">
-                    <Label>رقم العضوية</Label>
-                    <Input {...form.register("membershipNumber")} disabled={isPending} dir="ltr" className="text-left" placeholder="أدخل رقم عضويتك في SGMA إن وجد" />
-                    {form.formState.errors.membershipNumber && <p className="text-xs text-destructive">{form.formState.errors.membershipNumber.message}</p>}
                   </div>
                 </CardContent>
               </Card>

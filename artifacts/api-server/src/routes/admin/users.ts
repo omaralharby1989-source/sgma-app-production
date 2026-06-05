@@ -1,6 +1,6 @@
 import { Router } from "express";
 import { db, usersTable } from "@workspace/db";
-import { eq, and, or, ilike, sql } from "drizzle-orm";
+import { eq, and, or, ne, ilike, sql } from "drizzle-orm";
 import { UpdateAdminUserBody } from "@workspace/api-zod";
 import { requireAuth } from "../../middlewares/auth";
 import {
@@ -13,6 +13,8 @@ import {
 const router = Router();
 
 const VALID_ROLES = ["MEMBER", "MODERATOR", "ADMIN", "SUPER_ADMIN"];
+const VALID_STATUSES = ["PENDING", "ACTIVE", "SUSPENDED"];
+type Status = "PENDING" | "ACTIVE" | "SUSPENDED";
 
 type UserRow = typeof usersTable.$inferSelect;
 
@@ -63,6 +65,23 @@ async function countUsersWhere(where: ReturnType<typeof eq>): Promise<number> {
   return row?.value ?? 0;
 }
 
+// Count super admins that can actually log in: only ACTIVE + isActive accounts
+// count. PENDING/SUSPENDED/inactive supers cannot authenticate, so they must not
+// satisfy the "last super admin" guards.
+async function countLoginEligibleSupers(): Promise<number> {
+  const [row] = await db
+    .select({ value: sql<number>`count(*)::int` })
+    .from(usersTable)
+    .where(
+      and(
+        eq(usersTable.role, "SUPER_ADMIN"),
+        eq(usersTable.status, "ACTIVE"),
+        eq(usersTable.isActive, true),
+      )!,
+    );
+  return row?.value ?? 0;
+}
+
 // List users (admin/super only)
 router.get("/admin/users", requireAuth, async (req, res): Promise<void> => {
   if (!isAdminOrSuper(req.user!.role)) {
@@ -73,10 +92,14 @@ router.get("/admin/users", requireAuth, async (req, res): Promise<void> => {
   try {
     const q = typeof req.query.q === "string" ? req.query.q.trim() : "";
     const roleFilter = typeof req.query.role === "string" ? req.query.role : "";
+    const statusFilter = typeof req.query.status === "string" ? req.query.status : "";
 
     const conditions = [];
     if (roleFilter && VALID_ROLES.includes(roleFilter)) {
       conditions.push(eq(usersTable.role, roleFilter as Role));
+    }
+    if (statusFilter && VALID_STATUSES.includes(statusFilter)) {
+      conditions.push(eq(usersTable.status, statusFilter as Status));
     }
     if (q) {
       const like = `%${q}%`;
@@ -179,8 +202,21 @@ router.patch("/admin/users/:id", requireAuth, async (req, res): Promise<void> =>
     if (d.professionGroup !== undefined) updates.professionGroup = d.professionGroup?.trim() || null;
     if (d.specialtyText !== undefined) updates.specialtyText = d.specialtyText?.trim() || null;
     if (d.bio !== undefined) updates.bio = d.bio?.trim() || null;
-    if (d.membershipNumber !== undefined)
-      updates.membershipNumber = d.membershipNumber?.trim() || null;
+    if (d.membershipNumber !== undefined) {
+      const trimmed = d.membershipNumber?.trim() || null;
+      if (trimmed) {
+        const [conflict] = await db
+          .select()
+          .from(usersTable)
+          .where(and(eq(usersTable.membershipNumber, trimmed), ne(usersTable.id, id)))
+          .limit(1);
+        if (conflict) {
+          res.status(409).json({ error: "رقم العضوية مستخدم بالفعل" });
+          return;
+        }
+      }
+      updates.membershipNumber = trimmed;
+    }
 
     // Role change
     if (d.role !== undefined && d.role !== target.role) {
@@ -193,12 +229,12 @@ router.patch("/admin/users/:id", requireAuth, async (req, res): Promise<void> =>
         return;
       }
       if (target.role === "SUPER_ADMIN" && d.role !== "SUPER_ADMIN") {
-        // Guard the last ACTIVE super admin: demoting the only active super
-        // would lock everyone out even if inactive/suspended supers exist.
-        const activeSupers = await countUsersWhere(
-          and(eq(usersTable.role, "SUPER_ADMIN"), eq(usersTable.isActive, true))!,
-        );
-        if (target.isActive && activeSupers <= 1) {
+        // Guard the last login-eligible super admin: demoting the only one that
+        // can actually log in (ACTIVE + isActive) would lock everyone out even
+        // if PENDING/SUSPENDED/inactive supers exist.
+        const activeSupers = await countLoginEligibleSupers();
+        const targetLoginEligible = target.status === "ACTIVE" && target.isActive;
+        if (targetLoginEligible && activeSupers <= 1) {
           res.status(403).json({ error: "لا يمكن إزالة آخر حساب سوبر أدمن نشط" });
           return;
         }
@@ -210,16 +246,18 @@ router.patch("/admin/users/:id", requireAuth, async (req, res): Promise<void> =>
     const wantsStatus = d.status !== undefined && d.status !== target.status;
     const wantsActive = d.isActive !== undefined && d.isActive !== target.isActive;
     if (wantsStatus || wantsActive) {
-      const deactivating = d.isActive === false || d.status === "SUSPENDED";
+      // A user is "deactivated" whenever the resulting state is not login-eligible:
+      // isActive=false, or any status other than ACTIVE (SUSPENDED or PENDING).
+      const deactivating =
+        d.isActive === false || (d.status !== undefined && d.status !== "ACTIVE");
       if (target.id === actorId && deactivating) {
         res.status(403).json({ error: "لا يمكنك تعطيل حسابك الخاص" });
         return;
       }
       if (target.role === "SUPER_ADMIN" && deactivating) {
-        const activeSupers = await countUsersWhere(
-          and(eq(usersTable.role, "SUPER_ADMIN"), eq(usersTable.isActive, true))!,
-        );
-        if (activeSupers <= 1) {
+        const activeSupers = await countLoginEligibleSupers();
+        const targetLoginEligible = target.status === "ACTIVE" && target.isActive;
+        if (targetLoginEligible && activeSupers <= 1) {
           res.status(403).json({ error: "لا يمكن تعطيل آخر حساب سوبر أدمن نشط" });
           return;
         }

@@ -57,6 +57,7 @@ import type {
   SendAdminChatMessageInput,
   SendChatMessageInput,
   SignupInput,
+  SignupResponse,
   UpdateArticleInput,
   UpdateBroadcastInput,
   UpdateNewsInput
@@ -163,9 +164,9 @@ export const getSignupUrl = () => {
 /**
  * @summary Register a new member
  */
-export const signup = async (signupInput: SignupInput, options?: RequestInit): Promise<AuthResponse> => {
+export const signup = async (signupInput: SignupInput, options?: RequestInit): Promise<SignupResponse> => {
 
-  return customFetch<AuthResponse>(getSignupUrl(),
+  return customFetch<SignupResponse>(getSignupUrl(),
   {
     ...options,
     method: 'POST',
