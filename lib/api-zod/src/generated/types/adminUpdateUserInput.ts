@@ -28,6 +28,8 @@ export interface AdminUpdateUserInput {
   specialtyText?: string | null;
   /** @nullable */
   bio?: string | null;
+  /** @nullable */
+  membershipNumber?: string | null;
   role?: AdminUpdateUserInputRole;
   status?: AdminUpdateUserInputStatus;
   isActive?: boolean;

@@ -18,5 +18,7 @@ export interface AdminUserItem {
   isActive: boolean;
   /** @nullable */
   professionGroup?: string | null;
+  /** @nullable */
+  membershipNumber?: string | null;
   createdAt: Date;
 }

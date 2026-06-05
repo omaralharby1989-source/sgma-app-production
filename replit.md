@@ -40,6 +40,20 @@ A mobile-first bilingual (Arabic/English) member community web app with JWT auth
 - Role validation happens at login — user must select the correct role to match DB role
 - Password hashing uses bcryptjs (pure JS, no native bindings needed)
 - Base64 data URIs stored directly for avatar images (Phase 1 — no object storage yet)
+- API body-parser limits raised to 8mb (json + urlencoded) so base64 avatar uploads aren't rejected with 413 before reaching the route; an `entity.too.large` handler returns Arabic JSON 413
+
+## Profile Image + Membership Number Status — COMPLETE
+
+Avatar upload fix:
+- Root cause was `express.json()` default 100kb limit → 413 before the route. Fixed in `artifacts/api-server/src/app.ts` (limits → 8mb + Arabic 413 handler)
+- `home.tsx` avatar upload: client-side type (jpeg/png/webp) + 2MB validation with Arabic toasts; reads server error from `err.data.error` (NOT `err.response.data` — this fetch client puts the payload on `ApiError.data`); resets `input.value`; `reader.onerror` handled
+
+Membership Number (`membershipNumber` / رقم العضوية) — OPTIONAL, nullable:
+- DB: nullable `membership_number` text column on `users`
+- OpenAPI: added to SignupInput (optional), MemberProfile, MemberProfileUpdate, AdminUserItem, AdminUserDetail, AdminUpdateUserInput
+- Backend: signup inserts `trim() || null`; member PATCH + admin PATCH allow it; respects existing role protections (admin edits still blocked by canActOnUser etc.)
+- Frontend: register form (optional field, sends `undefined` when empty), `/home` profile (shows "غير مضاف" when empty, editable), `/admin/users` edit dialog
+- Null vs undefined: signup sends `undefined` when empty (SignupInput type), profile/admin updates send `null` when empty (nullable update types)
 
 ## Phase 1 Status — COMPLETE
 

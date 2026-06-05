@@ -318,6 +318,8 @@ export interface SignupInput {
   professionGroup: string;
   /** @minLength 1 */
   specialtyText: string;
+  /** Optional SGMA membership number */
+  membershipNumber?: string;
 }
 
 export type LoginInputRole = typeof LoginInputRole[keyof typeof LoginInputRole];
@@ -381,6 +383,8 @@ export interface MemberProfile {
   bio?: string | null;
   /** @nullable */
   avatarUrl?: string | null;
+  /** @nullable */
+  membershipNumber?: string | null;
   createdAt: string;
   /** @nullable */
   updatedAt?: string | null;
@@ -411,6 +415,8 @@ export interface MemberProfileUpdate {
   specialtyText?: string;
   /** @nullable */
   bio?: string | null;
+  /** @nullable */
+  membershipNumber?: string | null;
 }
 
 export interface PasswordUpdate {
@@ -490,6 +496,8 @@ export interface AdminUserItem {
   isActive: boolean;
   /** @nullable */
   professionGroup?: string | null;
+  /** @nullable */
+  membershipNumber?: string | null;
   createdAt: string;
 }
 
@@ -539,6 +547,8 @@ export interface AdminUserDetail {
   bio?: string | null;
   /** @nullable */
   avatarUrl?: string | null;
+  /** @nullable */
+  membershipNumber?: string | null;
   createdAt: string;
   updatedAt: string;
 }
@@ -582,6 +592,8 @@ export interface AdminUpdateUserInput {
   specialtyText?: string | null;
   /** @nullable */
   bio?: string | null;
+  /** @nullable */
+  membershipNumber?: string | null;
   role?: AdminUpdateUserInputRole;
   status?: AdminUpdateUserInputStatus;
   isActive?: boolean;

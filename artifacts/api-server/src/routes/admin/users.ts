@@ -26,6 +26,7 @@ function formatUserItem(row: UserRow) {
     status: row.status,
     isActive: row.isActive,
     professionGroup: row.professionGroup,
+    membershipNumber: row.membershipNumber ?? null,
     createdAt: row.createdAt.toISOString(),
   };
 }
@@ -48,6 +49,7 @@ function formatUserDetail(row: UserRow) {
     specialtyText: row.specialtyText,
     bio: row.bio,
     avatarUrl: row.avatarUrl,
+    membershipNumber: row.membershipNumber ?? null,
     createdAt: row.createdAt.toISOString(),
     updatedAt: row.updatedAt.toISOString(),
   };
@@ -177,6 +179,8 @@ router.patch("/admin/users/:id", requireAuth, async (req, res): Promise<void> =>
     if (d.professionGroup !== undefined) updates.professionGroup = d.professionGroup?.trim() || null;
     if (d.specialtyText !== undefined) updates.specialtyText = d.specialtyText?.trim() || null;
     if (d.bio !== undefined) updates.bio = d.bio?.trim() || null;
+    if (d.membershipNumber !== undefined)
+      updates.membershipNumber = d.membershipNumber?.trim() || null;
 
     // Role change
     if (d.role !== undefined && d.role !== target.role) {

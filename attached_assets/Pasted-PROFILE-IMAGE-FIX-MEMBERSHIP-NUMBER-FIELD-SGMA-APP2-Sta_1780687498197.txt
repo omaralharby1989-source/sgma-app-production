@@ -1,0 +1,303 @@
+PROFILE IMAGE FIX + MEMBERSHIP NUMBER FIELD — SGMA APP2
+
+Start this task carefully.
+
+Scope:
+
+1. Diagnose and fix the profile image/avatar upload problem in “حسابي”.
+2. After the image problem is fixed, add Membership Number to registration, profile, and admin user management.
+
+Do not add new unrelated features.
+Do not break:
+
+* login
+* register
+* home/my account
+* news
+* articles
+* chat
+* broadcast
+* admin dashboard
+* more page
+
+Current architecture:
+
+* PostgreSQL + Drizzle
+* JWT auth
+* Arabic RTL
+* Mobile-first
+* No Firebase
+* No MySQL migration
+
+==================================================
+A. FIRST: DIAGNOSE PROFILE IMAGE PROBLEM
+========================================
+
+The user tested the My Account page and profile editing works, but changing/uploading the profile image fails with an error like:
+لا يمكن تحميل الصورة
+
+You must first investigate the exact cause before changing logic.
+
+Check:
+
+1. Frontend avatar upload code:
+
+* file input handling
+* accepted file types
+* image size validation
+* base64 conversion if used
+* request payload sent to backend
+* correct endpoint path
+* error handling message
+
+2. Backend avatar endpoint:
+
+* route exists and is mounted correctly
+* endpoint requires JWT correctly
+* request body schema matches frontend payload
+* payload size limit is not too small
+* avatarUrl/base64 field is accepted
+* database column supports the stored value
+* backend returns useful error instead of generic failure
+
+3. Server/body parser limits:
+   If the image is converted to base64, make sure Express JSON body size limit is large enough for reasonable profile images.
+
+Recommended:
+
+* Accept jpg, jpeg, png, webp
+* Limit file size reasonably, for example 1–2 MB before base64
+* Show Arabic error if too large:
+  حجم الصورة كبير جداً، يرجى اختيار صورة أصغر
+
+4. Storage strategy:
+   For now, do not add external storage.
+   If current system uses base64/avatarUrl in database, keep it simple and stable.
+   Do not introduce Firebase Storage.
+   Do not introduce S3.
+   Do not introduce random upload services.
+
+5. Fix the problem:
+
+* Avatar upload/change must work from /home.
+* After upload, avatar preview must update.
+* After page refresh, avatar must still show.
+* If no avatar exists, initials fallback must still work.
+* Broken avatar data must not crash the page.
+
+==================================================
+B. THEN: ADD MEMBERSHIP NUMBER
+==============================
+
+After avatar is fixed and verified, add a Membership Number field.
+
+Arabic label:
+رقم العضوية
+
+Field name:
+membershipNumber
+
+Database:
+Add membershipNumber to the users table if missing.
+
+Suggested properties:
+
+* string/text
+* optional or required depending current registration policy
+
+Important decision:
+For now, make membershipNumber OPTIONAL during public registration unless the user explicitly wants it required later.
+
+Reason:
+Some new users may not yet have an official SGMA membership number when registering.
+
+But in the profile/admin pages it should be visible and editable where appropriate.
+
+==================================================
+C. REGISTRATION PAGE
+====================
+
+Add field to /register:
+
+Label:
+رقم العضوية
+
+Placeholder:
+أدخل رقم عضويتك في SGMA إن وجد
+
+Validation:
+
+* optional for now
+* trim whitespace
+* if provided, save it
+
+Do not break existing required fields.
+
+==================================================
+D. MY ACCOUNT PAGE /home
+========================
+
+Show membershipNumber in “حسابي”.
+
+In display mode:
+
+* Show رقم العضوية
+* If empty, show:
+  غير مضاف
+
+In edit mode:
+
+* Allow the user to edit membershipNumber
+* Optional
+* Save changes with the rest of profile information
+
+The user must still NOT be able to edit:
+
+* role
+* isDeveloper
+* isActive
+* status
+
+==================================================
+E. ADMIN USERS MANAGEMENT
+=========================
+
+Update /admin/users.
+
+Show membershipNumber in:
+
+* user list if space allows
+* user detail/edit panel
+
+Allow:
+
+* SUPER_ADMIN can edit membershipNumber for any user.
+* ADMIN can edit membershipNumber for MEMBER and MODERATOR according to existing user-management restrictions.
+* MODERATOR cannot access user management.
+
+Do not allow membershipNumber changes to bypass existing role protections.
+
+==================================================
+F. BACKEND API REQUIREMENTS
+===========================
+
+Update user/profile APIs if needed:
+
+Register:
+
+* POST /api/auth/signup accepts membershipNumber optional.
+
+Profile:
+
+* GET /api/member/profile returns membershipNumber.
+* PATCH /api/member/profile allows current user to update membershipNumber.
+
+Admin:
+
+* GET /api/admin/users returns membershipNumber.
+* GET /api/admin/users/:id returns membershipNumber.
+* PATCH /api/admin/users/:id allows membershipNumber update according to existing permissions.
+
+Security:
+
+* Do not let user update protected fields.
+* Do not trust role/isDeveloper/isActive from frontend.
+* Keep all existing admin permission rules.
+
+==================================================
+G. OPENAPI / GENERATED CLIENT
+=============================
+
+If schemas change:
+
+* Update OpenAPI.
+* Regenerate client.
+* Do not manually edit generated files.
+* Run typecheck.
+
+Update relevant schemas:
+
+* Signup input
+* User/profile response
+* Profile update input
+* Admin user item/detail
+* Admin update user input
+
+==================================================
+H. TESTING REQUIRED
+===================
+
+Do not report completion until tested in Preview.
+
+Avatar tests:
+
+1. Login works.
+2. Open /home.
+3. Upload/change avatar with a valid image.
+4. Avatar preview updates.
+5. Refresh page — avatar remains visible.
+6. Try unsupported file type — clear Arabic error.
+7. Try too-large image — clear Arabic error.
+8. No avatar fallback still works.
+
+Membership number tests:
+
+1. /register shows رقم العضوية.
+2. Register works with membershipNumber empty.
+3. Register works with membershipNumber filled.
+4. /home displays membershipNumber.
+5. User can edit membershipNumber.
+6. Refresh page — membershipNumber remains saved.
+7. /admin/users shows membershipNumber.
+8. SUPER_ADMIN can edit membershipNumber.
+9. ADMIN can edit membershipNumber only for allowed target users.
+10. MODERATOR cannot access user management.
+
+Regression:
+
+1. /login works.
+2. /register works.
+3. /home works.
+4. /news works.
+5. /articles works.
+6. /chat works.
+7. /broadcast works for allowed roles.
+8. /admin works.
+9. /more works.
+10. Typecheck passes.
+11. Backend starts cleanly.
+12. Preview operational.
+
+==================================================
+I. REQUIRED REPORT
+==================
+
+After completion, provide:
+
+PROFILE IMAGE + MEMBERSHIP NUMBER REPORT
+
+1. Exact cause of avatar upload failure
+2. Files changed for avatar fix
+3. Avatar storage strategy used
+4. Avatar test results
+5. Database changes for membershipNumber
+6. Registration changes
+7. My Account changes
+8. Admin Users changes
+9. Backend API changes
+10. OpenAPI/client generation status
+11. Permission checks
+12. Runtime test results
+13. Preview status
+14. Known issues, if any
+15. Confirmation:
+
+* No Firebase
+* No MySQL migration
+* No unrelated features added
+* Existing modules still work
+
+Important:
+First fix and verify avatar upload.
+Then add membershipNumber.
+Do not hide runtime failures behind typecheck success.

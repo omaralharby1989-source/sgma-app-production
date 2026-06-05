@@ -26,4 +26,6 @@ export interface MemberProfileUpdate {
   specialtyText?: string;
   /** @nullable */
   bio?: string | null;
+  /** @nullable */
+  membershipNumber?: string | null;
 }

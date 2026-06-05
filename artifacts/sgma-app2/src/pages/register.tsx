@@ -26,6 +26,7 @@ const registerSchema = z
     whatsapp: z.string().min(1, "الرجاء إدخال رقم الواتساب"),
     professionGroup: z.string().min(1, "الرجاء اختيار المجموعة المهنية"),
     specialtyText: z.string().min(1, "الرجاء كتابة الاختصاص بالتفصيل"),
+    membershipNumber: z.string().optional(),
     acceptTerms: z.literal(true, {
       errorMap: () => ({ message: "يجب الموافقة على شروط الاستخدام وسياسة الخصوصية" }),
     }),
@@ -56,6 +57,7 @@ export default function Register() {
       whatsapp: "",
       professionGroup: "",
       specialtyText: "",
+      membershipNumber: "",
       acceptTerms: false as unknown as true,
     },
   });
@@ -74,6 +76,7 @@ export default function Register() {
           whatsapp: data.whatsapp,
           professionGroup: data.professionGroup,
           specialtyText: data.specialtyText,
+          membershipNumber: data.membershipNumber?.trim() || undefined,
         },
       },
       {
@@ -196,6 +199,14 @@ export default function Register() {
                 <Input id="whatsapp" type="tel" {...form.register("whatsapp")} disabled={isPending} className="text-left" dir="ltr" />
                 {form.formState.errors.whatsapp && (
                   <p className="text-xs text-destructive">{form.formState.errors.whatsapp.message}</p>
+                )}
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="membershipNumber">رقم العضوية (اختياري)</Label>
+                <Input id="membershipNumber" type="text" {...form.register("membershipNumber")} disabled={isPending} className="text-left" dir="ltr" placeholder="أدخل رقم عضويتك في SGMA إن وجد" />
+                {form.formState.errors.membershipNumber && (
+                  <p className="text-xs text-destructive">{form.formState.errors.membershipNumber.message}</p>
                 )}
               </div>
             </section>

@@ -44,7 +44,8 @@ export const SignupBody = zod.object({
   "phone": zod.string().min(1),
   "whatsapp": zod.string().min(1),
   "professionGroup": zod.string().min(1),
-  "specialtyText": zod.string().min(1)
+  "specialtyText": zod.string().min(1),
+  "membershipNumber": zod.string().optional().describe('Optional SGMA membership number')
 })
 
 
@@ -76,6 +77,7 @@ export const LoginResponse = zod.object({
   "specialtyText": zod.string().nullish(),
   "bio": zod.string().nullish(),
   "avatarUrl": zod.string().nullish(),
+  "membershipNumber": zod.string().nullish(),
   "createdAt": zod.coerce.date(),
   "updatedAt": zod.coerce.date().nullish()
 })
@@ -102,6 +104,7 @@ export const GetMemberProfileResponse = zod.object({
   "specialtyText": zod.string().nullish(),
   "bio": zod.string().nullish(),
   "avatarUrl": zod.string().nullish(),
+  "membershipNumber": zod.string().nullish(),
   "createdAt": zod.coerce.date(),
   "updatedAt": zod.coerce.date().nullish()
 })
@@ -132,7 +135,8 @@ export const UpdateMemberProfileBody = zod.object({
   "whatsapp": zod.string().min(1).optional(),
   "professionGroup": zod.string().min(1).optional(),
   "specialtyText": zod.string().min(1).optional(),
-  "bio": zod.string().nullish()
+  "bio": zod.string().nullish(),
+  "membershipNumber": zod.string().nullish()
 })
 
 export const UpdateMemberProfileResponse = zod.object({
@@ -152,6 +156,7 @@ export const UpdateMemberProfileResponse = zod.object({
   "specialtyText": zod.string().nullish(),
   "bio": zod.string().nullish(),
   "avatarUrl": zod.string().nullish(),
+  "membershipNumber": zod.string().nullish(),
   "createdAt": zod.coerce.date(),
   "updatedAt": zod.coerce.date().nullish()
 })
@@ -768,6 +773,7 @@ export const GetAdminUsersResponseItem = zod.object({
   "status": zod.enum(['PENDING', 'ACTIVE', 'SUSPENDED']),
   "isActive": zod.boolean(),
   "professionGroup": zod.string().nullish(),
+  "membershipNumber": zod.string().nullish(),
   "createdAt": zod.coerce.date()
 })
 export const GetAdminUsersResponse = zod.array(GetAdminUsersResponseItem)
@@ -797,6 +803,7 @@ export const GetAdminUserResponse = zod.object({
   "specialtyText": zod.string().nullish(),
   "bio": zod.string().nullish(),
   "avatarUrl": zod.string().nullish(),
+  "membershipNumber": zod.string().nullish(),
   "createdAt": zod.coerce.date(),
   "updatedAt": zod.coerce.date()
 })
@@ -824,6 +831,7 @@ export const UpdateAdminUserBody = zod.object({
   "professionGroup": zod.string().nullish(),
   "specialtyText": zod.string().nullish(),
   "bio": zod.string().nullish(),
+  "membershipNumber": zod.string().nullish(),
   "role": zod.enum(['MEMBER', 'MODERATOR', 'ADMIN', 'SUPER_ADMIN']).optional(),
   "status": zod.enum(['PENDING', 'ACTIVE', 'SUSPENDED']).optional(),
   "isActive": zod.boolean().optional()
@@ -846,6 +854,7 @@ export const UpdateAdminUserResponse = zod.object({
   "specialtyText": zod.string().nullish(),
   "bio": zod.string().nullish(),
   "avatarUrl": zod.string().nullish(),
+  "membershipNumber": zod.string().nullish(),
   "createdAt": zod.coerce.date(),
   "updatedAt": zod.coerce.date()
 })

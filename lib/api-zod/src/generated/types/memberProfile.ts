@@ -33,6 +33,8 @@ export interface MemberProfile {
   bio?: string | null;
   /** @nullable */
   avatarUrl?: string | null;
+  /** @nullable */
+  membershipNumber?: string | null;
   createdAt: Date;
   /** @nullable */
   updatedAt?: Date | null;

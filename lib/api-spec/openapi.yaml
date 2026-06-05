@@ -1955,6 +1955,9 @@ components:
         specialtyText:
           type: string
           minLength: 1
+        membershipNumber:
+          type: string
+          description: Optional SGMA membership number
 
     LoginInput:
       type: object
@@ -2016,6 +2019,8 @@ components:
           type: ["string", "null"]
         avatarUrl:
           type: ["string", "null"]
+        membershipNumber:
+          type: ["string", "null"]
         createdAt:
           type: string
           format: date-time
@@ -2054,6 +2059,8 @@ components:
           type: string
           minLength: 1
         bio:
+          type: ["string", "null"]
+        membershipNumber:
           type: ["string", "null"]
 
     PasswordUpdate:
@@ -2158,6 +2165,8 @@ components:
           type: boolean
         professionGroup:
           type: ["string", "null"]
+        membershipNumber:
+          type: ["string", "null"]
         createdAt:
           type: string
           format: date-time
@@ -2205,6 +2214,8 @@ components:
           type: ["string", "null"]
         avatarUrl:
           type: ["string", "null"]
+        membershipNumber:
+          type: ["string", "null"]
         createdAt:
           type: string
           format: date-time
@@ -2236,6 +2247,8 @@ components:
         specialtyText:
           type: ["string", "null"]
         bio:
+          type: ["string", "null"]
+        membershipNumber:
           type: ["string", "null"]
         role:
           type: string

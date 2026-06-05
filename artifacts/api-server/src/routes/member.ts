@@ -25,6 +25,7 @@ function formatUser(user: typeof usersTable.$inferSelect) {
     specialtyText: user.specialtyText ?? null,
     bio: user.bio ?? null,
     avatarUrl: user.avatarUrl ?? null,
+    membershipNumber: user.membershipNumber ?? null,
     createdAt: user.createdAt.toISOString(),
     updatedAt: user.updatedAt?.toISOString() ?? null,
   };
@@ -95,6 +96,8 @@ router.patch("/member/profile", requireAuth, async (req, res): Promise<void> => 
     if (parsed.data.professionGroup !== undefined) updates.professionGroup = parsed.data.professionGroup;
     if (parsed.data.specialtyText !== undefined) updates.specialtyText = parsed.data.specialtyText;
     if (parsed.data.bio !== undefined) updates.bio = parsed.data.bio ?? undefined;
+    if (parsed.data.membershipNumber !== undefined)
+      updates.membershipNumber = parsed.data.membershipNumber?.trim() || null;
 
     const [user] = await db
       .update(usersTable)

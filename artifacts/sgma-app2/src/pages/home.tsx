@@ -38,6 +38,7 @@ const profileSchema = z.object({
   professionGroup: z.string().min(1, "الرجاء اختيار المجموعة المهنية"),
   specialtyText: z.string().min(1, "الرجاء كتابة الاختصاص بالتفصيل"),
   bio: z.string().optional(),
+  membershipNumber: z.string().optional(),
 });
 
 type ProfileForm = z.infer<typeof profileSchema>;
@@ -101,6 +102,7 @@ export default function Home() {
       professionGroup: "",
       specialtyText: "",
       bio: "",
+      membershipNumber: "",
     },
   });
 
@@ -128,6 +130,7 @@ export default function Home() {
       professionGroup: profile.professionGroup || "",
       specialtyText: profile.specialtyText || "",
       bio: profile.bio || "",
+      membershipNumber: profile.membershipNumber || "",
     });
     setIsEditing(true);
   };
@@ -146,6 +149,7 @@ export default function Home() {
           professionGroup: data.professionGroup,
           specialtyText: data.specialtyText,
           bio: data.bio ?? null,
+          membershipNumber: data.membershipNumber?.trim() || null,
         },
       });
       toast({ title: "تم تحديث الملف الشخصي بنجاح" });
@@ -178,8 +182,33 @@ export default function Home() {
   };
 
   const handleAvatarUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
+    const input = e.target;
+    const file = input.files?.[0];
     if (!file) return;
+
+    const ALLOWED_TYPES = ["image/jpeg", "image/jpg", "image/png", "image/webp"];
+    const MAX_BYTES = 2 * 1024 * 1024;
+
+    if (!ALLOWED_TYPES.includes(file.type)) {
+      toast({
+        title: "نوع الملف غير مدعوم",
+        description: "يرجى اختيار صورة بصيغة JPG أو PNG أو WEBP",
+        variant: "destructive",
+      });
+      input.value = "";
+      return;
+    }
+
+    if (file.size > MAX_BYTES) {
+      toast({
+        title: "حجم الصورة كبير جداً",
+        description: "حجم الصورة كبير جداً، يرجى اختيار صورة أصغر (الحد الأقصى 2 ميجابايت)",
+        variant: "destructive",
+      });
+      input.value = "";
+      return;
+    }
+
     const reader = new FileReader();
     reader.onload = async (event) => {
       const base64 = event.target?.result as string;
@@ -188,9 +217,17 @@ export default function Home() {
         toast({ title: "تم تحديث الصورة الشخصية" });
         queryClient.invalidateQueries({ queryKey: getGetMemberProfileQueryKey() });
         queryClient.invalidateQueries({ queryKey: getGetMemberStatsQueryKey() });
-      } catch {
-        toast({ title: "حدث خطأ", description: "تعذر رفع الصورة", variant: "destructive" });
+      } catch (err) {
+        const description =
+          (err as { data?: { error?: string } })?.data?.error ?? "تعذر رفع الصورة";
+        toast({ title: "حدث خطأ", description, variant: "destructive" });
+      } finally {
+        input.value = "";
       }
+    };
+    reader.onerror = () => {
+      toast({ title: "حدث خطأ", description: "تعذر قراءة الصورة", variant: "destructive" });
+      input.value = "";
     };
     reader.readAsDataURL(file);
   };
@@ -230,7 +267,7 @@ export default function Home() {
             </button>
             <input
               type="file"
-              accept="image/*"
+              accept="image/jpeg,image/png,image/webp"
               className="hidden"
               ref={fileInputRef}
               onChange={handleAvatarUpload}
@@ -333,6 +370,11 @@ export default function Home() {
                     <Input type="tel" {...form.register("whatsapp")} disabled={isPending} dir="ltr" className="text-left" />
                     {form.formState.errors.whatsapp && <p className="text-xs text-destructive">{form.formState.errors.whatsapp.message}</p>}
                   </div>
+                  <div className="space-y-2">
+                    <Label>رقم العضوية</Label>
+                    <Input {...form.register("membershipNumber")} disabled={isPending} dir="ltr" className="text-left" placeholder="أدخل رقم عضويتك في SGMA إن وجد" />
+                    {form.formState.errors.membershipNumber && <p className="text-xs text-destructive">{form.formState.errors.membershipNumber.message}</p>}
+                  </div>
                 </CardContent>
               </Card>
 
@@ -418,6 +460,7 @@ export default function Home() {
                   <InfoRow label="العنوان الكامل" value={profile.address} />
                   <InfoRow label="رقم الهاتف" value={profile.phone} dir="ltr" />
                   <InfoRow label="رقم الواتساب" value={profile.whatsapp} dir="ltr" />
+                  <InfoRow label="رقم العضوية" value={profile.membershipNumber || "غير مضاف"} dir="ltr" />
                 </CardContent>
               </Card>
 

@@ -33,6 +33,8 @@ export interface AdminUserDetail {
   bio?: string | null;
   /** @nullable */
   avatarUrl?: string | null;
+  /** @nullable */
+  membershipNumber?: string | null;
   createdAt: Date;
   updatedAt: Date;
 }

@@ -59,10 +59,11 @@ export default function AdminUsers() {
   const [q, setQ] = useState("");
   const [roleFilter, setRoleFilter] = useState<string>("ALL");
   const [editing, setEditing] = useState<AdminUserItem | null>(null);
-  const [form, setForm] = useState<{ role: string; status: string; isActive: boolean }>({
+  const [form, setForm] = useState<{ role: string; status: string; isActive: boolean; membershipNumber: string }>({
     role: "MEMBER",
     status: "ACTIVE",
     isActive: true,
+    membershipNumber: "",
   });
 
   const params = {
@@ -85,7 +86,7 @@ export default function AdminUsers() {
 
   function openEdit(u: AdminUserItem) {
     setEditing(u);
-    setForm({ role: u.role, status: u.status, isActive: u.isActive });
+    setForm({ role: u.role, status: u.status, isActive: u.isActive, membershipNumber: u.membershipNumber ?? "" });
   }
 
   // ADMIN cannot act on SUPER_ADMIN users at all
@@ -101,6 +102,7 @@ export default function AdminUsers() {
       role: form.role as AdminUpdateUserInput["role"],
       status: form.status as AdminUpdateUserInput["status"],
       isActive: form.isActive,
+      membershipNumber: form.membershipNumber.trim() || null,
     };
     updateUser.mutate(
       { id: editing.id, data: payload },
@@ -238,6 +240,17 @@ export default function AdminUsers() {
                     <SelectItem value="SUSPENDED">موقوف</SelectItem>
                   </SelectContent>
                 </Select>
+              </div>
+
+              <div className="space-y-2">
+                <Label>رقم العضوية</Label>
+                <Input
+                  value={form.membershipNumber}
+                  onChange={(e) => setForm((f) => ({ ...f, membershipNumber: e.target.value }))}
+                  dir="ltr"
+                  className="text-left"
+                  placeholder="غير مضاف"
+                />
               </div>
 
               <div className="flex items-center justify-between">

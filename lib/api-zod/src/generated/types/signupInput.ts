@@ -29,4 +29,6 @@ export interface SignupInput {
   professionGroup: string;
   /** @minLength 1 */
   specialtyText: string;
+  /** Optional SGMA membership number */
+  membershipNumber?: string;
 }

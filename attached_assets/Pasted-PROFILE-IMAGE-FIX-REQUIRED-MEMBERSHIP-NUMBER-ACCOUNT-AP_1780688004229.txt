@@ -1,0 +1,446 @@
+PROFILE IMAGE FIX + REQUIRED MEMBERSHIP NUMBER + ACCOUNT APPROVAL FLOW + EXTERNAL TEST LINK — SGMA APP2
+
+Start this task carefully.
+
+Scope:
+
+1. Diagnose and fix the profile image/avatar upload problem in “حسابي”.
+2. Add required Membership Number during registration.
+3. Prevent non-members/unverified users from accessing the app.
+4. Add account approval flow for ADMIN/SUPER_ADMIN.
+5. Provide an external public preview/test link after verification.
+
+Do not add unrelated features.
+Do not break existing modules:
+
+* login
+* register
+* home/my account
+* news
+* articles
+* chat
+* broadcast
+* admin dashboard
+* more page
+* developer-info
+
+Current architecture:
+
+* PostgreSQL + Drizzle
+* JWT auth
+* Arabic RTL
+* Mobile-first
+* No Firebase
+* No MySQL migration
+
+==================================================
+A. FIRST: FIX PROFILE IMAGE / AVATAR UPLOAD
+===========================================
+
+The profile image change in /home currently fails with an Arabic error like:
+لا يمكن تحميل الصورة
+
+Investigate the exact cause before changing logic.
+
+Check:
+
+1. Frontend avatar upload:
+
+* file input handling
+* accepted file types
+* file size validation
+* base64 conversion if used
+* request payload sent to backend
+* correct endpoint path
+* frontend error handling
+
+2. Backend avatar endpoint:
+
+* route exists and is mounted
+* JWT protected correctly
+* request body schema matches frontend payload
+* Express JSON/body size limit is large enough
+* avatarUrl/base64 field is accepted
+* DB column supports stored value
+* useful error returned instead of generic failure
+
+3. Body size:
+   If base64 is used, increase JSON body size limit safely, for example to support images up to 1–2 MB before conversion.
+
+Rules:
+
+* Accept jpg, jpeg, png, webp
+* Reject unsupported types with Arabic error
+* Reject too-large images with Arabic error:
+  حجم الصورة كبير جداً، يرجى اختيار صورة أصغر
+* Do not add Firebase Storage
+* Do not add S3
+* Do not add external upload service
+* Keep current simple avatarUrl/base64 strategy if already used
+
+Required avatar behavior:
+
+* Upload works from /home
+* Avatar preview updates immediately
+* Refresh page: avatar remains visible
+* Empty avatar: initials fallback works
+* Broken avatar data does not crash the page
+
+==================================================
+B. ADD REQUIRED MEMBERSHIP NUMBER
+=================================
+
+Add field:
+
+Field name:
+membershipNumber
+
+Arabic label:
+رقم العضوية
+
+Purpose:
+Only SGMA members should be able to register and use the application.
+
+This field is REQUIRED during registration.
+
+Database:
+Add membershipNumber to users table if missing.
+
+Properties:
+
+* text/string
+* required for newly registered users
+* unique if safe and clean to implement
+* trim whitespace
+* do not allow empty value
+
+If uniqueness is implemented:
+
+* Duplicate membershipNumber should return a clear Arabic-friendly error.
+
+==================================================
+C. REGISTRATION PAGE /register
+==============================
+
+Add required field:
+
+Label:
+رقم العضوية
+
+Placeholder:
+أدخل رقم عضويتك في SGMA
+
+Validation:
+
+* required
+* trim whitespace
+* clear Arabic error if empty:
+  الرجاء إدخال رقم العضوية
+
+Important:
+No public role selector.
+New public users must still be created as:
+role = MEMBER
+isDeveloper = false
+
+==================================================
+D. ACCOUNT APPROVAL FLOW
+========================
+
+Because only verified SGMA members should access the app, new accounts must NOT become fully active automatically.
+
+Required behavior for new public registration:
+
+* User submits register form with membershipNumber.
+* Account is created as MEMBER.
+* Account must be inactive or pending verification by default.
+
+Use the existing status/isActive system cleanly.
+
+Preferred:
+status = PENDING
+isActive = false
+
+If current enum does not support PENDING, extend it safely.
+Acceptable statuses:
+
+* ACTIVE
+* PENDING
+* SUSPENDED
+* INACTIVE
+
+After successful registration, show Arabic message:
+تم إرسال طلب التسجيل بنجاح. سيتم تفعيل حسابك بعد التحقق من رقم العضوية من قبل الإدارة.
+
+Do NOT immediately log the user into the app if account is pending.
+
+==================================================
+E. LOGIN BLOCK FOR UNVERIFIED USERS
+===================================
+
+Update login behavior.
+
+If user exists but account is not active / status is PENDING:
+
+* Do not issue JWT token.
+* Do not allow access to app pages.
+* Return clear Arabic-friendly message:
+  حسابك قيد المراجعة. سيتم تفعيله بعد التحقق من رقم العضوية.
+
+If status is SUSPENDED/INACTIVE:
+Return:
+تم إيقاف حسابك، يرجى التواصل مع الإدارة.
+
+Only ACTIVE users can log in and receive JWT.
+
+Existing active users, especially SUPER_ADMIN, must continue working.
+
+==================================================
+F. ADMIN USER APPROVAL
+======================
+
+Update /admin/users so ADMIN and SUPER_ADMIN can verify/activate accounts.
+
+Access:
+
+* SUPER_ADMIN: full user management
+* ADMIN: can manage MEMBER/MODERATOR according to existing restrictions
+* MODERATOR: no user management
+
+Admin users page must show:
+
+* membershipNumber
+* status/isActive
+* clear badge:
+
+  * قيد المراجعة
+  * نشط
+  * موقوف / غير فعال
+
+Add filters if clean:
+
+* All
+* Pending
+* Active
+* Suspended/Inactive
+
+For pending users:
+ADMIN/SUPER_ADMIN should be able to:
+
+* View membershipNumber
+* Verify membership manually
+* Activate account
+
+Button:
+تفعيل الحساب
+
+After activation:
+
+* status = ACTIVE
+* isActive = true
+* user can log in
+
+Do not allow:
+
+* MEMBER to activate themselves
+* MODERATOR to activate users
+* ADMIN to modify SUPER_ADMIN
+* anyone to deactivate last active SUPER_ADMIN
+* self-deactivation/self-demotion
+
+Keep all existing admin permission protections.
+
+==================================================
+G. MY ACCOUNT /home
+===================
+
+Show membershipNumber in user profile.
+
+Display:
+رقم العضوية
+
+If available, show value.
+
+In edit mode:
+
+* For normal users, membershipNumber should preferably be read-only after registration, because it is used for verification.
+* If you decide to allow editing, then changing membershipNumber should reset status to PENDING and require re-verification.
+* Preferred for now: read-only in user profile after registration.
+
+Admin can edit membershipNumber from /admin/users according to permissions.
+
+==================================================
+H. BACKEND API REQUIREMENTS
+===========================
+
+Update APIs as needed:
+
+POST /api/auth/signup:
+
+* requires membershipNumber
+* creates user as MEMBER
+* status = PENDING
+* isActive = false
+* does not issue JWT if pending
+* returns success message/status
+
+POST /api/auth/login:
+
+* only ACTIVE + isActive users can log in
+* PENDING users blocked with Arabic-friendly message
+* SUSPENDED/INACTIVE users blocked
+
+GET /api/member/profile:
+
+* returns membershipNumber
+
+PATCH /api/member/profile:
+
+* do not allow normal user to freely bypass verification by changing membershipNumber
+* preferred: membershipNumber read-only for members
+
+Admin:
+GET /api/admin/users:
+
+* includes membershipNumber and status/isActive
+
+GET /api/admin/users/:id:
+
+* includes membershipNumber
+
+PATCH /api/admin/users/:id:
+
+* allows ADMIN/SUPER_ADMIN to edit membershipNumber according to existing user-management permissions
+* allows activation of pending users according to permissions
+* preserves all SUPER_ADMIN safety rules
+
+==================================================
+I. OPENAPI / GENERATED CLIENT
+=============================
+
+Update OpenAPI schemas:
+
+* Signup input
+* Signup response if needed
+* Login response/error behavior if needed
+* Member profile response
+* Profile update input if needed
+* Admin user item/detail
+* Admin update user input
+
+Then:
+
+* Regenerate client
+* Do not manually edit generated files
+* Fix type errors
+* Run typecheck
+
+==================================================
+J. EXTERNAL TEST LINK REQUIRED
+==============================
+
+After completing and verifying the changes, provide an external/public preview link that I can send to another person for testing.
+
+Requirements:
+
+* Link must open the current running SGMA APP2 preview.
+* If Replit provides an external URL, include it in the report.
+* If the current environment needs deployment or webview sharing enabled, explain the exact next step.
+* Do not expose secrets.
+* Do not include database credentials.
+
+Also provide test instructions for the external tester:
+
+External tester should verify:
+
+1. Register page opens.
+2. Membership number is required.
+3. Registration without membership number is blocked.
+4. Registration with membership number succeeds but account remains pending.
+5. Pending account cannot log in until activated.
+6. Admin can activate the account.
+7. After activation, the tester can log in.
+
+==================================================
+K. TESTING REQUIRED
+===================
+
+Do not report completion until tested in Preview.
+
+Avatar tests:
+
+1. Login as active SUPER_ADMIN.
+2. Open /home.
+3. Upload valid avatar image.
+4. Avatar preview updates.
+5. Refresh page — avatar remains visible.
+6. Unsupported type shows Arabic error.
+7. Too-large image shows Arabic error.
+8. Empty avatar fallback still works.
+
+Membership/approval tests:
+
+1. /register shows رقم العضوية.
+2. Registration without membershipNumber is blocked.
+3. Registration with membershipNumber succeeds.
+4. New registered account is PENDING / inactive.
+5. Pending account cannot log in.
+6. Admin users page shows pending account and membershipNumber.
+7. ADMIN/SUPER_ADMIN can activate pending account.
+8. Activated user can log in.
+9. MEMBER cannot activate self.
+10. MODERATOR cannot access user management.
+11. Existing SUPER_ADMIN login still works.
+
+Regression:
+
+1. /login works.
+2. /register works.
+3. /home works.
+4. /news works.
+5. /articles works.
+6. /chat works.
+7. /broadcast works for allowed roles.
+8. /admin works.
+9. /more works.
+10. /developer-info works.
+11. Typecheck passes.
+12. Backend starts cleanly.
+13. Preview operational.
+
+==================================================
+L. REQUIRED REPORT
+==================
+
+After completion, provide:
+
+PROFILE IMAGE + MEMBERSHIP APPROVAL REPORT
+
+1. Exact cause of avatar upload failure
+2. Avatar fix implemented
+3. Avatar storage strategy
+4. Avatar test results
+5. Database changes for membershipNumber/status if any
+6. Registration changes
+7. Login blocking behavior for pending/inactive users
+8. Admin user activation changes
+9. My Account membershipNumber display behavior
+10. Backend API changes
+11. OpenAPI/client generation status
+12. Permission/security checks
+13. Runtime test results
+14. External public test link
+15. External tester instructions
+16. Preview status
+17. Known issues, if any
+18. Confirmation:
+
+* No Firebase
+* No MySQL migration
+* No unrelated features added
+* Existing modules still work
+
+Important:
+First fix and verify avatar upload.
+Then implement required membershipNumber and pending approval flow.
+Do not hide runtime failures behind typecheck success.
