@@ -15,6 +15,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { Skeleton } from "@/components/ui/skeleton";
 import { BackButton } from "@/components/BackButton";
+import { ImageInput } from "@/components/ImageInput";
 import { useToast } from "@/hooks/use-toast";
 import { Pencil, Save, Send, Loader2, AlertCircle } from "lucide-react";
 import { canEditArticle } from "@/lib/articles";
@@ -192,15 +193,11 @@ export default function ArticleEdit() {
                 />
               </div>
 
-              <div className="space-y-1.5">
-                <Label htmlFor="ed-image">رابط صورة المقال (اختياري)</Label>
-                <Input
-                  id="ed-image"
-                  value={imageUrl}
-                  onChange={(e) => setImageUrl(e.target.value)}
-                  dir="ltr"
-                />
-              </div>
+              <ImageInput
+                label="صورة المقال (اختياري)"
+                value={imageUrl}
+                onChange={setImageUrl}
+              />
 
               <div className="space-y-1.5">
                 <Label htmlFor="ed-content">محتوى المقال</Label>

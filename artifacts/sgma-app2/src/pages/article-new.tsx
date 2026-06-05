@@ -8,6 +8,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { BackButton } from "@/components/BackButton";
+import { ImageInput } from "@/components/ImageInput";
 import { useToast } from "@/hooks/use-toast";
 import { PenLine, Send, Save, Loader2 } from "lucide-react";
 
@@ -136,16 +137,11 @@ export default function ArticleNew() {
               />
             </div>
 
-            <div className="space-y-1.5">
-              <Label htmlFor="ar-image">رابط صورة المقال (اختياري)</Label>
-              <Input
-                id="ar-image"
-                value={imageUrl}
-                onChange={(e) => setImageUrl(e.target.value)}
-                placeholder="https://..."
-                dir="ltr"
-              />
-            </div>
+            <ImageInput
+              label="صورة المقال (اختياري)"
+              value={imageUrl}
+              onChange={setImageUrl}
+            />
 
             <div className="space-y-1.5">
               <Label htmlFor="ar-content">محتوى المقال</Label>

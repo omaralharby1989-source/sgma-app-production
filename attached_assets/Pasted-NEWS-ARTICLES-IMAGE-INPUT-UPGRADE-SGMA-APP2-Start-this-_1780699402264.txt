@@ -1,0 +1,405 @@
+NEWS + ARTICLES IMAGE INPUT UPGRADE — SGMA APP2
+
+Start this task now.
+
+Scope:
+Upgrade image handling in both News and Articles so the user/admin can choose either:
+
+1. Paste an image URL
+   OR
+2. Upload an image from phone/device
+
+This must work in:
+
+* News management/create/edit forms
+* Articles create/edit forms
+* Article admin management if image editing exists there
+
+Do not add unrelated features.
+Do not break existing modules:
+
+* login
+* register
+* home/my account
+* news
+* articles
+* chat
+* broadcast
+* admin dashboard
+* board
+* developer-info
+* static pages
+* membership approval flow
+
+Current architecture:
+
+* PostgreSQL + Drizzle
+* JWT auth
+* Arabic RTL
+* Mobile-first
+* No Firebase
+* No MySQL migration
+
+==================================================
+A. CURRENT PROBLEM
+==================
+
+Currently, when creating/editing news or articles, the image field only asks for an image URL.
+
+Required:
+Allow both options together:
+
+* رابط صورة
+* رفع صورة من الجهاز / الجوال
+
+The user should not be forced to use only a URL.
+
+==================================================
+B. IMAGE INPUT UI REQUIREMENTS
+==============================
+
+Create a reusable component if appropriate, for example:
+
+ImageInput
+
+It should support:
+
+1. Image URL input
+   Label:
+   رابط الصورة
+
+Placeholder:
+أدخل رابط الصورة إن وجد
+
+2. File upload input
+   Label:
+   أو ارفع صورة من جهازك
+
+Button/field:
+اختيار صورة
+
+3. Preview
+   After URL or file selection, show a preview.
+
+4. Clear image
+   Button:
+   إزالة الصورة
+
+5. Arabic validation messages:
+
+* نوع الصورة غير مدعوم
+* حجم الصورة كبير جداً، يرجى اختيار صورة أصغر
+* تعذر تحميل الصورة
+* الرجاء إدخال رابط صورة صحيح أو اختيار صورة من الجهاز
+
+Supported image types:
+
+* jpg
+* jpeg
+* png
+* webp
+
+Max file size:
+
+* 2 MB
+
+==================================================
+C. IMAGE STORAGE STRATEGY
+=========================
+
+For now, keep the current simple strategy.
+
+If the user uploads a file:
+
+* Convert it to a base64 data URL in the frontend.
+* Store it in the existing image field:
+
+  * News: imageUrl
+  * Articles: imageUrl or coverImageUrl according to current schema mapping
+
+If the user uses a URL:
+
+* Store the URL string in the same image field.
+
+Do not add:
+
+* Firebase Storage
+* S3
+* external upload services
+* new file server
+
+Important:
+The frontend image display must handle both:
+
+* normal https image URLs
+* data:image/...;base64 images
+
+==================================================
+D. SERVER / BACKEND REQUIREMENTS
+================================
+
+Backend must accept both:
+
+* https/http image URL
+* base64 data image URL
+
+For base64:
+Validate:
+
+* starts with data:image/
+* mime is jpeg/png/webp
+* decoded size <= 2 MB
+
+For URL:
+Validate lightly:
+
+* must be a string
+* if provided, should be a valid http/https URL
+* or allow empty/null
+
+Do not allow dangerous non-image protocols:
+
+* javascript:
+* data:text/html
+* file:
+* blob: should not be persisted
+
+If invalid:
+Return 400 with Arabic-friendly error.
+
+==================================================
+E. NEWS FORMS
+=============
+
+Update News management UI where news is created/edited.
+
+Fields should include:
+
+* title
+* summary
+* content
+* category
+* status
+* image input with two options:
+
+  * URL
+  * upload from device
+
+Image preview must appear.
+
+When saving:
+
+* imageUrl should contain either:
+
+  * normal URL
+  * base64 data URL
+
+Public /news and /news/:id must display both correctly.
+
+Broken/missing image must use fallback.
+
+==================================================
+F. ARTICLES FORMS
+=================
+
+Update article create/edit UI:
+
+Routes likely involved:
+
+* /articles/new
+* /articles/:id/edit
+* /admin/articles if image editing exists there
+
+Fields should include:
+
+* title
+* summary
+* content
+* category
+* image input with two options:
+
+  * URL
+  * upload from device
+
+Image preview must appear.
+
+When saving:
+
+* article image field should contain either:
+
+  * normal URL
+  * base64 data URL
+
+Public /articles and /articles/:id must display both correctly.
+
+Broken/missing image must use fallback.
+
+==================================================
+G. MOBILE REQUIREMENTS
+======================
+
+This must work from phone.
+
+File input must allow:
+
+* choosing from gallery
+* possibly camera if browser offers it
+
+Use:
+accept="image/jpeg,image/png,image/webp"
+
+Do not force camera only.
+Do not break iPhone/Android.
+
+Forms must remain mobile-friendly.
+Image preview must not overflow screen.
+
+==================================================
+H. REUSABLE COMPONENT REQUIREMENT
+=================================
+
+If possible, create one reusable component:
+
+components/ImageInput.tsx
+or similar.
+
+Use it in:
+
+* news form
+* article form
+
+Component props:
+
+* value
+* onChange
+* label
+* disabled optional
+* maxSizeMB optional
+* helperText optional
+
+It should internally handle:
+
+* URL input
+* file upload
+* validation
+* preview
+* clear button
+
+Do not duplicate large upload logic in multiple pages unless unavoidable.
+
+==================================================
+I. SECURITY / PERMISSION RULES
+==============================
+
+Do not change role permissions.
+
+News:
+
+* only MODERATOR / ADMIN / SUPER_ADMIN according to current rules can create/edit news.
+
+Articles:
+
+* members can create their own articles according to current workflow.
+* authors can edit only allowed statuses.
+* admin/moderator review rules remain unchanged.
+
+This task must only improve image input, not change permissions.
+
+==================================================
+J. OPENAPI / GENERATED CLIENT
+=============================
+
+If schema validation changes:
+
+* Update OpenAPI imageUrl fields description/validation if needed.
+* Regenerate client.
+* Do not manually edit generated files.
+* Run typecheck.
+
+If no API contract change is required because imageUrl already accepts string, say so clearly in the report.
+
+==================================================
+K. TESTING REQUIRED
+===================
+
+Do not report completion until tested in Preview.
+
+Required tests:
+
+News:
+
+1. Create news using image URL.
+2. Create news using uploaded image from device/base64.
+3. Edit news image from URL to uploaded image.
+4. Edit news image from uploaded image to URL.
+5. Public /news card shows image.
+6. /news/:id shows image.
+7. Missing/broken image fallback still works.
+
+Articles:
+
+1. Create article using image URL.
+2. Create article using uploaded image from device/base64.
+3. Edit article image from URL to uploaded image.
+4. Edit article image from uploaded image to URL.
+5. /articles card shows image after approval if needed.
+6. /articles/:id shows image.
+7. My Articles still works.
+
+Validation:
+
+1. Unsupported file type rejected.
+2. File larger than 2 MB rejected.
+3. Invalid URL rejected if provided.
+4. Empty image is allowed only if current form allows optional image.
+
+Regression:
+
+1. /login works.
+2. /register works.
+3. /home works.
+4. /news works.
+5. /articles works.
+6. /chat works.
+7. /broadcast works.
+8. /admin works.
+9. /board works.
+10. /more works.
+11. Typecheck passes.
+12. Backend starts cleanly.
+13. Preview works.
+14. External link still has no removeChild translation error.
+
+==================================================
+L. REQUIRED REPORT
+==================
+
+After completion, provide:
+
+NEWS + ARTICLES IMAGE INPUT REPORT
+
+1. What was changed
+2. Files changed
+3. Whether a reusable ImageInput component was created
+4. Image storage strategy:
+
+   * URL
+   * base64 upload
+5. Backend validation status
+6. News form test results
+7. Articles form test results
+8. Public display test results
+9. Validation test results
+10. OpenAPI/client generation status
+11. Regression test results
+12. Preview status
+13. Known issues, if any
+14. Confirmation:
+
+* No Firebase
+* No MySQL migration
+* No unrelated features added
+* Existing permissions unchanged
+* Existing modules still work
+
+Do not report success until both URL images and uploaded images work in News and Articles.

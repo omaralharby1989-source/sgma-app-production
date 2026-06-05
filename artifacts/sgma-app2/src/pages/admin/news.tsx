@@ -34,6 +34,7 @@ import {
   DialogFooter,
 } from "@/components/ui/dialog";
 import { BackButton } from "@/components/BackButton";
+import { ImageInput } from "@/components/ImageInput";
 import { useToast } from "@/hooks/use-toast";
 import { AlertCircle, Loader2, Plus } from "lucide-react";
 
@@ -262,14 +263,11 @@ export default function AdminNews() {
                 onChange={(e) => setForm((f) => ({ ...f, category: e.target.value }))}
               />
             </div>
-            <div className="space-y-1.5">
-              <Label>رابط الصورة</Label>
-              <Input
-                value={form.imageUrl}
-                onChange={(e) => setForm((f) => ({ ...f, imageUrl: e.target.value }))}
-                placeholder="https://..."
-              />
-            </div>
+            <ImageInput
+              label="صورة الخبر"
+              value={form.imageUrl}
+              onChange={(v) => setForm((f) => ({ ...f, imageUrl: v }))}
+            />
             <div className="space-y-1.5">
               <Label>الحالة</Label>
               <Select value={form.status} onValueChange={(v) => setForm((f) => ({ ...f, status: v }))}>

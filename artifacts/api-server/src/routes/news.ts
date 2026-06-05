@@ -3,6 +3,7 @@ import { db, newsTable } from "@workspace/db";
 import { eq, and, sql } from "drizzle-orm";
 import { CreateNewsBody, UpdateNewsBody } from "@workspace/api-zod";
 import { requireAuth } from "../middlewares/auth";
+import { validateImageSource } from "../lib/imageValidation";
 
 const router = Router();
 
@@ -88,6 +89,13 @@ router.post("/news", requireAuth, async (req, res): Promise<void> => {
   }
 
   const { title, summary, content, imageUrl, category, status } = parsed.data;
+
+  const imageError = validateImageSource(imageUrl);
+  if (imageError) {
+    res.status(400).json({ error: imageError });
+    return;
+  }
+
   const finalStatus = status ?? "DRAFT";
   const isPublished = finalStatus === "PUBLISHED";
 
@@ -146,6 +154,15 @@ router.patch("/news/:id", requireAuth, async (req, res): Promise<void> => {
     }
 
     const { title, summary, content, imageUrl, category, status } = parsed.data;
+
+    if (imageUrl !== undefined) {
+      const imageError = validateImageSource(imageUrl);
+      if (imageError) {
+        res.status(400).json({ error: imageError });
+        return;
+      }
+    }
+
     const updates: Partial<typeof newsTable.$inferInsert> = {};
 
     if (title !== undefined) updates.title = title.trim();

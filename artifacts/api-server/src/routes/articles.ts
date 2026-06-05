@@ -3,6 +3,7 @@ import { db, articlesTable, usersTable } from "@workspace/db";
 import { eq, and, or, sql } from "drizzle-orm";
 import { CreateArticleBody, UpdateArticleBody, RejectArticleBody } from "@workspace/api-zod";
 import { requireAuth } from "../middlewares/auth";
+import { validateImageSource } from "../lib/imageValidation";
 
 const router = Router();
 
@@ -115,6 +116,13 @@ router.post("/articles", requireAuth, async (req, res): Promise<void> => {
   }
 
   const { title, summary, content, category, imageUrl, status } = parsed.data;
+
+  const imageError = validateImageSource(imageUrl);
+  if (imageError) {
+    res.status(400).json({ error: imageError });
+    return;
+  }
+
   // Author controls only DRAFT vs PENDING; never APPROVED/REJECTED/ARCHIVED.
   const finalStatus = status === "DRAFT" ? "DRAFT" : "PENDING";
 
@@ -178,6 +186,15 @@ router.patch("/articles/:id", requireAuth, async (req, res): Promise<void> => {
     }
 
     const { title, summary, content, category, imageUrl, status } = parsed.data;
+
+    if (imageUrl !== undefined) {
+      const imageError = validateImageSource(imageUrl);
+      if (imageError) {
+        res.status(400).json({ error: imageError });
+        return;
+      }
+    }
+
     const updates: Partial<typeof articlesTable.$inferInsert> = {};
 
     if (title !== undefined) updates.title = title.trim();
