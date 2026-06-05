@@ -58,10 +58,12 @@ import type {
   SendChatMessageInput,
   SignupInput,
   SignupResponse,
+  StaticPage,
   UpdateArticleInput,
   UpdateBroadcastInput,
   UpdateDeveloperInfoInput,
-  UpdateNewsInput
+  UpdateNewsInput,
+  UpdateStaticPageInput
 } from './api.schemas';
 
 import { customFetch } from '../custom-fetch';
@@ -662,6 +664,155 @@ export function useGetMemberStats<TData = Awaited<ReturnType<typeof getMemberSta
 
 
 
+
+export const getGetStaticPageUrl = (slug: string,) => {
+
+
+
+
+  return `/api/static-pages/${slug}`
+}
+
+/**
+ * @summary Get a static page by slug
+ */
+export const getStaticPage = async (slug: string, options?: RequestInit): Promise<StaticPage> => {
+
+  return customFetch<StaticPage>(getGetStaticPageUrl(slug),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getGetStaticPageQueryKey = (slug: string,) => {
+    return [
+    `/api/static-pages/${slug}`
+    ] as const;
+    }
+
+
+export const getGetStaticPageQueryOptions = <TData = Awaited<ReturnType<typeof getStaticPage>>, TError = ErrorType<ErrorResponse>>(slug: string, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getStaticPage>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetStaticPageQueryKey(slug);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getStaticPage>>> = ({ signal }) => getStaticPage(slug, { signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, enabled: !!(slug), ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getStaticPage>>, TError, TData> & { queryKey: QueryKey }
+}
+
+export type GetStaticPageQueryResult = NonNullable<Awaited<ReturnType<typeof getStaticPage>>>
+export type GetStaticPageQueryError = ErrorType<ErrorResponse>
+
+
+/**
+ * @summary Get a static page by slug
+ */
+
+export function useGetStaticPage<TData = Awaited<ReturnType<typeof getStaticPage>>, TError = ErrorType<ErrorResponse>>(
+ slug: string, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getStaticPage>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+
+ ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+
+  const queryOptions = getGetStaticPageQueryOptions(slug,options)
+
+  const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
+
+  return { ...query, queryKey: queryOptions.queryKey };
+}
+
+
+
+
+
+
+
+export const getUpdateStaticPageUrl = (slug: string,) => {
+
+
+
+
+  return `/api/static-pages/${slug}`
+}
+
+/**
+ * @summary Update a static page (developer account only)
+ */
+export const updateStaticPage = async (slug: string,
+    updateStaticPageInput: UpdateStaticPageInput, options?: RequestInit): Promise<StaticPage> => {
+
+  return customFetch<StaticPage>(getUpdateStaticPageUrl(slug),
+  {
+    ...options,
+    method: 'PATCH',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(
+      updateStaticPageInput,)
+  }
+);}
+
+
+
+
+export const getUpdateStaticPageMutationOptions = <TError = ErrorType<ErrorResponse>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof updateStaticPage>>, TError,{slug: string;data: BodyType<UpdateStaticPageInput>}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof updateStaticPage>>, TError,{slug: string;data: BodyType<UpdateStaticPageInput>}, TContext> => {
+
+const mutationKey = ['updateStaticPage'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof updateStaticPage>>, {slug: string;data: BodyType<UpdateStaticPageInput>}> = (props) => {
+          const {slug,data} = props ?? {};
+
+          return  updateStaticPage(slug,data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type UpdateStaticPageMutationResult = NonNullable<Awaited<ReturnType<typeof updateStaticPage>>>
+    export type UpdateStaticPageMutationBody = BodyType<UpdateStaticPageInput>
+    export type UpdateStaticPageMutationError = ErrorType<ErrorResponse>
+
+    /**
+ * @summary Update a static page (developer account only)
+ */
+export const useUpdateStaticPage = <TError = ErrorType<ErrorResponse>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof updateStaticPage>>, TError,{slug: string;data: BodyType<UpdateStaticPageInput>}, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof updateStaticPage>>,
+        TError,
+        {slug: string;data: BodyType<UpdateStaticPageInput>},
+        TContext
+      > => {
+      return useMutation(getUpdateStaticPageMutationOptions(options));
+    }
 
 export const getGetDeveloperInfoUrl = () => {
 

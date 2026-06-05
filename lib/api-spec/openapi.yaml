@@ -228,6 +228,80 @@ paths:
               schema:
                 $ref: "#/components/schemas/ErrorResponse"
 
+  /static-pages/{slug}:
+    get:
+      operationId: getStaticPage
+      tags: [public]
+      summary: Get a static page by slug
+      parameters:
+        - name: slug
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Static page
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/StaticPage"
+        "404":
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+    patch:
+      operationId: updateStaticPage
+      tags: [public]
+      summary: Update a static page (developer account only)
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: slug
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateStaticPageInput"
+      responses:
+        "200":
+          description: Updated static page
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/StaticPage"
+        "400":
+          description: Invalid input
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "403":
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "404":
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
   /developer-info:
     get:
       operationId: getDeveloperInfo
@@ -2215,6 +2289,35 @@ components:
         email:
           type: string
           format: email
+          minLength: 1
+
+    StaticPage:
+      type: object
+      required: [id, slug, title, content]
+      properties:
+        id:
+          type: integer
+        slug:
+          type: string
+        title:
+          type: string
+        content:
+          type: string
+        updatedAt:
+          type: ["string", "null"]
+          format: date-time
+        updatedById:
+          type: ["integer", "null"]
+
+    UpdateStaticPageInput:
+      type: object
+      required: [title, content]
+      properties:
+        title:
+          type: string
+          minLength: 1
+        content:
+          type: string
           minLength: 1
 
     AdminDashboardStats:

@@ -23,6 +23,7 @@ import ArticleEdit from "./pages/article-edit";
 import ArticleDetail from "./pages/article-detail";
 import Broadcast from "./pages/broadcast";
 import DeveloperInfo from "./pages/developer-info";
+import StaticPage from "./pages/static-page";
 import Unauthorized from "./pages/unauthorized";
 import { ProtectedLayout } from "./components/layout/ProtectedLayout";
 import { getStoredUser, isStaffRole } from "./lib/auth";
@@ -97,6 +98,15 @@ function Router() {
       <Route path="/login" component={Login} />
       <Route path="/register" component={Register} />
       <Route path="/developer-info" component={DeveloperInfo} />
+      <Route path="/privacy-policy">
+        <StaticPage slug="privacy-policy" />
+      </Route>
+      <Route path="/terms">
+        <StaticPage slug="terms" />
+      </Route>
+      <Route path="/about-sgma">
+        <StaticPage slug="about-sgma" />
+      </Route>
       <Route path="/unauthorized" component={Unauthorized} />
 
       <Route path="/home">

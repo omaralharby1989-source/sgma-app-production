@@ -204,6 +204,49 @@ export const GetMemberStatsResponse = zod.object({
 
 
 /**
+ * @summary Get a static page by slug
+ */
+export const GetStaticPageParams = zod.object({
+  "slug": zod.coerce.string()
+})
+
+export const GetStaticPageResponse = zod.object({
+  "id": zod.number(),
+  "slug": zod.string(),
+  "title": zod.string(),
+  "content": zod.string(),
+  "updatedAt": zod.coerce.date().nullish(),
+  "updatedById": zod.number().nullish()
+})
+
+
+/**
+ * @summary Update a static page (developer account only)
+ */
+export const UpdateStaticPageParams = zod.object({
+  "slug": zod.coerce.string()
+})
+
+
+
+
+
+export const UpdateStaticPageBody = zod.object({
+  "title": zod.string().min(1),
+  "content": zod.string().min(1)
+})
+
+export const UpdateStaticPageResponse = zod.object({
+  "id": zod.number(),
+  "slug": zod.string(),
+  "title": zod.string(),
+  "content": zod.string(),
+  "updatedAt": zod.coerce.date().nullish(),
+  "updatedById": zod.number().nullish()
+})
+
+
+/**
  * @summary Get developer information
  */
 export const GetDeveloperInfoResponse = zod.object({

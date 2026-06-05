@@ -488,6 +488,24 @@ export interface UpdateDeveloperInfoInput {
   email: string;
 }
 
+export interface StaticPage {
+  id: number;
+  slug: string;
+  title: string;
+  content: string;
+  /** @nullable */
+  updatedAt?: string | null;
+  /** @nullable */
+  updatedById?: number | null;
+}
+
+export interface UpdateStaticPageInput {
+  /** @minLength 1 */
+  title: string;
+  /** @minLength 1 */
+  content: string;
+}
+
 export interface AdminDashboardStats {
   pendingArticles: number;
   publishedNews: number;

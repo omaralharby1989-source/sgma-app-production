@@ -74,6 +74,18 @@ New signups are NOT auto-activated. They must be approved by an admin before the
 - Removed `routes/public.ts` (it only held the old GET); GET+PATCH now live in `routes/developer-info.ts`.
 - NOTE: developer-info edit permission is gated on email+isDeveloper from DB, NOT role — SUPER_ADMIN alone is NOT enough.
 
+## Legal / About Pages Module — COMPLETE
+
+Three editable static informational pages under `/more`, public to read, developer-only to edit (same identity gate as developer-info):
+- Routes (public, listed before ProtectedRoute in `App.tsx`): `/about-sgma`, `/privacy-policy`, `/terms`. One reusable component `pages/static-page.tsx` takes a `slug` prop.
+- `/more` has a new section `القانونية والمعلومات` with من نحن(/about-sgma), سياسة الخصوصية(/privacy-policy), الشروط والأحكام(/terms). All existing `/more` items kept.
+- DB: `static_pages` table (`lib/db/src/schema/staticPages.ts`) — `id`, `slug` UNIQUE, `title`, `content`, `updated_by_id`, `updated_at`. ALLOWED slugs only: `privacy-policy`, `terms`, `about-sgma`.
+- `GET /api/static-pages/:slug` — PUBLIC. Self-seeds the canonical row per slug via `ensurePageRow()` (uses `onConflictDoNothing` on the unique slug, so no duplicate rows on restart/race). Unknown slug → 404.
+- `PATCH /api/static-pages/:slug` — JWT-protected; editable ONLY by the developer account (DB lookup: `email === "lordhygm@gmail.com" AND isDeveloper === true`). Non-developer (incl. ADMIN/SUPER_ADMIN without isDeveloper) → 403; no token → 401; invalid body → 400; unknown slug → 404. Edits `title` + `content` only; sets `updatedById`.
+- Frontend: professional RTL card layout, `whitespace-pre-line` content (seed text uses real newlines for numbered sections), آخر تحديث date, BackButton(fallback=/more), BroadcastBanner. Edit button (تعديل الصفحة) shown ONLY when `isDeveloperUser(getStoredUser())`. Success toast "تم تحديث الصفحة بنجاح".
+- OpenAPI: `StaticPage` + `UpdateStaticPageInput` schemas, `GET/PATCH /static-pages/{slug}` paths → generated `UpdateStaticPageBody` (zod) + `useGetStaticPage`/`useUpdateStaticPage`/`getGetStaticPageQueryKey` (react).
+- NOTE: login request field is `identifier` (not `account`); login response is `AuthResponse { token, user }`.
+
 ## Phase 1 Status — COMPLETE
 
 Implemented:
