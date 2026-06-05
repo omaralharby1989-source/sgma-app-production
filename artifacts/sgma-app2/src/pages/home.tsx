@@ -250,7 +250,7 @@ export default function Home() {
         <CardContent className="p-6 flex flex-col items-center text-center">
           <div className="relative mb-4">
             <Avatar className="h-24 w-24 border-4 border-background shadow-sm">
-              <AvatarImage src={profile.avatarUrl || ""} />
+              {profile.avatarUrl && <AvatarImage src={profile.avatarUrl} />}
               <AvatarFallback className="text-2xl">{profile.fullName.substring(0, 2)}</AvatarFallback>
             </Avatar>
             <button

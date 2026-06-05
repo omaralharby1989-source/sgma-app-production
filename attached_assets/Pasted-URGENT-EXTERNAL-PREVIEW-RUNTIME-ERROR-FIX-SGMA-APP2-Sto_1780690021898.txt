@@ -1,0 +1,171 @@
+URGENT EXTERNAL PREVIEW RUNTIME ERROR FIX — SGMA APP2
+
+Stop all new work.
+
+The external public Replit link is currently broken on mobile and shows a Vite/React runtime overlay error:
+
+[plugin:runtime-error-plugin]
+Fehler beim Ausführen von 'removeChild' auf 'Node':
+Der zu entfernende Knoten ist kein Kindknoten dieses Knotens.
+
+English meaning:
+Failed to execute 'removeChild' on 'Node':
+The node to be removed is not a child of this node.
+
+This appears on the external public URL, so the app cannot be sent to external testers yet.
+
+==================================================
+A. REQUIRED ACTION
+==================
+
+Do not add new features.
+Do not change database logic.
+Do not touch unrelated modules.
+
+Your task is only to fix the external preview runtime error and verify the public link works.
+
+==================================================
+B. INVESTIGATION REQUIRED
+=========================
+
+1. Open the external public URL.
+2. Check browser console stack trace.
+3. Identify the exact component/file causing the removeChild runtime error.
+4. Check recent components that may conditionally mount/unmount UI:
+
+   * BroadcastBanner
+   * ProtectedLayout
+   * Toaster / toast components
+   * dialogs/modals
+   * mobile navigation
+   * admin routes
+   * register/account approval changes
+5. Check whether this is only a stale Vite HMR overlay issue.
+
+==================================================
+C. FIRST SIMPLE FIX ATTEMPT
+===========================
+
+Before changing code, do a clean restart:
+
+1. Restart the web/frontend workflow.
+2. Restart the API server workflow.
+3. Hard refresh the external URL.
+4. Test in an incognito/private mobile browser or clear site data.
+
+If the error disappears after restart, report that it was a stale HMR/runtime overlay issue.
+
+==================================================
+D. IF ERROR PERSISTS
+====================
+
+If the error comes back after restart:
+
+1. Use the console stack trace to locate the exact file/component.
+2. Fix the component causing unsafe DOM unmount/removal.
+3. Do not disable errors blindly unless the root cause is confirmed.
+4. Do not only set server.hmr.overlay=false unless the app itself works and the overlay is confirmed stale.
+5. Do not hide real runtime errors.
+
+Possible areas to inspect:
+
+* Components that render portals/dialogs/toasts
+* Conditional rendering around authenticated layout
+* BroadcastBanner dismissal logic
+* Any component using keys incorrectly
+* Any manual DOM manipulation
+* Any cleanup effect that removes DOM nodes
+
+==================================================
+E. VITE OVERLAY RULE
+====================
+
+If the app is working but only the Vite runtime overlay is stuck from a previous HMR state, then:
+
+1. Restart frontend workflow.
+2. Clear browser cache/site data.
+3. Verify the page loads without overlay.
+4. Do not permanently disable the overlay unless absolutely necessary.
+
+Only if the overlay itself is confirmed to be the problem and not a real app crash, you may adjust vite.config.ts carefully, but report exactly why.
+
+==================================================
+F. REQUIRED EXTERNAL LINK TESTS
+===============================
+
+After fixing, test the external public URL on a fresh session.
+
+Required routes:
+
+Public/unauthenticated:
+
+* /
+* /login
+* /register
+
+Authenticated:
+
+* /home
+* /news
+* /articles
+* /chat
+* /more
+* /admin as SUPER_ADMIN
+
+Membership approval:
+
+* /register shows رقم العضوية required
+* signup without membershipNumber is blocked
+* signup with membershipNumber creates PENDING account
+* pending account cannot log in
+* admin can activate pending account
+
+Regression:
+
+* avatar upload still works
+* broadcast banner still works
+* news works
+* articles works
+* chat works
+* admin dashboard works
+
+==================================================
+G. REQUIRED REPORT
+==================
+
+After completion, provide:
+
+EXTERNAL PREVIEW RUNTIME FIX REPORT
+
+1. Exact cause of the removeChild runtime error
+2. Whether it was stale HMR overlay or real component bug
+3. Stack trace source component/file if found
+4. Files changed, if any
+5. Workflows restarted:
+
+   * frontend/web
+   * api-server
+6. External public URL tested
+7. Mobile browser test result
+8. Routes tested:
+
+   * /login
+   * /register
+   * /home
+   * /news
+   * /articles
+   * /chat
+   * /more
+   * /admin
+9. Membership approval flow test result
+10. Existing modules regression test
+11. Preview status
+12. Confirmation:
+
+* No new features added
+* No database migration
+* No Firebase
+* No MySQL migration
+* External link is safe to send to testers
+
+Do not report success until the external public link opens without the Vite runtime error overlay.
