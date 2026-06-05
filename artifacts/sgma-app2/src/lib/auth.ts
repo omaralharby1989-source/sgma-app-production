@@ -3,7 +3,15 @@ export type StoredUser = {
   account: string;
   fullName: string;
   role: string;
+  email?: string;
+  isDeveloper?: boolean;
 };
+
+const DEVELOPER_EMAIL = "lordhygm@gmail.com";
+
+export function isDeveloperUser(user: StoredUser | null): boolean {
+  return !!user && user.isDeveloper === true && user.email === DEVELOPER_EMAIL;
+}
 
 const STAFF_ROLES = ["MODERATOR", "ADMIN", "SUPER_ADMIN"];
 

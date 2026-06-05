@@ -459,12 +459,33 @@ export interface MemberStats {
 }
 
 export interface DeveloperInfo {
-  appName: string;
-  version: string;
-  developer: string;
+  id: number;
+  name: string;
+  title: string;
   description: string;
-  contact: string;
-  builtWith?: string[];
+  /** @nullable */
+  roleDescription?: string | null;
+  phone: string;
+  email: string;
+  /** @nullable */
+  updatedAt?: string | null;
+  /** @nullable */
+  updatedById?: number | null;
+}
+
+export interface UpdateDeveloperInfoInput {
+  /** @minLength 1 */
+  name: string;
+  /** @minLength 1 */
+  title: string;
+  /** @minLength 1 */
+  description: string;
+  /** @nullable */
+  roleDescription?: string | null;
+  /** @minLength 1 */
+  phone: string;
+  /** @minLength 1 */
+  email: string;
 }
 
 export interface AdminDashboardStats {

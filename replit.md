@@ -63,6 +63,17 @@ New signups are NOT auto-activated. They must be approved by an admin before the
 - Admin `/admin/users`: `status` query-param filter (All/Pending/Active/Suspended); status badges; membershipNumber shown per row; one-tap "تفعيل الحساب" button (PATCH `status=ACTIVE, isActive=true`) for PENDING/inactive users.
 - SAFETY: because PENDING now blocks login, admin guards treat ANY non-login-eligible result (`isActive=false` OR `status !== ACTIVE`) as "deactivation". Last-super-admin guards count only LOGIN-ELIGIBLE supers (`role=SUPER_ADMIN AND status=ACTIVE AND is_active=true`) via `countLoginEligibleSupers()`. Cannot self-deactivate (incl. self→PENDING) or demote/deactivate the last login-eligible super admin.
 
+## Developer Info Module Status — COMPLETE
+
+`/developer-info` is now a developer-PERSON card (repurposed from the old app-info page), public + editable by the real developer only:
+- `GET /api/developer-info` — PUBLIC (no auth). Returns `{ id, name, title, description, roleDescription, phone, email, updatedAt, updatedById }`. Self-seeds the single active record on a fresh DB via `ensureInfoRow()` so the public card never 404s.
+- `PATCH /api/developer-info` — JWT-protected; editable ONLY by the developer account. Backend resolves `req.user.userId` → DB user and requires `user.email === "lordhygm@gmail.com" AND user.isDeveloper === true`. SUPER_ADMIN/ADMIN/MODERATOR/MEMBER without isDeveloper → 403. Server NEVER trusts client role. Invalid body → 400, no token → 401.
+- Single active `developer_info` record (no history). Person fields (`name/title/phone/email/role_description/updated_by_id`) were ADDED as nullable columns alongside legacy app-info columns (kept, non-destructive); `description` reused for the professional description.
+- Frontend `/developer-info`: professional RTL card, NO photo (icon placeholder), shows name/title/professional description/الدور في SGMA/phone/email + اتصال هاتفي (tel:) and إرسال بريد إلكتروني (mailto:) buttons. Edit button (تعديل معلومات المطور) shown ONLY when `isDeveloperUser(getStoredUser())` (email===lordhygm AND isDeveloper). Edit form validates required fields + email format; success toast "تم تحديث معلومات المطور بنجاح".
+- `StoredUser` extended with optional `email`/`isDeveloper` (login already stores full user). `lib/auth.ts` exports `isDeveloperUser()`.
+- Removed `routes/public.ts` (it only held the old GET); GET+PATCH now live in `routes/developer-info.ts`.
+- NOTE: developer-info edit permission is gated on email+isDeveloper from DB, NOT role — SUPER_ADMIN alone is NOT enough.
+
 ## Phase 1 Status — COMPLETE
 
 Implemented:

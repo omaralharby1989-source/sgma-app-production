@@ -1,4 +1,4 @@
-import { pgTable, text, serial, timestamp, boolean } from "drizzle-orm/pg-core";
+import { pgTable, text, serial, timestamp, boolean, integer } from "drizzle-orm/pg-core";
 
 export const developerInfoTable = pgTable("developer_info", {
   id: serial("id").primaryKey(),
@@ -8,6 +8,12 @@ export const developerInfoTable = pgTable("developer_info", {
   description: text("description").notNull(),
   contact: text("contact").notNull(),
   builtWith: text("built_with").notNull().default("[]"),
+  name: text("name"),
+  title: text("title"),
+  phone: text("phone"),
+  email: text("email"),
+  roleDescription: text("role_description"),
+  updatedById: integer("updated_by_id"),
   isActive: boolean("is_active").notNull().default(true),
   updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow().$onUpdate(() => new Date()),
 });

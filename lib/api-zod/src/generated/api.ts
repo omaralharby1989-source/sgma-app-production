@@ -204,15 +204,50 @@ export const GetMemberStatsResponse = zod.object({
 
 
 /**
- * @summary Get developer/app information
+ * @summary Get developer information
  */
 export const GetDeveloperInfoResponse = zod.object({
-  "appName": zod.string(),
-  "version": zod.string(),
-  "developer": zod.string(),
+  "id": zod.number(),
+  "name": zod.string(),
+  "title": zod.string(),
   "description": zod.string(),
-  "contact": zod.string(),
-  "builtWith": zod.array(zod.string()).optional()
+  "roleDescription": zod.string().nullish(),
+  "phone": zod.string(),
+  "email": zod.string(),
+  "updatedAt": zod.coerce.date().nullish(),
+  "updatedById": zod.number().nullish()
+})
+
+
+/**
+ * @summary Update developer information (developer account only)
+ */
+
+
+
+
+
+
+
+export const UpdateDeveloperInfoBody = zod.object({
+  "name": zod.string().min(1),
+  "title": zod.string().min(1),
+  "description": zod.string().min(1),
+  "roleDescription": zod.string().nullish(),
+  "phone": zod.string().min(1),
+  "email": zod.string().email().min(1)
+})
+
+export const UpdateDeveloperInfoResponse = zod.object({
+  "id": zod.number(),
+  "name": zod.string(),
+  "title": zod.string(),
+  "description": zod.string(),
+  "roleDescription": zod.string().nullish(),
+  "phone": zod.string(),
+  "email": zod.string(),
+  "updatedAt": zod.coerce.date().nullish(),
+  "updatedById": zod.number().nullish()
 })
 
 

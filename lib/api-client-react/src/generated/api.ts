@@ -60,6 +60,7 @@ import type {
   SignupResponse,
   UpdateArticleInput,
   UpdateBroadcastInput,
+  UpdateDeveloperInfoInput,
   UpdateNewsInput
 } from './api.schemas';
 
@@ -671,7 +672,7 @@ export const getGetDeveloperInfoUrl = () => {
 }
 
 /**
- * @summary Get developer/app information
+ * @summary Get developer information
  */
 export const getDeveloperInfo = async ( options?: RequestInit): Promise<DeveloperInfo> => {
 
@@ -695,7 +696,7 @@ export const getGetDeveloperInfoQueryKey = () => {
     }
 
 
-export const getGetDeveloperInfoQueryOptions = <TData = Awaited<ReturnType<typeof getDeveloperInfo>>, TError = ErrorType<unknown>>( options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getDeveloperInfo>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+export const getGetDeveloperInfoQueryOptions = <TData = Awaited<ReturnType<typeof getDeveloperInfo>>, TError = ErrorType<ErrorResponse>>( options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getDeveloperInfo>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
 ) => {
 
 const {query: queryOptions, request: requestOptions} = options ?? {};
@@ -714,14 +715,14 @@ const {query: queryOptions, request: requestOptions} = options ?? {};
 }
 
 export type GetDeveloperInfoQueryResult = NonNullable<Awaited<ReturnType<typeof getDeveloperInfo>>>
-export type GetDeveloperInfoQueryError = ErrorType<unknown>
+export type GetDeveloperInfoQueryError = ErrorType<ErrorResponse>
 
 
 /**
- * @summary Get developer/app information
+ * @summary Get developer information
  */
 
-export function useGetDeveloperInfo<TData = Awaited<ReturnType<typeof getDeveloperInfo>>, TError = ErrorType<unknown>>(
+export function useGetDeveloperInfo<TData = Awaited<ReturnType<typeof getDeveloperInfo>>, TError = ErrorType<ErrorResponse>>(
   options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getDeveloperInfo>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
 
  ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
@@ -738,6 +739,77 @@ export function useGetDeveloperInfo<TData = Awaited<ReturnType<typeof getDevelop
 
 
 
+
+export const getUpdateDeveloperInfoUrl = () => {
+
+
+
+
+  return `/api/developer-info`
+}
+
+/**
+ * @summary Update developer information (developer account only)
+ */
+export const updateDeveloperInfo = async (updateDeveloperInfoInput: UpdateDeveloperInfoInput, options?: RequestInit): Promise<DeveloperInfo> => {
+
+  return customFetch<DeveloperInfo>(getUpdateDeveloperInfoUrl(),
+  {
+    ...options,
+    method: 'PATCH',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(
+      updateDeveloperInfoInput,)
+  }
+);}
+
+
+
+
+export const getUpdateDeveloperInfoMutationOptions = <TError = ErrorType<ErrorResponse>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof updateDeveloperInfo>>, TError,{data: BodyType<UpdateDeveloperInfoInput>}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof updateDeveloperInfo>>, TError,{data: BodyType<UpdateDeveloperInfoInput>}, TContext> => {
+
+const mutationKey = ['updateDeveloperInfo'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof updateDeveloperInfo>>, {data: BodyType<UpdateDeveloperInfoInput>}> = (props) => {
+          const {data} = props ?? {};
+
+          return  updateDeveloperInfo(data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type UpdateDeveloperInfoMutationResult = NonNullable<Awaited<ReturnType<typeof updateDeveloperInfo>>>
+    export type UpdateDeveloperInfoMutationBody = BodyType<UpdateDeveloperInfoInput>
+    export type UpdateDeveloperInfoMutationError = ErrorType<ErrorResponse>
+
+    /**
+ * @summary Update developer information (developer account only)
+ */
+export const useUpdateDeveloperInfo = <TError = ErrorType<ErrorResponse>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof updateDeveloperInfo>>, TError,{data: BodyType<UpdateDeveloperInfoInput>}, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof updateDeveloperInfo>>,
+        TError,
+        {data: BodyType<UpdateDeveloperInfoInput>},
+        TContext
+      > => {
+      return useMutation(getUpdateDeveloperInfoMutationOptions(options));
+    }
 
 export const getGetPublicChatMessagesUrl = () => {
 

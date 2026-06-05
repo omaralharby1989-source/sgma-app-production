@@ -6,17 +6,17 @@
  * OpenAPI spec version: 0.1.0
  */
 
-export interface DeveloperInfo {
-  id: number;
+export interface UpdateDeveloperInfoInput {
+  /** @minLength 1 */
   name: string;
+  /** @minLength 1 */
   title: string;
+  /** @minLength 1 */
   description: string;
   /** @nullable */
   roleDescription?: string | null;
+  /** @minLength 1 */
   phone: string;
+  /** @minLength 1 */
   email: string;
-  /** @nullable */
-  updatedAt?: Date | null;
-  /** @nullable */
-  updatedById?: number | null;
 }

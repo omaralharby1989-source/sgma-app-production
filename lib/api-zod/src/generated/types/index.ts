@@ -67,5 +67,6 @@ export * from './signupResponseStatus';
 export * from './updateArticleInput';
 export * from './updateArticleInputStatus';
 export * from './updateBroadcastInput';
+export * from './updateDeveloperInfoInput';
 export * from './updateNewsInput';
 export * from './updateNewsInputStatus';

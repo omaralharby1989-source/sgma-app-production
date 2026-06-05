@@ -1,0 +1,326 @@
+DEVELOPER INFO PAGE ACTIVATION — SGMA APP2
+
+Start this task now.
+
+Scope:
+Activate and complete the Developer Info page.
+
+Do not add unrelated features.
+Do not break existing modules:
+
+* login
+* register
+* home
+* news
+* articles
+* chat
+* broadcast
+* admin dashboard
+* more page
+* membership approval flow
+
+Current architecture:
+
+* PostgreSQL + Drizzle
+* JWT auth
+* Arabic RTL
+* Mobile-first
+* No Firebase
+* No MySQL migration
+
+==================================================
+A. PURPOSE
+==========
+
+The /developer-info page must display public information about the app developer.
+
+This page should be visible to all users/public visitors if currently public, and should also work inside the app.
+
+It must show a beautiful professional card, without developer photo.
+
+Developer information:
+
+Name:
+عمر الحربي
+
+Title:
+مطور التطبيق
+
+Professional description:
+عمر الحربي يعمل كممرض اختصاص تخدير وعناية مركزة، وهو المنسق العام في لجنة المساعدين الطبيين والتمريض في الجمعية الطبية السورية الألمانية SGMA، وعضو مجلس الإدارة.
+
+Additional professional text:
+ساهم في تطوير هذا التطبيق بهدف خدمة أعضاء الجمعية وتسهيل التواصل الداخلي، وتنظيم الأخبار والمقالات والبث الإداري بطريقة حديثة وآمنة. يجمع عمر الحربي بين الخبرة المهنية في المجال الصحي والعمل التنظيمي داخل SGMA، مع اهتمام واضح بتطوير الأدوات الرقمية التي تدعم الكوادر الطبية والتمريضية.
+
+Phone:
+017634443419
+
+Email:
+[lordhygm@gmail.com](mailto:lordhygm@gmail.com)
+
+==================================================
+B. PUBLIC DISPLAY REQUIREMENTS
+==============================
+
+Route:
+
+* /developer-info
+
+Display as a professional card.
+
+Card content:
+
+* اسم المطور: عمر الحربي
+* المسمى: مطور التطبيق
+* الوصف المهني
+* الدور في SGMA
+* رقم الهاتف
+* البريد الإلكتروني
+
+Design:
+
+* Arabic RTL
+* Mobile-first
+* Elegant professional card
+* No image/avatar
+* Clean icon placeholders are allowed
+* Contact buttons:
+
+  * اتصال هاتفي
+  * إرسال بريد إلكتروني
+* Phone should use tel:
+* Email should use mailto:
+* BackButton if appropriate
+* No broken layout
+* Broadcast banner should still work for authenticated users if already implemented
+
+==================================================
+C. STORAGE / DATABASE
+=====================
+
+Use the existing DeveloperInfo table/model if already present.
+
+If missing, create or extend safely.
+
+Fields should support:
+
+* id
+* name
+* title
+* description
+* phone
+* email
+* roleDescription optional
+* updatedAt
+* updatedById optional
+
+Seed or update the existing developer info record with the information above.
+
+Do not duplicate multiple developer records unless current design supports history.
+Preferred:
+Use a single active developer info record.
+
+==================================================
+D. EDIT PERMISSION — DEVELOPER ONLY
+===================================
+
+Only the real developer account may edit this information.
+
+Developer account:
+
+* email: [lordhygm@gmail.com](mailto:lordhygm@gmail.com)
+* isDeveloper = true
+
+Edit permission rule:
+Only authenticated user with:
+
+* email = [lordhygm@gmail.com](mailto:lordhygm@gmail.com)
+  AND
+* isDeveloper = true
+
+can edit developer info.
+
+Important:
+
+* SUPER_ADMIN alone is NOT enough unless this same account also has isDeveloper=true.
+* ADMIN cannot edit developer info.
+* MODERATOR cannot edit developer info.
+* MEMBER cannot edit developer info.
+* Other SUPER_ADMIN accounts cannot edit it if isDeveloper=false.
+
+Backend must enforce this.
+Frontend hiding is not enough.
+
+==================================================
+E. EDIT UI
+==========
+
+On /developer-info:
+
+If current authenticated user is the developer:
+Show button:
+تعديل معلومات المطور
+
+Clicking opens edit mode or edit form.
+
+Editable fields:
+
+* name
+* title
+* description
+* phone
+* email
+* roleDescription if used
+
+Buttons:
+
+* حفظ التعديلات
+* إلغاء
+
+Validation:
+
+* name required
+* title required
+* description required
+* phone required
+* email required and valid
+
+After save:
+
+* Show Arabic success message:
+  تم تحديث معلومات المطور بنجاح
+* Refresh displayed info
+* Stay on /developer-info
+
+If user is not the developer:
+Do not show edit button.
+
+==================================================
+F. BACKEND API REQUIREMENTS
+===========================
+
+Required APIs:
+
+GET /api/developer-info
+
+* Public or authenticated according to current existing behavior
+* Returns current developer info
+
+PATCH /api/developer-info
+
+* JWT protected
+* Only developer account can update
+* Must check:
+  req.user.email === "[lordhygm@gmail.com](mailto:lordhygm@gmail.com)"
+  AND current user.isDeveloper === true from database
+* Do not trust frontend role
+* Return 403 for everyone else
+
+If PATCH already exists, update its permission logic.
+
+If GET already exists, keep it working.
+
+==================================================
+G. ADMIN / USER DATA REQUIREMENT
+================================
+
+Ensure the account [lordhygm@gmail.com](mailto:lordhygm@gmail.com) has:
+
+* isDeveloper = true
+* role = SUPER_ADMIN
+* isActive = true
+* status = ACTIVE
+
+If not, fix the seed/data carefully without exposing secrets.
+
+Do not change password unless explicitly needed.
+
+==================================================
+H. OPENAPI / GENERATED CLIENT
+=============================
+
+If API contract changes:
+
+* Update OpenAPI
+* Regenerate client
+* Do not manually edit generated files
+* Run typecheck
+
+Schemas:
+
+* DeveloperInfo
+* UpdateDeveloperInfoInput
+
+==================================================
+I. SECURITY TESTS REQUIRED
+==========================
+
+Test these cases:
+
+1. Public/user can open /developer-info and see developer card.
+2. [lordhygm@gmail.com](mailto:lordhygm@gmail.com) with isDeveloper=true can see edit button.
+3. [lordhygm@gmail.com](mailto:lordhygm@gmail.com) can update developer info.
+4. ADMIN without isDeveloper cannot edit.
+5. SUPER_ADMIN without isDeveloper cannot edit.
+6. MODERATOR cannot edit.
+7. MEMBER cannot edit.
+8. Backend PATCH returns 403 for non-developer users.
+
+==================================================
+J. RUNTIME TESTS REQUIRED
+=========================
+
+Do not report completion until tested in Preview.
+
+Required:
+
+1. /developer-info opens.
+2. Card design looks professional.
+3. No developer image is shown.
+4. Phone button works as tel link.
+5. Email button works as mailto link.
+6. Developer account sees edit button.
+7. Non-developer users do not see edit button.
+8. Edit/save works.
+9. Refresh page: updated info persists.
+10. Existing pages still work:
+
+* /login
+* /register
+* /home
+* /news
+* /articles
+* /chat
+* /broadcast
+* /admin
+* /more
+
+==================================================
+K. REQUIRED REPORT
+==================
+
+After completion, provide:
+
+DEVELOPER INFO ACTIVATION REPORT
+
+1. What was implemented
+2. Files changed
+3. Database changes or seed updates
+4. Final displayed developer information
+5. Public display status
+6. Edit permission logic
+7. Backend API changes
+8. OpenAPI/client generation status
+9. Security test results
+10. Runtime test results
+11. Preview status
+12. Known issues, if any
+13. Confirmation:
+
+* Only [lordhygm@gmail.com](mailto:lordhygm@gmail.com) with isDeveloper=true can edit
+* No Firebase
+* No MySQL migration
+* No unrelated features added
+* Existing modules still work
+
+Do not report success until /developer-info works visually in Preview and permission checks are verified.

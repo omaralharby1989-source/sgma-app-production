@@ -5,6 +5,7 @@
 - [SGMA APP2 auth system](sgma-app2-auth.md) — JWT auth setup, bcryptjs requirement, role validation at login.
 - [SGMA APP2 frontend import rules](sgma-app2-frontend-imports.md) — frontend must not import from @workspace/api-zod (server-side only).
 - [Drizzle push has no TTY](drizzle-push-no-tty.md) — ambiguous column changes prompt interactively and stall; drop empty tables via SQL first, then push.
+- [Developer Info edit permission](developer-info-edit-permission.md) — /developer-info PATCH is identity-gated (email===lordhygm AND isDeveloper from DB), NOT role; SUPER_ADMIN alone insufficient.
 - [API error shape & body limits](api-error-shape-and-body-limits.md) — read server errors from err.data.error (not err.response.data); express body limit raised to 8mb for base64 avatars.
 - [Last super-admin guard](admin-last-super-guard.md) — demote/deactivate guards must count LOGIN-ELIGIBLE supers (status=ACTIVE AND is_active) and treat any login-blocking state (incl. PENDING) as deactivation, or you lock everyone out.
 - [api-server new route restart](api-server-new-route-restart.md) — a brand-new route file can 404 until the api-server workflow is restarted; tsx watch may not register newly added modules.

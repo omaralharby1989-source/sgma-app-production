@@ -232,7 +232,7 @@ paths:
     get:
       operationId: getDeveloperInfo
       tags: [public]
-      summary: Get developer/app information
+      summary: Get developer information
       responses:
         "200":
           description: Developer info
@@ -240,6 +240,55 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/DeveloperInfo"
+        "404":
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+    patch:
+      operationId: updateDeveloperInfo
+      tags: [public]
+      summary: Update developer information (developer account only)
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateDeveloperInfoInput"
+      responses:
+        "200":
+          description: Updated developer info
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DeveloperInfo"
+        "400":
+          description: Invalid input
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "403":
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "404":
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
 
   /chat/public/messages:
     get:
@@ -2123,22 +2172,50 @@ components:
 
     DeveloperInfo:
       type: object
-      required: [appName, version, developer, description, contact]
+      required: [id, name, title, description, phone, email]
       properties:
-        appName:
+        id:
+          type: integer
+        name:
           type: string
-        version:
-          type: string
-        developer:
+        title:
           type: string
         description:
           type: string
-        contact:
+        roleDescription:
+          type: ["string", "null"]
+        phone:
           type: string
-        builtWith:
-          type: array
-          items:
-            type: string
+        email:
+          type: string
+        updatedAt:
+          type: ["string", "null"]
+          format: date-time
+        updatedById:
+          type: ["integer", "null"]
+
+    UpdateDeveloperInfoInput:
+      type: object
+      required: [name, title, description, phone, email]
+      properties:
+        name:
+          type: string
+          minLength: 1
+        title:
+          type: string
+          minLength: 1
+        description:
+          type: string
+          minLength: 1
+        roleDescription:
+          type: ["string", "null"]
+        phone:
+          type: string
+          minLength: 1
+        email:
+          type: string
+          format: email
+          minLength: 1
 
     AdminDashboardStats:
       type: object

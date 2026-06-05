@@ -1,0 +1,475 @@
+LEGAL / ABOUT PAGES MODULE — SGMA APP2
+
+Start this task now.
+
+Scope:
+Add and activate three informational pages under /more:
+
+1. سياسة الخصوصية
+2. الشروط والأحكام
+3. من نحن
+
+These pages must be readable by users, and only the real developer account may edit their content.
+
+Do not add unrelated features.
+Do not break existing modules:
+
+* login
+* register
+* home/my account
+* news
+* articles
+* chat
+* broadcast
+* admin dashboard
+* more page
+* developer-info
+* membership approval flow
+
+Current architecture:
+
+* PostgreSQL + Drizzle
+* JWT auth
+* Arabic RTL
+* Mobile-first
+* No Firebase
+* No MySQL migration
+
+==================================================
+A. REQUIRED ROUTES
+==================
+
+Create and activate these routes:
+
+* /privacy-policy
+* /terms
+* /about-sgma
+
+All pages should be clean, Arabic RTL, mobile-first, and readable.
+
+They may be public if the current app design allows public legal pages, but they must also work correctly inside the authenticated app.
+
+Recommended:
+
+* /privacy-policy public
+* /terms public
+* /about-sgma public
+
+If public, do not show private app controls to unauthenticated users.
+If authenticated, broadcast banner may appear if current layout supports it.
+
+==================================================
+B. UPDATE /more PAGE
+====================
+
+In /more, add a clear section:
+
+القانونية والمعلومات
+
+Items:
+
+1. من نحن
+   route: /about-sgma
+
+2. سياسة الخصوصية
+   route: /privacy-policy
+
+3. الشروط والأحكام
+   route: /terms
+
+Keep existing items:
+
+* المحادثات
+* الأخبار
+* المقالات
+* معلومات المطور
+* الإدارة والإشراف section according to role
+* تسجيل الخروج
+
+Do not remove or break any existing /more item.
+
+==================================================
+C. CONTENT STORAGE
+==================
+
+Create or use an existing database table for editable static pages.
+
+Preferred model/table:
+StaticPage
+
+Fields:
+
+* id
+* slug unique
+* title
+* content
+* updatedAt
+* updatedById optional
+
+Required slugs:
+
+* privacy-policy
+* terms
+* about-sgma
+
+If there is already a similar table/model, reuse it safely.
+
+Do not hardcode final text only in frontend.
+Seed the text into the database so the developer can edit it later.
+
+Do not create duplicate rows on every restart.
+Use upsert or safe seed logic.
+
+==================================================
+D. EDIT PERMISSION — DEVELOPER ONLY
+===================================
+
+Only the real developer may edit these pages.
+
+Developer account:
+
+* email: [lordhygm@gmail.com](mailto:lordhygm@gmail.com)
+* isDeveloper = true
+
+Edit permission rule:
+Only authenticated user with:
+
+* email = "[lordhygm@gmail.com](mailto:lordhygm@gmail.com)"
+  AND
+* isDeveloper = true in database
+
+can edit legal/about page content.
+
+Important:
+
+* SUPER_ADMIN alone is NOT enough unless it is this same developer account.
+* ADMIN cannot edit.
+* MODERATOR cannot edit.
+* MEMBER cannot edit.
+* Other SUPER_ADMIN accounts cannot edit if isDeveloper=false.
+
+Backend must enforce this.
+Frontend hiding is not enough.
+
+==================================================
+E. API REQUIREMENTS
+===================
+
+Create clean APIs:
+
+GET /api/static-pages/:slug
+
+* Public or authenticated depending current design
+* Returns:
+
+  * slug
+  * title
+  * content
+  * updatedAt
+
+PATCH /api/static-pages/:slug
+
+* JWT protected
+* Developer only
+* Allows editing:
+
+  * title
+  * content
+
+Allowed slugs only:
+
+* privacy-policy
+* terms
+* about-sgma
+
+Return 404 for unknown slug.
+Return 403 for non-developer edit attempts.
+
+Do not trust frontend role.
+Check developer permission from database.
+
+==================================================
+F. EDIT UI
+==========
+
+On each page:
+
+If current authenticated user is the real developer:
+Show button:
+تعديل الصفحة
+
+Clicking opens edit mode.
+
+Editable fields:
+
+* title
+* content
+
+Buttons:
+
+* حفظ التعديلات
+* إلغاء
+
+Validation:
+
+* title required
+* content required
+
+After save:
+Show Arabic success message:
+تم تحديث الصفحة بنجاح
+
+If user is not the developer:
+Do not show edit button.
+
+==================================================
+G. PAGE DESIGN REQUIREMENTS
+===========================
+
+All three pages must be:
+
+* Arabic RTL
+* Mobile-first
+* Clean professional card layout
+* Comfortable reading typography
+* BackButton if appropriate
+* Proper spacing
+* No broken layout
+* No horizontal scrolling
+* Bottom navigation must not cover content
+* Long text must be readable
+
+Suggested layout:
+
+* Header card with page title
+* Main content card with paragraphs/numbered sections
+* Last updated date if available
+* Developer-only edit button at top or bottom
+
+==================================================
+H. SEED CONTENT — PRIVACY POLICY
+================================
+
+Page slug:
+privacy-policy
+
+Title:
+سياسة الخصوصية
+
+Content:
+
+سياسة الخصوصية
+
+1. من نحن
+   نحن الجمعية الطبية السورية الألمانية (SGMA)، جمعية غير ربحية قيد التسجيل في ألمانيا، تهدف إلى دعم وتمكين الأطباء السوريين وتعزيز العمل الطبي الإنساني.
+
+2. البيانات التي نجمعها
+   نقوم بجمع بعض المعلومات الشخصية عند استخدامك لموقعنا أو خدماتنا، مثل:
+
+الاسم الكامل
+البريد الإلكتروني
+التخصص الطبي
+بيانات التصفح (مثل عنوان IP ونوع المتصفح)
+
+نستخدم هذه البيانات فقط للأغراض التي جُمعت من أجلها، مثل إدارة العضوية والتواصل معك بشأن فعاليات الجمعية.
+
+3. استخدام ملفات تعريف الارتباط (Cookies)
+   يستخدم موقعنا ملفات تعريف الارتباط لتحسين تجربة المستخدم وتحليل أداء الموقع. يمكنك تعديل إعدادات المتصفح الخاص بك للتحكم في استخدام هذه الملفات.
+
+4. مشاركة البيانات
+   نحن لا نشارك بياناتك الشخصية مع أطراف ثالثة إلا في الحالات الضرورية، مثل:
+
+الامتثال للمتطلبات القانونية
+التعامل مع مزودي الخدمات التقنيين الذين يساعدوننا في تشغيل الموقع، مع ضمان التزامهم بسياسات الخصوصية الصارمة
+
+5. مدة الاحتفاظ بالبيانات
+   نحتفظ ببياناتك الشخصية فقط للمدة اللازمة لتحقيق الأغراض التي جُمعت من أجلها، أو كما هو مطلوب بموجب القوانين المعمول بها.
+
+6. حقوقك
+   بموجب اللائحة العامة لحماية البيانات (GDPR)، لديك الحقوق التالية:
+
+الاطلاع على بياناتك الشخصية التي نحتفظ بها
+طلب تصحيح أو حذف بياناتك
+الاعتراض على معالجة بياناتك
+سحب موافقتك في أي وقت
+
+لممارسة أي من هذه الحقوق، يرجى التواصل معنا عبر البريد الإلكتروني:
+
+[info@sgma-med.org](mailto:info@sgma-med.org)
+
+7. التعديلات على سياسة الخصوصية
+   قد نقوم بتحديث هذه السياسة من وقت لآخر. سيتم نشر أي تغييرات على هذه الصفحة مع تحديث تاريخ السريان أدناه.
+
+==================================================
+I. SEED CONTENT — TERMS
+=======================
+
+Page slug:
+terms
+
+Title:
+الشروط والأحكام
+
+Content:
+
+الشروط والأحكام
+
+1. مقدمة
+   مرحباً بك في الموقع الرسمي للجمعية الطبية السورية الألمانية (SGMA). باستخدامك لهذا الموقع، فإنك توافق على الالتزام بالشروط والأحكام التالية. إذا كنت لا توافق على أي جزء منها، يُرجى التوقف عن استخدام الموقع.
+
+2. استخدام الموقع
+   يُسمح باستخدام هذا الموقع فقط لأغراض شخصية، مهنية، أو تطوعية تتعلق بأهداف الجمعية.
+
+يُمنع استخدام الموقع بأي طريقة تنتهك القوانين المعمول بها أو تمس بحقوق الجمعية أو المستخدمين الآخرين.
+
+تحتفظ الجمعية بحق تعديل أو تقييد أو إيقاف الوصول إلى الموقع أو إلى أجزاء منه، في أي وقت، ودون إشعار مسبق.
+
+3. العضوية والتسجيل
+   تتيح الجمعية للعاملين في المجال الصحي من السوريين فرصة الانضمام إليها بسهولة.
+
+يمكن أيضاً للمتطوعين من خارج الوسط الطبي التقديم للمساهمة ضمن أطر واضحة.
+
+يجب أن تكون جميع المعلومات المقدمة صحيحة وكاملة.
+
+تحتفظ الجمعية بحق قبول أو رفض الطلبات وفقاً لمعاييرها الداخلية.
+
+4. حماية البيانات
+   نلتزم بحماية بياناتك كما هو موضح في سياسة الخصوصية. باستخدام الموقع، فإنك توافق على شروط السياسة.
+
+5. حقوق الملكية الفكرية
+   جميع المحتويات على الموقع مملوكة للجمعية أو مستخدمة بترخيص رسمي.
+
+يُمنع نسخ أو استخدام أي جزء منها دون إذن مسبق.
+
+==================================================
+J. SEED CONTENT — ABOUT SGMA
+============================
+
+Page slug:
+about-sgma
+
+Title:
+من نحن
+
+Content:
+
+من نحن
+
+الجمعية الطبية السورية الألمانية هي منظمة طبية غير ربحية، مستقلة، تأسست بمبادرة من عاملين في المجال الصحي سوريين يعملون في ألمانيا، إيمانًا بدور الطب والصيدلة كجسر إنساني وعلمي يربط بين الشعوب، وبمسؤولية الكفاءات الصحية السورية في المساهمة بإعادة بناء وتطوير النظام الصحي في سوريا، وتعزيز حضور العاملين الصحيين السوريين في المجتمع الطبي الألماني.
+
+تعمل الجمعية على دعم القطاع الصحي في سوريا عبر تنظيم مهمات طبية تخصصية، إجراء عمليات نوعية، توفير الاستشارات والخدمات العلاجية، إضافة إلى التركيز على التدريب وبناء القدرات ونقل الخبرات الطبية الحديثة إلى الداخل السوري بالتعاون مع المؤسسات الصحية المحلية.
+
+وفي ألمانيا، تسعى سِجما إلى تمثيل الأطباء والصيادلة والعاملين الصحيين السوريين، ودعم اندماجهم المهني، وتعزيز حضورهم الأكاديمي والعلمي، وفتح مساحات للحوار والتعاون مع المؤسسات الطبية والبحثية الألمانية.
+
+تؤمن الجمعية بأن العمل الطبي لا يقتصر على العلاج فقط، بل يشمل التعليم، وبناء الإنسان، وترسيخ قيم المهنية، والاستقلالية، والعمل التطوعي، والالتزام الأخلاقي.
+
+ومن هذا المنطلق، تشكّل سِجما منصة تجمع بين الخبرة الطبية، والمسؤولية الإنسانية، والرؤية المستقبلية لخدمة الإنسان أينما كان.
+
+==================================================
+K. OPENAPI / GENERATED CLIENT
+=============================
+
+If API contract changes:
+
+* Update OpenAPI
+* Regenerate client
+* Do not manually edit generated files
+* Fix type errors
+* Run typecheck
+
+Schemas:
+
+* StaticPage
+* UpdateStaticPageInput
+
+==================================================
+L. SECURITY TESTS REQUIRED
+==========================
+
+Test:
+
+1. Public/authenticated user can open:
+
+* /privacy-policy
+* /terms
+* /about-sgma
+
+2. Developer account can see edit button:
+
+* email = [lordhygm@gmail.com](mailto:lordhygm@gmail.com)
+* isDeveloper = true
+
+3. Developer can edit and save content.
+
+4. Non-developer users cannot see edit button.
+
+5. Backend PATCH returns 403 for:
+
+* MEMBER
+* MODERATOR
+* ADMIN
+* SUPER_ADMIN with isDeveloper=false
+
+6. Only the developer account can update content.
+
+==================================================
+M. RUNTIME TESTS REQUIRED
+=========================
+
+Do not report completion until tested in Preview.
+
+Required tests:
+
+1. /more shows the new legal/info section.
+2. /privacy-policy opens and shows the correct text.
+3. /terms opens and shows the correct text.
+4. /about-sgma opens and shows the correct text.
+5. Developer account can edit each page.
+6. Changes persist after refresh.
+7. Non-developer cannot edit.
+8. Existing modules still work:
+
+   * /login
+   * /register
+   * /home
+   * /news
+   * /articles
+   * /chat
+   * /broadcast
+   * /admin
+   * /developer-info
+9. Typecheck passes.
+10. Backend starts cleanly.
+11. Preview works.
+12. External public link should not show the removeChild translation error.
+
+==================================================
+N. REQUIRED REPORT
+==================
+
+After completion, provide:
+
+LEGAL / ABOUT PAGES REPORT
+
+1. What was implemented
+2. Files changed
+3. Database changes / seeded rows
+4. Routes added
+5. Final /more structure
+6. Public read access status
+7. Developer-only edit permission logic
+8. Backend API changes
+9. OpenAPI/client generation status
+10. Security test results
+11. Runtime test results
+12. Preview status
+13. Known issues, if any
+14. Confirmation:
+
+* Only [lordhygm@gmail.com](mailto:lordhygm@gmail.com) with isDeveloper=true can edit
+* No Firebase
+* No MySQL migration
+* No unrelated features added
+* Existing modules still work
+
+Do not report success until all three pages work visually in Preview and permission checks are verified.
