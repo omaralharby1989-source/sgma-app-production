@@ -22,11 +22,14 @@ import type {
 import type {
   ActiveBroadcastResponse,
   AdminConversation,
+  ArticleDetail,
+  ArticleListResponse,
   AuthResponse,
   AvatarResponse,
   AvatarUpload,
   BroadcastItem,
   ChatMessage,
+  CreateArticleInput,
   CreateBroadcastInput,
   CreateNewsInput,
   DeveloperInfo,
@@ -38,12 +41,15 @@ import type {
   MemberProfileUpdate,
   MemberStats,
   MessageResponse,
+  MyArticlesResponse,
   NewsItem,
   NewsListResponse,
   PasswordUpdate,
+  RejectArticleInput,
   SendAdminChatMessageInput,
   SendChatMessageInput,
   SignupInput,
+  UpdateArticleInput,
   UpdateNewsInput
 } from './api.schemas';
 
@@ -1902,5 +1908,591 @@ export const useCreateBroadcast = <TError = ErrorType<ErrorResponse>,
         TContext
       > => {
       return useMutation(getCreateBroadcastMutationOptions(options));
+    }
+
+export const getGetArticlesUrl = () => {
+
+
+
+
+  return `/api/articles`
+}
+
+/**
+ * @summary List approved articles (newest first)
+ */
+export const getArticles = async ( options?: RequestInit): Promise<ArticleListResponse> => {
+
+  return customFetch<ArticleListResponse>(getGetArticlesUrl(),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getGetArticlesQueryKey = () => {
+    return [
+    `/api/articles`
+    ] as const;
+    }
+
+
+export const getGetArticlesQueryOptions = <TData = Awaited<ReturnType<typeof getArticles>>, TError = ErrorType<ErrorResponse>>( options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getArticles>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetArticlesQueryKey();
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getArticles>>> = ({ signal }) => getArticles({ signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getArticles>>, TError, TData> & { queryKey: QueryKey }
+}
+
+export type GetArticlesQueryResult = NonNullable<Awaited<ReturnType<typeof getArticles>>>
+export type GetArticlesQueryError = ErrorType<ErrorResponse>
+
+
+/**
+ * @summary List approved articles (newest first)
+ */
+
+export function useGetArticles<TData = Awaited<ReturnType<typeof getArticles>>, TError = ErrorType<ErrorResponse>>(
+  options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getArticles>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+
+ ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+
+  const queryOptions = getGetArticlesQueryOptions(options)
+
+  const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
+
+  return { ...query, queryKey: queryOptions.queryKey };
+}
+
+
+
+
+
+
+
+export const getCreateArticleUrl = () => {
+
+
+
+
+  return `/api/articles`
+}
+
+/**
+ * @summary Submit a new article (any authenticated user)
+ */
+export const createArticle = async (createArticleInput: CreateArticleInput, options?: RequestInit): Promise<ArticleDetail> => {
+
+  return customFetch<ArticleDetail>(getCreateArticleUrl(),
+  {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(
+      createArticleInput,)
+  }
+);}
+
+
+
+
+export const getCreateArticleMutationOptions = <TError = ErrorType<ErrorResponse>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof createArticle>>, TError,{data: BodyType<CreateArticleInput>}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof createArticle>>, TError,{data: BodyType<CreateArticleInput>}, TContext> => {
+
+const mutationKey = ['createArticle'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof createArticle>>, {data: BodyType<CreateArticleInput>}> = (props) => {
+          const {data} = props ?? {};
+
+          return  createArticle(data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type CreateArticleMutationResult = NonNullable<Awaited<ReturnType<typeof createArticle>>>
+    export type CreateArticleMutationBody = BodyType<CreateArticleInput>
+    export type CreateArticleMutationError = ErrorType<ErrorResponse>
+
+    /**
+ * @summary Submit a new article (any authenticated user)
+ */
+export const useCreateArticle = <TError = ErrorType<ErrorResponse>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof createArticle>>, TError,{data: BodyType<CreateArticleInput>}, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof createArticle>>,
+        TError,
+        {data: BodyType<CreateArticleInput>},
+        TContext
+      > => {
+      return useMutation(getCreateArticleMutationOptions(options));
+    }
+
+export const getGetMyArticlesUrl = () => {
+
+
+
+
+  return `/api/articles/my`
+}
+
+/**
+ * @summary List the current user's articles (all statuses, newest first)
+ */
+export const getMyArticles = async ( options?: RequestInit): Promise<MyArticlesResponse> => {
+
+  return customFetch<MyArticlesResponse>(getGetMyArticlesUrl(),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getGetMyArticlesQueryKey = () => {
+    return [
+    `/api/articles/my`
+    ] as const;
+    }
+
+
+export const getGetMyArticlesQueryOptions = <TData = Awaited<ReturnType<typeof getMyArticles>>, TError = ErrorType<ErrorResponse>>( options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getMyArticles>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetMyArticlesQueryKey();
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getMyArticles>>> = ({ signal }) => getMyArticles({ signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getMyArticles>>, TError, TData> & { queryKey: QueryKey }
+}
+
+export type GetMyArticlesQueryResult = NonNullable<Awaited<ReturnType<typeof getMyArticles>>>
+export type GetMyArticlesQueryError = ErrorType<ErrorResponse>
+
+
+/**
+ * @summary List the current user's articles (all statuses, newest first)
+ */
+
+export function useGetMyArticles<TData = Awaited<ReturnType<typeof getMyArticles>>, TError = ErrorType<ErrorResponse>>(
+  options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getMyArticles>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+
+ ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+
+  const queryOptions = getGetMyArticlesQueryOptions(options)
+
+  const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
+
+  return { ...query, queryKey: queryOptions.queryKey };
+}
+
+
+
+
+
+
+
+export const getGetArticleUrl = (id: number,) => {
+
+
+
+
+  return `/api/articles/${id}`
+}
+
+/**
+ * @summary Get an article (approved for all; own non-approved for author)
+ */
+export const getArticle = async (id: number, options?: RequestInit): Promise<ArticleDetail> => {
+
+  return customFetch<ArticleDetail>(getGetArticleUrl(id),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getGetArticleQueryKey = (id: number,) => {
+    return [
+    `/api/articles/${id}`
+    ] as const;
+    }
+
+
+export const getGetArticleQueryOptions = <TData = Awaited<ReturnType<typeof getArticle>>, TError = ErrorType<ErrorResponse>>(id: number, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getArticle>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetArticleQueryKey(id);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getArticle>>> = ({ signal }) => getArticle(id, { signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, enabled: !!(id), ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getArticle>>, TError, TData> & { queryKey: QueryKey }
+}
+
+export type GetArticleQueryResult = NonNullable<Awaited<ReturnType<typeof getArticle>>>
+export type GetArticleQueryError = ErrorType<ErrorResponse>
+
+
+/**
+ * @summary Get an article (approved for all; own non-approved for author)
+ */
+
+export function useGetArticle<TData = Awaited<ReturnType<typeof getArticle>>, TError = ErrorType<ErrorResponse>>(
+ id: number, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getArticle>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+
+ ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+
+  const queryOptions = getGetArticleQueryOptions(id,options)
+
+  const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
+
+  return { ...query, queryKey: queryOptions.queryKey };
+}
+
+
+
+
+
+
+
+export const getUpdateArticleUrl = (id: number,) => {
+
+
+
+
+  return `/api/articles/${id}`
+}
+
+/**
+ * @summary Update own article (only when DRAFT or PENDING)
+ */
+export const updateArticle = async (id: number,
+    updateArticleInput: UpdateArticleInput, options?: RequestInit): Promise<ArticleDetail> => {
+
+  return customFetch<ArticleDetail>(getUpdateArticleUrl(id),
+  {
+    ...options,
+    method: 'PATCH',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(
+      updateArticleInput,)
+  }
+);}
+
+
+
+
+export const getUpdateArticleMutationOptions = <TError = ErrorType<ErrorResponse>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof updateArticle>>, TError,{id: number;data: BodyType<UpdateArticleInput>}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof updateArticle>>, TError,{id: number;data: BodyType<UpdateArticleInput>}, TContext> => {
+
+const mutationKey = ['updateArticle'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof updateArticle>>, {id: number;data: BodyType<UpdateArticleInput>}> = (props) => {
+          const {id,data} = props ?? {};
+
+          return  updateArticle(id,data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type UpdateArticleMutationResult = NonNullable<Awaited<ReturnType<typeof updateArticle>>>
+    export type UpdateArticleMutationBody = BodyType<UpdateArticleInput>
+    export type UpdateArticleMutationError = ErrorType<ErrorResponse>
+
+    /**
+ * @summary Update own article (only when DRAFT or PENDING)
+ */
+export const useUpdateArticle = <TError = ErrorType<ErrorResponse>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof updateArticle>>, TError,{id: number;data: BodyType<UpdateArticleInput>}, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof updateArticle>>,
+        TError,
+        {id: number;data: BodyType<UpdateArticleInput>},
+        TContext
+      > => {
+      return useMutation(getUpdateArticleMutationOptions(options));
+    }
+
+export const getDeleteArticleUrl = (id: number,) => {
+
+
+
+
+  return `/api/articles/${id}`
+}
+
+/**
+ * @summary Archive own article (only when DRAFT or PENDING)
+ */
+export const deleteArticle = async (id: number, options?: RequestInit): Promise<MessageResponse> => {
+
+  return customFetch<MessageResponse>(getDeleteArticleUrl(id),
+  {
+    ...options,
+    method: 'DELETE'
+
+
+  }
+);}
+
+
+
+
+export const getDeleteArticleMutationOptions = <TError = ErrorType<ErrorResponse>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof deleteArticle>>, TError,{id: number}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof deleteArticle>>, TError,{id: number}, TContext> => {
+
+const mutationKey = ['deleteArticle'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof deleteArticle>>, {id: number}> = (props) => {
+          const {id} = props ?? {};
+
+          return  deleteArticle(id,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type DeleteArticleMutationResult = NonNullable<Awaited<ReturnType<typeof deleteArticle>>>
+
+    export type DeleteArticleMutationError = ErrorType<ErrorResponse>
+
+    /**
+ * @summary Archive own article (only when DRAFT or PENDING)
+ */
+export const useDeleteArticle = <TError = ErrorType<ErrorResponse>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof deleteArticle>>, TError,{id: number}, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof deleteArticle>>,
+        TError,
+        {id: number},
+        TContext
+      > => {
+      return useMutation(getDeleteArticleMutationOptions(options));
+    }
+
+export const getApproveArticleUrl = (id: number,) => {
+
+
+
+
+  return `/api/articles/${id}/approve`
+}
+
+/**
+ * @summary Approve an article (staff only)
+ */
+export const approveArticle = async (id: number, options?: RequestInit): Promise<ArticleDetail> => {
+
+  return customFetch<ArticleDetail>(getApproveArticleUrl(id),
+  {
+    ...options,
+    method: 'POST'
+
+
+  }
+);}
+
+
+
+
+export const getApproveArticleMutationOptions = <TError = ErrorType<ErrorResponse>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof approveArticle>>, TError,{id: number}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof approveArticle>>, TError,{id: number}, TContext> => {
+
+const mutationKey = ['approveArticle'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof approveArticle>>, {id: number}> = (props) => {
+          const {id} = props ?? {};
+
+          return  approveArticle(id,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type ApproveArticleMutationResult = NonNullable<Awaited<ReturnType<typeof approveArticle>>>
+
+    export type ApproveArticleMutationError = ErrorType<ErrorResponse>
+
+    /**
+ * @summary Approve an article (staff only)
+ */
+export const useApproveArticle = <TError = ErrorType<ErrorResponse>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof approveArticle>>, TError,{id: number}, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof approveArticle>>,
+        TError,
+        {id: number},
+        TContext
+      > => {
+      return useMutation(getApproveArticleMutationOptions(options));
+    }
+
+export const getRejectArticleUrl = (id: number,) => {
+
+
+
+
+  return `/api/articles/${id}/reject`
+}
+
+/**
+ * @summary Reject an article (staff only)
+ */
+export const rejectArticle = async (id: number,
+    rejectArticleInput?: RejectArticleInput, options?: RequestInit): Promise<ArticleDetail> => {
+
+  return customFetch<ArticleDetail>(getRejectArticleUrl(id),
+  {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(
+      rejectArticleInput,)
+  }
+);}
+
+
+
+
+export const getRejectArticleMutationOptions = <TError = ErrorType<ErrorResponse>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof rejectArticle>>, TError,{id: number;data?: BodyType<RejectArticleInput>}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof rejectArticle>>, TError,{id: number;data?: BodyType<RejectArticleInput>}, TContext> => {
+
+const mutationKey = ['rejectArticle'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof rejectArticle>>, {id: number;data?: BodyType<RejectArticleInput>}> = (props) => {
+          const {id,data} = props ?? {};
+
+          return  rejectArticle(id,data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type RejectArticleMutationResult = NonNullable<Awaited<ReturnType<typeof rejectArticle>>>
+    export type RejectArticleMutationBody = BodyType<RejectArticleInput> | undefined
+    export type RejectArticleMutationError = ErrorType<ErrorResponse>
+
+    /**
+ * @summary Reject an article (staff only)
+ */
+export const useRejectArticle = <TError = ErrorType<ErrorResponse>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof rejectArticle>>, TError,{id: number;data?: BodyType<RejectArticleInput>}, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof rejectArticle>>,
+        TError,
+        {id: number;data?: BodyType<RejectArticleInput>},
+        TContext
+      > => {
+      return useMutation(getRejectArticleMutationOptions(options));
     }
 

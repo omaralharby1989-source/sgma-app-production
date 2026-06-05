@@ -1,0 +1,630 @@
+ARTICLES MODULE IMPLEMENTATION — SGMA APP2
+
+Start the Articles Module now.
+
+Important:
+This task is ONLY for the Articles Module.
+
+Do not add:
+
+* Full Admin Dashboard
+* Member management
+* News management UI
+* Advertisement system
+* Any unrelated feature
+
+Do not break existing working modules:
+
+* /login
+* /register
+* /home
+* /news
+* /news/:id
+* /chat
+* /chat/public
+* /chat/admin
+* /broadcast
+* /more
+* /developer-info
+
+Keep current architecture:
+
+* PostgreSQL + Drizzle
+* JWT authentication
+* Arabic RTL
+* Mobile-first design
+* Existing bottom navigation
+* No Firebase
+* No MySQL migration
+* No old SGMA APP1 routes
+
+==================================================
+A. ARTICLES MODULE PURPOSE
+==========================
+
+Articles are different from News.
+
+News:
+
+* Official SGMA announcements and activities.
+
+Articles:
+
+* Scientific/professional content written by members or staff.
+* Articles should be submitted by users.
+* Articles should not become public automatically unless approved/published according to the status system.
+
+For this phase, build:
+
+1. Public approved articles reading experience.
+2. Article detail page.
+3. Write article page.
+4. My Articles page.
+5. Backend article APIs.
+6. Status workflow foundation.
+
+Do NOT build the full admin review dashboard now.
+Admin review/approval UI will be implemented later in the Admin Dashboard phase.
+
+==================================================
+B. REQUIRED ROUTES
+==================
+
+Create and activate these routes:
+
+1. /articles
+   Public approved articles list.
+
+2. /articles/:id
+   Article detail page.
+
+3. /articles/new
+   Write new article page.
+
+4. /articles/my
+   My Articles page.
+
+All routes must be JWT protected.
+
+Unauthenticated users must be redirected to /login.
+
+Update navigation:
+
+* /more المقالات item must open /articles.
+* Add clear buttons inside /articles:
+
+  * كتابة مقال
+  * مقالاتي
+
+Do not create broken routes.
+Do not remove /articles placeholder without replacing it with the real list page.
+
+==================================================
+C. DATABASE REQUIREMENTS
+========================
+
+Use the existing articles table/schema if already created.
+
+Article model should support at minimum:
+
+Article:
+
+* id
+* title
+* summary
+* content
+* imageUrl optional
+* category optional
+* status
+* authorId
+* reviewedById optional
+* rejectionReason optional
+* createdAt
+* updatedAt
+* publishedAt optional
+
+Status values:
+
+* DRAFT
+* PENDING
+* APPROVED
+* REJECTED
+* ARCHIVED
+
+If current schema is missing fields, extend it safely with PostgreSQL + Drizzle.
+
+Do not create duplicate articles tables.
+Do not delete existing data.
+Do not break existing schemas.
+
+==================================================
+D. ARTICLE STATUS WORKFLOW
+==========================
+
+For this phase:
+
+1. Public /articles list shows only:
+
+* APPROVED articles
+  or published articles according to existing schema.
+
+2. /articles/:id opens only:
+
+* approved/public articles for general users
+* author can open own article even if DRAFT/PENDING/REJECTED from My Articles if implemented cleanly.
+
+3. New submitted article:
+   Default status should be:
+   PENDING
+
+Reason:
+Member submits article for review.
+Admin/moderator approval will come later.
+
+4. Optional draft support:
+   If easy and clean, allow saving as DRAFT.
+   But required minimum is:
+
+* Submit article → PENDING
+
+5. REJECTED:
+   Not public.
+   Author can see it in My Articles.
+
+6. ARCHIVED:
+   Not public.
+
+==================================================
+E. PERMISSIONS
+==============
+
+All authenticated users can:
+
+* Read approved articles.
+* Open approved article detail.
+* Submit a new article.
+* View their own articles in /articles/my.
+
+Author can:
+
+* See own DRAFT/PENDING/REJECTED/APPROVED articles.
+* Edit own article only if status is DRAFT or PENDING.
+* Delete/archive own article only if status is DRAFT or PENDING, if implemented.
+
+MEMBER cannot:
+
+* Approve articles.
+* Publish articles.
+* Reject articles.
+* Edit other users’ articles.
+
+MODERATOR / ADMIN / SUPER_ADMIN:
+For this phase, may have backend-only approval endpoints if already simple, but do not build the full approval UI now.
+
+If adding backend-only review endpoints, enforce:
+
+* MODERATOR / ADMIN / SUPER_ADMIN can approve/reject/archive.
+* MEMBER forbidden.
+
+==================================================
+F. BACKEND API REQUIREMENTS
+===========================
+
+Create clean JWT-protected APIs.
+
+Public approved articles:
+
+GET /api/articles
+
+* Returns approved articles only.
+* Sorted newest first.
+
+GET /api/articles/:id
+
+* Returns approved article.
+* Also allow author to access own non-approved article if needed from My Articles.
+* Return 404 if not found or not allowed.
+
+My articles:
+
+GET /api/articles/my
+
+* Returns articles authored by current user.
+* Includes all statuses.
+* Sorted newest first.
+
+Create article:
+
+POST /api/articles
+
+* JWT protected.
+* Creates article for authenticated user.
+* Never trust authorId from frontend.
+* authorId must come from JWT.
+* Requires title, summary, content, category if used.
+* imageUrl optional.
+* Default status = PENDING unless draft support is implemented.
+
+Update own article:
+
+PATCH /api/articles/:id
+
+* Author can edit only own article.
+* Only allowed if status is DRAFT or PENDING.
+* Cannot edit APPROVED/REJECTED/ARCHIVED unless staff rules are added.
+* Must not allow authorId/status/reviewedById injection from frontend.
+
+Delete/archive own article:
+
+DELETE /api/articles/:id
+
+* Soft delete/archive preferred.
+* Author can archive only own DRAFT/PENDING.
+* Staff can archive later if backend review endpoints exist.
+
+Optional staff review endpoints:
+POST /api/articles/:id/approve
+POST /api/articles/:id/reject
+Only MODERATOR / ADMIN / SUPER_ADMIN.
+No frontend admin UI required now.
+
+==================================================
+G. OPENAPI / GENERATED CLIENT
+=============================
+
+Update OpenAPI for all article endpoints.
+
+After OpenAPI changes:
+
+* Regenerate generated client.
+* Do not manually edit generated files.
+* Fix type errors.
+* Run typecheck.
+
+Required schemas:
+
+* ArticleItem
+* ArticleDetail
+* ArticleListResponse
+* MyArticlesResponse
+* CreateArticleInput
+* UpdateArticleInput
+* ArticleStatus
+
+==================================================
+H. FRONTEND — ARTICLES LIST /articles
+=====================================
+
+Create a professional Arabic RTL mobile-first articles list.
+
+Header:
+
+* Title: المقالات
+* Subtitle: مقالات علمية ومهنية من أعضاء الجمعية
+
+Top actions:
+
+* Button: كتابة مقال → /articles/new
+* Button: مقالاتي → /articles/my
+
+Article cards should show:
+
+* Image or fallback
+* Title
+* Summary
+* Author name
+* Category badge if exists
+* Date
+* Read more hint: قراءة المقال
+
+Card behavior:
+
+* Clicking card opens /articles/:id
+
+Empty state:
+لا توجد مقالات منشورة حالياً
+
+Loading state:
+Clean skeleton/loading.
+
+Error state:
+تعذر تحميل المقالات، يرجى المحاولة لاحقاً
+
+Design:
+
+* Similar quality to News cards
+* But visually distinct enough to feel like articles/scientific content
+* No table layout
+* No admin-like UI
+
+==================================================
+I. FRONTEND — ARTICLE DETAIL /articles/:id
+==========================================
+
+Create full article reading page.
+
+Show:
+
+* Main image or fallback
+* Title
+* Author name
+* Date
+* Category
+* Status badge only if author is viewing own article
+* Full content
+* Back button
+
+Design:
+
+* Arabic RTL
+* Mobile-first
+* Reading-friendly typography
+* Comfortable spacing
+* Bottom navigation does not cover content
+
+If article not found:
+المقال غير موجود أو لم يعد متاحاً
+
+==================================================
+J. FRONTEND — WRITE ARTICLE /articles/new
+=========================================
+
+Create article submission page.
+
+Fields:
+
+* title required
+  Label: عنوان المقال
+* summary required
+  Label: ملخص قصير
+* category required or optional depending schema, but preferred required
+  Label: التصنيف
+* imageUrl optional
+  Label: رابط صورة المقال
+* content required
+  Label: محتوى المقال
+
+Validation:
+
+* title required
+* summary required
+* content required
+* content should not be too short
+* Arabic error messages
+
+Submit button:
+إرسال المقال للمراجعة
+
+After submit:
+
+* Show success message:
+  تم إرسال المقال للمراجعة
+* Redirect to /articles/my or stay with clear success state.
+
+Important:
+Do not publish directly.
+Created article status must be PENDING.
+
+==================================================
+K. FRONTEND — MY ARTICLES /articles/my
+======================================
+
+Create “My Articles” page.
+
+Title:
+مقالاتي
+
+Show user’s articles grouped or clearly labeled by status:
+
+Statuses Arabic labels:
+
+* DRAFT: مسودة
+* PENDING: قيد المراجعة
+* APPROVED: منشور
+* REJECTED: مرفوض
+* ARCHIVED: مؤرشف
+
+Each card:
+
+* title
+* summary
+* status badge
+* date
+* category
+* rejectionReason if rejected
+* buttons if allowed:
+
+  * عرض
+  * تعديل for DRAFT/PENDING only
+  * حذف/أرشفة for DRAFT/PENDING only if implemented
+
+If no articles:
+لم تقم بإرسال أي مقالات بعد
+
+==================================================
+L. ARTICLE EDITING
+==================
+
+If implementing edit now:
+
+Route:
+
+* /articles/:id/edit
+
+Rules:
+
+* Author only.
+* Only DRAFT/PENDING.
+* Save changes.
+* Keep status PENDING unless draft support exists.
+* No status escalation.
+
+If edit is too large, you may defer edit UI, but backend permissions must still be safe.
+
+Preferred:
+Implement edit if clean and stable.
+
+==================================================
+M. IMAGE HANDLING
+=================
+
+Use imageUrl string only for now.
+
+Do not build complex upload/storage now.
+
+Rules:
+
+* imageUrl optional.
+* Missing image uses fallback.
+* Broken image uses fallback.
+* No broken image icon.
+
+No Firebase Storage.
+
+==================================================
+N. UI QUALITY REQUIREMENTS
+==========================
+
+All article pages must be:
+
+* Arabic RTL
+* Mobile-first
+* Professional
+* Clean cards
+* Comfortable reading
+* Clear buttons
+* No broken links
+* No 404 for intended routes
+* Bottom nav must not cover forms or buttons
+* Broadcast banner must still work at top of authenticated pages
+
+==================================================
+O. TESTING REQUIREMENTS
+=======================
+
+Do not report completion until tested in Preview.
+
+Required tests:
+
+General:
+
+1. Login works.
+2. /articles opens.
+3. /articles/new opens.
+4. /articles/my opens.
+5. /articles/:id opens for approved article.
+6. Bottom navigation and /more links still work.
+
+Article list:
+
+1. Shows approved articles only.
+2. Cards show title, summary, author, date, category, image/fallback.
+3. Clicking card opens detail.
+
+Create article:
+
+1. Submit empty form shows validation errors.
+2. Submit valid article creates PENDING article.
+3. It does NOT appear in public /articles list.
+4. It appears in /articles/my with status قيد المراجعة.
+
+My Articles:
+
+1. Shows current user articles.
+2. Shows correct status badges.
+3. Rejected reason display works if applicable.
+4. User cannot see other users’ private articles.
+
+Permissions:
+
+1. MEMBER cannot approve/reject articles.
+2. MEMBER cannot update another user’s article.
+3. MEMBER cannot inject authorId/status via API.
+4. Backend enforces permissions.
+
+Regression:
+
+1. /home works.
+2. /news works.
+3. /news/:id works.
+4. /chat works.
+5. /chat/public works.
+6. /chat/admin works.
+7. /broadcast works for staff.
+8. Broadcast banner still appears.
+9. /more works.
+10. /developer-info works.
+11. Typecheck passes.
+12. Backend starts cleanly.
+13. Preview Panel operational.
+
+==================================================
+P. SEED DATA
+============
+
+If there are no approved articles, seed 2–3 sample approved articles for visual testing.
+
+Sample article ideas:
+
+1. أهمية التدريب المستمر للكوادر التمريضية
+2. مبادئ السلامة في العناية المركزة
+3. دور المساعدين الطبيين في تحسين جودة الرعاية
+
+Mark sample content as test content if appropriate.
+
+Do not create misleading real organizational claims beyond test/demo content.
+
+==================================================
+Q. REQUIRED REPORT
+==================
+
+After completion, provide:
+
+ARTICLES MODULE REPORT
+
+1. What was implemented
+2. Files changed
+3. Database/table changes
+4. Backend endpoints added
+5. Frontend routes added
+6. Article workflow:
+
+   * public approved list
+   * detail page
+   * create article
+   * my articles
+   * statuses
+7. Permissions:
+
+   * author permissions
+   * member restrictions
+   * staff backend-only review if implemented
+8. Image/fallback behavior
+9. Seed/sample articles status
+10. OpenAPI/client generation status
+11. Runtime test results:
+
+* /articles
+* /articles/:id
+* /articles/new
+* /articles/my
+* create PENDING article
+* PENDING hidden from public list
+* PENDING visible in My Articles
+* permission checks
+* existing pages regression
+
+12. Preview status
+13. Known issues, if any
+14. Confirmation:
+
+* No Firebase
+* No MySQL migration
+* No Admin Dashboard started
+* No News management UI started
+* No Advertisement system started
+* Broadcast still works
+
+Important:
+If Preview breaks, stop and fix runtime first.
+Do not hide runtime failures behind typecheck success.

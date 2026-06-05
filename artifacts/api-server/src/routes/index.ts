@@ -5,6 +5,7 @@ import memberRouter from "./member";
 import publicRouter from "./public";
 import chatRouter from "./chat";
 import newsRouter from "./news";
+import articlesRouter from "./articles";
 import broadcastsRouter from "./broadcasts";
 
 const router: IRouter = Router();
@@ -15,6 +16,7 @@ router.use(memberRouter);
 router.use(publicRouter);
 router.use(chatRouter);
 router.use(newsRouter);
+router.use(articlesRouter);
 router.use(broadcastsRouter);
 
 export default router;

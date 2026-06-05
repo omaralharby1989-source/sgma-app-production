@@ -1,30 +1,80 @@
-import { Card, CardContent } from "@/components/ui/card";
-import { BackButton } from "@/components/BackButton";
-import { FileText, Clock } from "lucide-react";
+import { Link } from "wouter";
+import { useGetArticles, getGetArticlesQueryKey } from "@workspace/api-client-react";
+import { ArticleCard } from "@/components/articles/ArticleCard";
+import { Button } from "@/components/ui/button";
+import { Skeleton } from "@/components/ui/skeleton";
+import { BookOpen, AlertCircle, PenLine, FolderOpen } from "lucide-react";
+
+function ArticleSkeleton() {
+  return (
+    <div className="overflow-hidden rounded-xl border border-border/50 bg-card">
+      <Skeleton className="aspect-[16/9] w-full" />
+      <div className="space-y-2 p-4">
+        <Skeleton className="h-3 w-28" />
+        <Skeleton className="h-5 w-3/4" />
+        <Skeleton className="h-4 w-full" />
+      </div>
+    </div>
+  );
+}
 
 export default function Articles() {
-  return (
-    <div className="min-h-[100dvh] bg-muted/20 p-4 max-w-lg mx-auto">
-      <div className="flex items-center justify-between pt-2 pb-4">
-        <h1 className="text-2xl font-bold">المقالات</h1>
-        <BackButton fallback="/more" />
-      </div>
+  const { data: articles, isLoading, isError } = useGetArticles({
+    query: { queryKey: getGetArticlesQueryKey(), retry: false },
+  });
 
-      <Card className="shadow-sm border-border/50">
-        <CardContent className="p-8 flex flex-col items-center text-center">
-          <div className="h-16 w-16 bg-primary/10 rounded-2xl flex items-center justify-center mb-5">
-            <FileText className="h-8 w-8 text-primary" />
+  return (
+    <div className="mx-auto min-h-[100dvh] max-w-lg bg-muted/20">
+      <header className="border-b border-border bg-card px-4 pb-4 pt-6">
+        <h1 className="text-2xl font-bold">المقالات</h1>
+        <p className="mt-1 text-sm text-muted-foreground">
+          مقالات علمية ومهنية من أعضاء الجمعية
+        </p>
+
+        <div className="mt-4 grid grid-cols-2 gap-2">
+          <Button asChild className="gap-2">
+            <Link href="/articles/new">
+              <PenLine className="h-4 w-4" />
+              كتابة مقال
+            </Link>
+          </Button>
+          <Button asChild variant="outline" className="gap-2">
+            <Link href="/articles/my">
+              <FolderOpen className="h-4 w-4" />
+              مقالاتي
+            </Link>
+          </Button>
+        </div>
+      </header>
+
+      <div className="space-y-4 p-4">
+        {isLoading && (
+          <>
+            <ArticleSkeleton />
+            <ArticleSkeleton />
+            <ArticleSkeleton />
+          </>
+        )}
+
+        {!isLoading && isError && (
+          <div className="flex flex-col items-center justify-center py-20 text-center text-muted-foreground">
+            <AlertCircle className="mb-3 h-12 w-12 opacity-40" />
+            <p>تعذر تحميل المقالات، يرجى المحاولة لاحقاً</p>
           </div>
-          <h2 className="text-lg font-semibold mb-2">قسم المقالات</h2>
-          <p className="text-muted-foreground text-sm leading-relaxed max-w-xs">
-            قسم المقالات قيد التحضير وسيتم تفعيله قريباً.
-          </p>
-          <div className="mt-5 inline-flex items-center gap-2 text-xs bg-secondary/20 text-secondary-foreground px-3 py-1.5 rounded-full font-medium">
-            <Clock className="h-3.5 w-3.5" />
-            قريباً
+        )}
+
+        {!isLoading && !isError && articles && articles.length === 0 && (
+          <div className="flex flex-col items-center justify-center py-20 text-center text-muted-foreground">
+            <BookOpen className="mb-3 h-12 w-12 opacity-40" />
+            <p>لا توجد مقالات منشورة حالياً</p>
           </div>
-        </CardContent>
-      </Card>
+        )}
+
+        {!isLoading &&
+          !isError &&
+          articles &&
+          articles.map((item) => <ArticleCard key={item.id} item={item} />)}
+      </div>
     </div>
   );
 }

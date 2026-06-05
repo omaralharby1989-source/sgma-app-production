@@ -96,7 +96,7 @@ More page (`/more`) organization:
 - Staff-only section `الإدارة والإشراف` (MODERATOR/ADMIN/SUPER_ADMIN): إرسال بث → /broadcast — NEVER shown to MEMBER
 - `الحساب`: تسجيل الخروج
 
-Articles (`/articles`): protected placeholder page (title المقالات, "قسم المقالات قيد التحضير وسيتم تفعيله قريباً") — NOT a 404. Full articles module not built.
+Articles: now a FULL module — see "Articles Module Status" below (no longer a placeholder).
 
 Broadcast:
 - `/broadcast` — JWT + role protected (staffOnly); MEMBER visiting manually → redirected to /unauthorized
@@ -109,6 +109,27 @@ Broadcast endpoints (`artifacts/api-server/src/routes/broadcasts.ts`, table `bro
 - `POST /api/broadcasts` — staff only (403 for MEMBER); server sets authorId = req.user.userId; invalid/empty title|content → 400; bad expiresAt → 400
 
 Reusable `BackButton` (`src/components/BackButton.tsx`): default label رجوع, uses history when available, else `fallback` route prop.
+
+## Articles Module Status — COMPLETE
+
+Member-authored articles with a PENDING-based moderation workflow (separate from News). All routes JWT-protected (ProtectedRoute, not staffOnly):
+- `/articles` — list of APPROVED articles only (loading skeleton / error / empty: "لا توجد مقالات منشورة حالياً"); buttons كتابة مقال→/articles/new, مقالاتي→/articles/my
+- `/articles/:id` — detail (cover image, category, date, author, summary, content). Status badge shown ONLY to the owner. Not-found: "المقال غير موجود أو لم يعد متاحاً"
+- `/articles/new` — write form (title+summary+content required, category+imageUrl optional). إرسال المقال للمراجعة → PENDING; حفظ كمسودة → DRAFT. Success: "تم إرسال المقال للمراجعة"
+- `/articles/my` — own articles with status badge; REJECTED shows rejectionReason; تعديل + أرشفة only for DRAFT/PENDING
+- `/articles/:id/edit` — edit own DRAFT/PENDING only; DRAFT can also be submitted for review
+
+Route order in wouter `<Switch>`: `/articles/new`, `/articles/my`, `/articles/:id/edit` MUST precede `/articles/:id`.
+
+Articles data model (`lib/db/src/schema/articles.ts`):
+- `articleStatusEnum`: DRAFT/PENDING/APPROVED/REJECTED/ARCHIVED; `status` defaults PENDING
+- Added: `category`, `reviewedById`, `rejectionReason`; legacy `isPublished`/`coverImageUrl` kept (API maps `coverImageUrl` → response `imageUrl`)
+
+Articles security (`artifacts/api-server/src/routes/articles.ts`):
+- `GET /api/articles` — APPROVED only; `GET /api/articles/my` — caller's own; `GET /api/articles/:id`
+- `POST/PATCH/DELETE /api/articles` — server ALWAYS sets authorId = req.user.userId (never trusts client); create/update status clamped to DRAFT/PENDING (Zod enum + backend). Author may edit/delete ONLY own DRAFT/PENDING (else 403). DELETE = archive.
+- `POST /api/articles/:id/approve` `/reject` — staff only (403 for MEMBER), backend-only (no UI); sets reviewedById + rejectionReason
+- 3 sample APPROVED articles seeded
 
 ## Test Accounts
 

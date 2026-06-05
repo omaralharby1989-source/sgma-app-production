@@ -816,6 +816,282 @@ paths:
               schema:
                 $ref: "#/components/schemas/ErrorResponse"
 
+  /articles:
+    get:
+      operationId: getArticles
+      tags: [articles]
+      summary: List approved articles (newest first)
+      security:
+        - BearerAuth: []
+      responses:
+        "200":
+          description: Approved articles list
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ArticleListResponse"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+    post:
+      operationId: createArticle
+      tags: [articles]
+      summary: Submit a new article (any authenticated user)
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateArticleInput"
+      responses:
+        "201":
+          description: Article created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ArticleDetail"
+        "400":
+          description: Validation error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /articles/my:
+    get:
+      operationId: getMyArticles
+      tags: [articles]
+      summary: List the current user's articles (all statuses, newest first)
+      security:
+        - BearerAuth: []
+      responses:
+        "200":
+          description: Current user's articles
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MyArticlesResponse"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /articles/{id}:
+    get:
+      operationId: getArticle
+      tags: [articles]
+      summary: Get an article (approved for all; own non-approved for author)
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Article detail
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ArticleDetail"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "404":
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+    patch:
+      operationId: updateArticle
+      tags: [articles]
+      summary: Update own article (only when DRAFT or PENDING)
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateArticleInput"
+      responses:
+        "200":
+          description: Article updated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ArticleDetail"
+        "400":
+          description: Validation error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "403":
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "404":
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+    delete:
+      operationId: deleteArticle
+      tags: [articles]
+      summary: Archive own article (only when DRAFT or PENDING)
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Article archived
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MessageResponse"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "403":
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "404":
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /articles/{id}/approve:
+    post:
+      operationId: approveArticle
+      tags: [articles]
+      summary: Approve an article (staff only)
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Article approved
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ArticleDetail"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "403":
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "404":
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /articles/{id}/reject:
+    post:
+      operationId: rejectArticle
+      tags: [articles]
+      summary: Reject an article (staff only)
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/RejectArticleInput"
+      responses:
+        "200":
+          description: Article rejected
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ArticleDetail"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "403":
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "404":
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
 components:
   securitySchemes:
     BearerAuth:
@@ -1040,6 +1316,144 @@ components:
         expiresAt:
           type: string
           description: Optional expiry timestamp (ISO date or date-time)
+
+    ArticleStatus:
+      type: string
+      enum: [DRAFT, PENDING, APPROVED, REJECTED, ARCHIVED]
+
+    ArticleItem:
+      type: object
+      required: [id, title, status, createdAt, updatedAt]
+      properties:
+        id:
+          type: integer
+        title:
+          type: string
+        summary:
+          type: ["string", "null"]
+        imageUrl:
+          type: ["string", "null"]
+        category:
+          type: ["string", "null"]
+        status:
+          $ref: "#/components/schemas/ArticleStatus"
+        authorId:
+          type: ["integer", "null"]
+        authorName:
+          type: ["string", "null"]
+        rejectionReason:
+          type: ["string", "null"]
+        publishedAt:
+          type: ["string", "null"]
+          format: date-time
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+
+    ArticleDetail:
+      type: object
+      required: [id, title, content, status, createdAt, updatedAt]
+      properties:
+        id:
+          type: integer
+        title:
+          type: string
+        summary:
+          type: ["string", "null"]
+        content:
+          type: string
+        imageUrl:
+          type: ["string", "null"]
+        category:
+          type: ["string", "null"]
+        status:
+          $ref: "#/components/schemas/ArticleStatus"
+        authorId:
+          type: ["integer", "null"]
+        authorName:
+          type: ["string", "null"]
+        reviewedById:
+          type: ["integer", "null"]
+        rejectionReason:
+          type: ["string", "null"]
+        publishedAt:
+          type: ["string", "null"]
+          format: date-time
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+
+    ArticleListResponse:
+      type: array
+      items:
+        $ref: "#/components/schemas/ArticleItem"
+
+    MyArticlesResponse:
+      type: array
+      items:
+        $ref: "#/components/schemas/ArticleItem"
+
+    CreateArticleInput:
+      type: object
+      required: [title, summary, content]
+      properties:
+        title:
+          type: string
+          minLength: 1
+          maxLength: 200
+        summary:
+          type: string
+          minLength: 1
+          maxLength: 500
+        content:
+          type: string
+          minLength: 30
+        category:
+          type: string
+          maxLength: 100
+        imageUrl:
+          type: string
+        status:
+          type: string
+          enum: [DRAFT, PENDING]
+          description: Author may save as DRAFT; otherwise submitted as PENDING
+
+    UpdateArticleInput:
+      type: object
+      properties:
+        title:
+          type: string
+          minLength: 1
+          maxLength: 200
+        summary:
+          type: string
+          minLength: 1
+          maxLength: 500
+        content:
+          type: string
+          minLength: 30
+        category:
+          type: string
+          maxLength: 100
+        imageUrl:
+          type: string
+        status:
+          type: string
+          enum: [DRAFT, PENDING]
+          description: Author may move a DRAFT to PENDING (submit for review)
+
+    RejectArticleInput:
+      type: object
+      properties:
+        reason:
+          type: string
+          maxLength: 500
 
     SignupInput:
       type: object

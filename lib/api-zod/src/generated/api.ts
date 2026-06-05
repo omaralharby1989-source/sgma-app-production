@@ -535,3 +535,205 @@ export const CreateBroadcastBody = zod.object({
 })
 
 
+/**
+ * @summary List approved articles (newest first)
+ */
+export const GetArticlesResponseItem = zod.object({
+  "id": zod.number(),
+  "title": zod.string(),
+  "summary": zod.string().nullish(),
+  "imageUrl": zod.string().nullish(),
+  "category": zod.string().nullish(),
+  "status": zod.enum(['DRAFT', 'PENDING', 'APPROVED', 'REJECTED', 'ARCHIVED']),
+  "authorId": zod.number().nullish(),
+  "authorName": zod.string().nullish(),
+  "rejectionReason": zod.string().nullish(),
+  "publishedAt": zod.coerce.date().nullish(),
+  "createdAt": zod.coerce.date(),
+  "updatedAt": zod.coerce.date()
+})
+export const GetArticlesResponse = zod.array(GetArticlesResponseItem)
+
+
+/**
+ * @summary Submit a new article (any authenticated user)
+ */
+export const createArticleBodyTitleMax = 200;
+
+export const createArticleBodySummaryMax = 500;
+
+export const createArticleBodyContentMin = 30;
+
+export const createArticleBodyCategoryMax = 100;
+
+
+
+export const CreateArticleBody = zod.object({
+  "title": zod.string().min(1).max(createArticleBodyTitleMax),
+  "summary": zod.string().min(1).max(createArticleBodySummaryMax),
+  "content": zod.string().min(createArticleBodyContentMin),
+  "category": zod.string().max(createArticleBodyCategoryMax).optional(),
+  "imageUrl": zod.string().optional(),
+  "status": zod.enum(['DRAFT', 'PENDING']).optional().describe('Author may save as DRAFT; otherwise submitted as PENDING')
+})
+
+
+/**
+ * @summary List the current user's articles (all statuses, newest first)
+ */
+export const GetMyArticlesResponseItem = zod.object({
+  "id": zod.number(),
+  "title": zod.string(),
+  "summary": zod.string().nullish(),
+  "imageUrl": zod.string().nullish(),
+  "category": zod.string().nullish(),
+  "status": zod.enum(['DRAFT', 'PENDING', 'APPROVED', 'REJECTED', 'ARCHIVED']),
+  "authorId": zod.number().nullish(),
+  "authorName": zod.string().nullish(),
+  "rejectionReason": zod.string().nullish(),
+  "publishedAt": zod.coerce.date().nullish(),
+  "createdAt": zod.coerce.date(),
+  "updatedAt": zod.coerce.date()
+})
+export const GetMyArticlesResponse = zod.array(GetMyArticlesResponseItem)
+
+
+/**
+ * @summary Get an article (approved for all; own non-approved for author)
+ */
+export const GetArticleParams = zod.object({
+  "id": zod.coerce.number()
+})
+
+export const GetArticleResponse = zod.object({
+  "id": zod.number(),
+  "title": zod.string(),
+  "summary": zod.string().nullish(),
+  "content": zod.string(),
+  "imageUrl": zod.string().nullish(),
+  "category": zod.string().nullish(),
+  "status": zod.enum(['DRAFT', 'PENDING', 'APPROVED', 'REJECTED', 'ARCHIVED']),
+  "authorId": zod.number().nullish(),
+  "authorName": zod.string().nullish(),
+  "reviewedById": zod.number().nullish(),
+  "rejectionReason": zod.string().nullish(),
+  "publishedAt": zod.coerce.date().nullish(),
+  "createdAt": zod.coerce.date(),
+  "updatedAt": zod.coerce.date()
+})
+
+
+/**
+ * @summary Update own article (only when DRAFT or PENDING)
+ */
+export const UpdateArticleParams = zod.object({
+  "id": zod.coerce.number()
+})
+
+export const updateArticleBodyTitleMax = 200;
+
+export const updateArticleBodySummaryMax = 500;
+
+export const updateArticleBodyContentMin = 30;
+
+export const updateArticleBodyCategoryMax = 100;
+
+
+
+export const UpdateArticleBody = zod.object({
+  "title": zod.string().min(1).max(updateArticleBodyTitleMax).optional(),
+  "summary": zod.string().min(1).max(updateArticleBodySummaryMax).optional(),
+  "content": zod.string().min(updateArticleBodyContentMin).optional(),
+  "category": zod.string().max(updateArticleBodyCategoryMax).optional(),
+  "imageUrl": zod.string().optional(),
+  "status": zod.enum(['DRAFT', 'PENDING']).optional().describe('Author may move a DRAFT to PENDING (submit for review)')
+})
+
+export const UpdateArticleResponse = zod.object({
+  "id": zod.number(),
+  "title": zod.string(),
+  "summary": zod.string().nullish(),
+  "content": zod.string(),
+  "imageUrl": zod.string().nullish(),
+  "category": zod.string().nullish(),
+  "status": zod.enum(['DRAFT', 'PENDING', 'APPROVED', 'REJECTED', 'ARCHIVED']),
+  "authorId": zod.number().nullish(),
+  "authorName": zod.string().nullish(),
+  "reviewedById": zod.number().nullish(),
+  "rejectionReason": zod.string().nullish(),
+  "publishedAt": zod.coerce.date().nullish(),
+  "createdAt": zod.coerce.date(),
+  "updatedAt": zod.coerce.date()
+})
+
+
+/**
+ * @summary Archive own article (only when DRAFT or PENDING)
+ */
+export const DeleteArticleParams = zod.object({
+  "id": zod.coerce.number()
+})
+
+export const DeleteArticleResponse = zod.object({
+  "message": zod.string()
+})
+
+
+/**
+ * @summary Approve an article (staff only)
+ */
+export const ApproveArticleParams = zod.object({
+  "id": zod.coerce.number()
+})
+
+export const ApproveArticleResponse = zod.object({
+  "id": zod.number(),
+  "title": zod.string(),
+  "summary": zod.string().nullish(),
+  "content": zod.string(),
+  "imageUrl": zod.string().nullish(),
+  "category": zod.string().nullish(),
+  "status": zod.enum(['DRAFT', 'PENDING', 'APPROVED', 'REJECTED', 'ARCHIVED']),
+  "authorId": zod.number().nullish(),
+  "authorName": zod.string().nullish(),
+  "reviewedById": zod.number().nullish(),
+  "rejectionReason": zod.string().nullish(),
+  "publishedAt": zod.coerce.date().nullish(),
+  "createdAt": zod.coerce.date(),
+  "updatedAt": zod.coerce.date()
+})
+
+
+/**
+ * @summary Reject an article (staff only)
+ */
+export const RejectArticleParams = zod.object({
+  "id": zod.coerce.number()
+})
+
+export const rejectArticleBodyReasonMax = 500;
+
+
+
+export const RejectArticleBody = zod.object({
+  "reason": zod.string().max(rejectArticleBodyReasonMax).optional()
+})
+
+export const RejectArticleResponse = zod.object({
+  "id": zod.number(),
+  "title": zod.string(),
+  "summary": zod.string().nullish(),
+  "content": zod.string(),
+  "imageUrl": zod.string().nullish(),
+  "category": zod.string().nullish(),
+  "status": zod.enum(['DRAFT', 'PENDING', 'APPROVED', 'REJECTED', 'ARCHIVED']),
+  "authorId": zod.number().nullish(),
+  "authorName": zod.string().nullish(),
+  "reviewedById": zod.number().nullish(),
+  "rejectionReason": zod.string().nullish(),
+  "publishedAt": zod.coerce.date().nullish(),
+  "createdAt": zod.coerce.date(),
+  "updatedAt": zod.coerce.date()
+})
+
+

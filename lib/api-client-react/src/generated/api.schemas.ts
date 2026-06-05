@@ -166,6 +166,135 @@ export interface CreateBroadcastInput {
   expiresAt?: string;
 }
 
+export type ArticleStatus = typeof ArticleStatus[keyof typeof ArticleStatus];
+
+
+export const ArticleStatus = {
+  DRAFT: 'DRAFT',
+  PENDING: 'PENDING',
+  APPROVED: 'APPROVED',
+  REJECTED: 'REJECTED',
+  ARCHIVED: 'ARCHIVED',
+} as const;
+
+export interface ArticleItem {
+  id: number;
+  title: string;
+  /** @nullable */
+  summary?: string | null;
+  /** @nullable */
+  imageUrl?: string | null;
+  /** @nullable */
+  category?: string | null;
+  status: ArticleStatus;
+  /** @nullable */
+  authorId?: number | null;
+  /** @nullable */
+  authorName?: string | null;
+  /** @nullable */
+  rejectionReason?: string | null;
+  /** @nullable */
+  publishedAt?: string | null;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface ArticleDetail {
+  id: number;
+  title: string;
+  /** @nullable */
+  summary?: string | null;
+  content: string;
+  /** @nullable */
+  imageUrl?: string | null;
+  /** @nullable */
+  category?: string | null;
+  status: ArticleStatus;
+  /** @nullable */
+  authorId?: number | null;
+  /** @nullable */
+  authorName?: string | null;
+  /** @nullable */
+  reviewedById?: number | null;
+  /** @nullable */
+  rejectionReason?: string | null;
+  /** @nullable */
+  publishedAt?: string | null;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export type ArticleListResponse = ArticleItem[];
+
+export type MyArticlesResponse = ArticleItem[];
+
+/**
+ * Author may save as DRAFT; otherwise submitted as PENDING
+ */
+export type CreateArticleInputStatus = typeof CreateArticleInputStatus[keyof typeof CreateArticleInputStatus];
+
+
+export const CreateArticleInputStatus = {
+  DRAFT: 'DRAFT',
+  PENDING: 'PENDING',
+} as const;
+
+export interface CreateArticleInput {
+  /**
+     * @minLength 1
+     * @maxLength 200
+     */
+  title: string;
+  /**
+     * @minLength 1
+     * @maxLength 500
+     */
+  summary: string;
+  /** @minLength 30 */
+  content: string;
+  /** @maxLength 100 */
+  category?: string;
+  imageUrl?: string;
+  /** Author may save as DRAFT; otherwise submitted as PENDING */
+  status?: CreateArticleInputStatus;
+}
+
+/**
+ * Author may move a DRAFT to PENDING (submit for review)
+ */
+export type UpdateArticleInputStatus = typeof UpdateArticleInputStatus[keyof typeof UpdateArticleInputStatus];
+
+
+export const UpdateArticleInputStatus = {
+  DRAFT: 'DRAFT',
+  PENDING: 'PENDING',
+} as const;
+
+export interface UpdateArticleInput {
+  /**
+     * @minLength 1
+     * @maxLength 200
+     */
+  title?: string;
+  /**
+     * @minLength 1
+     * @maxLength 500
+     */
+  summary?: string;
+  /** @minLength 30 */
+  content?: string;
+  /** @maxLength 100 */
+  category?: string;
+  imageUrl?: string;
+  /** Author may move a DRAFT to PENDING (submit for review) */
+  status?: UpdateArticleInputStatus;
+}
+
+export interface RejectArticleInput {
+  /** @maxLength 500 */
+  reason?: string;
+}
+
 export interface SignupInput {
   /** @minLength 2 */
   fullName: string;

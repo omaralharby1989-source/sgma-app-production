@@ -17,6 +17,10 @@ import ChatAdmin from "./pages/chat-admin";
 import News from "./pages/news";
 import NewsDetail from "./pages/news-detail";
 import Articles from "./pages/articles";
+import ArticleNew from "./pages/article-new";
+import ArticleMy from "./pages/article-my";
+import ArticleEdit from "./pages/article-edit";
+import ArticleDetail from "./pages/article-detail";
 import Broadcast from "./pages/broadcast";
 import DeveloperInfo from "./pages/developer-info";
 import Unauthorized from "./pages/unauthorized";
@@ -108,6 +112,18 @@ function Router() {
       </Route>
       <Route path="/articles">
         <ProtectedRoute component={Articles} />
+      </Route>
+      <Route path="/articles/new">
+        <ProtectedRoute component={ArticleNew} />
+      </Route>
+      <Route path="/articles/my">
+        <ProtectedRoute component={ArticleMy} />
+      </Route>
+      <Route path="/articles/:id/edit">
+        <ProtectedRoute component={ArticleEdit} />
+      </Route>
+      <Route path="/articles/:id">
+        <ProtectedRoute component={ArticleDetail} />
       </Route>
       <Route path="/broadcast">
         <ProtectedRoute component={Broadcast} staffOnly />

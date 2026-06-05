@@ -5,3 +5,4 @@
 - [SGMA APP2 auth system](sgma-app2-auth.md) — JWT auth setup, bcryptjs requirement, role validation at login.
 - [SGMA APP2 frontend import rules](sgma-app2-frontend-imports.md) — frontend must not import from @workspace/api-zod (server-side only).
 - [Drizzle push has no TTY](drizzle-push-no-tty.md) — ambiguous column changes prompt interactively and stall; drop empty tables via SQL first, then push.
+- [api-server new route restart](api-server-new-route-restart.md) — a brand-new route file can 404 until the api-server workflow is restarted; tsx watch may not register newly added modules.
