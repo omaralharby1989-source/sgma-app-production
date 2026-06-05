@@ -503,3 +503,35 @@ export const DeleteNewsResponse = zod.object({
 })
 
 
+/**
+ * @summary List active, non-expired broadcasts (newest first)
+ */
+export const GetActiveBroadcastsResponseItem = zod.object({
+  "id": zod.number(),
+  "title": zod.string(),
+  "content": zod.string(),
+  "authorId": zod.number().nullish(),
+  "isActive": zod.boolean(),
+  "expiresAt": zod.coerce.date().nullish(),
+  "createdAt": zod.coerce.date(),
+  "updatedAt": zod.coerce.date()
+})
+export const GetActiveBroadcastsResponse = zod.array(GetActiveBroadcastsResponseItem)
+
+
+/**
+ * @summary Create a broadcast (staff only)
+ */
+export const createBroadcastBodyTitleMax = 200;
+
+export const createBroadcastBodyContentMax = 2000;
+
+
+
+export const CreateBroadcastBody = zod.object({
+  "title": zod.string().min(1).max(createBroadcastBodyTitleMax),
+  "content": zod.string().min(1).max(createBroadcastBodyContentMax),
+  "expiresAt": zod.string().optional().describe('Optional expiry timestamp (ISO date or date-time)')
+})
+
+

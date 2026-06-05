@@ -2,20 +2,19 @@ import { useGetDeveloperInfo } from "@workspace/api-client-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
-import { ArrowRight, Code2, Info, Mail, Smartphone } from "lucide-react";
-import { useLocation } from "wouter";
+import { Code2, Info, Mail, Smartphone } from "lucide-react";
+import { BackButton } from "@/components/BackButton";
+import { BroadcastBanner } from "@/components/BroadcastBanner";
 
 export default function DeveloperInfo() {
-  const [, setLocation] = useLocation();
   const { data: info, isLoading } = useGetDeveloperInfo();
 
   return (
     <div className="min-h-[100dvh] bg-background p-4 max-w-lg mx-auto">
-      <div className="flex items-center mb-6">
-        <Button variant="ghost" size="icon" onClick={() => window.history.back()} className="mr-2">
-          <ArrowRight className="h-5 w-5" />
-        </Button>
+      <BroadcastBanner />
+      <div className="flex items-center justify-between mb-6 pt-2">
         <h1 className="text-xl font-bold">معلومات المطور</h1>
+        <BackButton fallback="/more" />
       </div>
 
       {isLoading ? (

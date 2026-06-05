@@ -6,11 +6,14 @@
  * OpenAPI spec version: 0.1.0
  */
 
+export * from './activeBroadcastResponse';
 export * from './adminConversation';
 export * from './authResponse';
 export * from './avatarResponse';
 export * from './avatarUpload';
+export * from './broadcastItem';
 export * from './chatMessage';
+export * from './createBroadcastInput';
 export * from './createNewsInput';
 export * from './createNewsInputStatus';
 export * from './developerInfo';

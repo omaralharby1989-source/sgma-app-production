@@ -16,15 +16,24 @@ import ChatPublic from "./pages/chat-public";
 import ChatAdmin from "./pages/chat-admin";
 import News from "./pages/news";
 import NewsDetail from "./pages/news-detail";
+import Articles from "./pages/articles";
+import Broadcast from "./pages/broadcast";
 import DeveloperInfo from "./pages/developer-info";
 import Unauthorized from "./pages/unauthorized";
 import { ProtectedLayout } from "./components/layout/ProtectedLayout";
+import { getStoredUser, isStaffRole } from "./lib/auth";
 
 setAuthTokenGetter(() => localStorage.getItem("sgma_auth_token"));
 
 const queryClient = new QueryClient();
 
-function ProtectedRoute({ component: Component }: { component: React.ComponentType }) {
+function ProtectedRoute({
+  component: Component,
+  staffOnly = false,
+}: {
+  component: React.ComponentType;
+  staffOnly?: boolean;
+}) {
   const [isChecking, setIsChecking] = useState(true);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [, setLocation] = useLocation();
@@ -33,11 +42,13 @@ function ProtectedRoute({ component: Component }: { component: React.ComponentTy
     const token = localStorage.getItem("sgma_auth_token");
     if (!token) {
       setLocation("/login");
+    } else if (staffOnly && !isStaffRole(getStoredUser()?.role)) {
+      setLocation("/unauthorized");
     } else {
       setIsAuthenticated(true);
     }
     setIsChecking(false);
-  }, [setLocation]);
+  }, [setLocation, staffOnly]);
 
   if (isChecking) {
     return (
@@ -94,6 +105,12 @@ function Router() {
       </Route>
       <Route path="/news/:id">
         <ProtectedRoute component={NewsDetail} />
+      </Route>
+      <Route path="/articles">
+        <ProtectedRoute component={Articles} />
+      </Route>
+      <Route path="/broadcast">
+        <ProtectedRoute component={Broadcast} staffOnly />
       </Route>
 
       <Route component={NotFound} />

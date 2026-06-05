@@ -136,6 +136,36 @@ export interface UpdateNewsInput {
   status?: UpdateNewsInputStatus;
 }
 
+export interface BroadcastItem {
+  id: number;
+  title: string;
+  content: string;
+  /** @nullable */
+  authorId?: number | null;
+  isActive: boolean;
+  /** @nullable */
+  expiresAt?: string | null;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export type ActiveBroadcastResponse = BroadcastItem[];
+
+export interface CreateBroadcastInput {
+  /**
+     * @minLength 1
+     * @maxLength 200
+     */
+  title: string;
+  /**
+     * @minLength 1
+     * @maxLength 2000
+     */
+  content: string;
+  /** Optional expiry timestamp (ISO date or date-time) */
+  expiresAt?: string;
+}
+
 export interface SignupInput {
   /** @minLength 2 */
   fullName: string;

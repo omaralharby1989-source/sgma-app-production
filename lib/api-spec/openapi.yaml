@@ -20,6 +20,8 @@ tags:
     description: Chat operations
   - name: news
     description: News operations
+  - name: broadcasts
+    description: Broadcast operations
 paths:
   /healthz:
     get:
@@ -754,6 +756,66 @@ paths:
               schema:
                 $ref: "#/components/schemas/ErrorResponse"
 
+  /broadcasts/active:
+    get:
+      operationId: getActiveBroadcasts
+      tags: [broadcasts]
+      summary: List active, non-expired broadcasts (newest first)
+      security:
+        - BearerAuth: []
+      responses:
+        "200":
+          description: Active broadcasts
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ActiveBroadcastResponse"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /broadcasts:
+    post:
+      operationId: createBroadcast
+      tags: [broadcasts]
+      summary: Create a broadcast (staff only)
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateBroadcastInput"
+      responses:
+        "201":
+          description: Broadcast created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/BroadcastItem"
+        "400":
+          description: Validation error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "403":
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
 components:
   securitySchemes:
     BearerAuth:
@@ -933,6 +995,51 @@ components:
         status:
           type: string
           enum: [DRAFT, PUBLISHED, ARCHIVED]
+
+    BroadcastItem:
+      type: object
+      required: [id, title, content, isActive, createdAt, updatedAt]
+      properties:
+        id:
+          type: integer
+        title:
+          type: string
+        content:
+          type: string
+        authorId:
+          type: ["integer", "null"]
+        isActive:
+          type: boolean
+        expiresAt:
+          type: ["string", "null"]
+          format: date-time
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+
+    ActiveBroadcastResponse:
+      type: array
+      items:
+        $ref: "#/components/schemas/BroadcastItem"
+
+    CreateBroadcastInput:
+      type: object
+      required: [title, content]
+      properties:
+        title:
+          type: string
+          minLength: 1
+          maxLength: 200
+        content:
+          type: string
+          minLength: 1
+          maxLength: 2000
+        expiresAt:
+          type: string
+          description: Optional expiry timestamp (ISO date or date-time)
 
     SignupInput:
       type: object

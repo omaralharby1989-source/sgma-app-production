@@ -1,0 +1,472 @@
+MORE PAGE + ARTICLES SEPARATION + BROADCAST VISIBILITY FIX — SGMA APP2
+
+Start this task now.
+
+Scope:
+This task is ONLY for:
+
+1. Fixing the /more page organization.
+2. Separating News and Articles as different entries.
+3. Fixing Broadcast visibility rules.
+4. Preparing Broadcast behavior correctly.
+5. Adding/using a reusable BackButton component where appropriate if not already present.
+
+Do not add:
+
+* Full Admin Dashboard
+* Full Articles publishing module
+* Full News management UI
+* Member management
+* Advertisement system
+* Any unrelated feature
+
+Do not break existing working modules:
+
+* /login
+* /register
+* /home
+* /news
+* /news/:id
+* /chat
+* /chat/public
+* /chat/admin
+* /developer-info
+
+Keep current architecture:
+
+* PostgreSQL + Drizzle
+* JWT auth
+* Arabic RTL
+* Mobile-first
+* Existing bottom navigation
+* No Firebase
+* No MySQL migration
+
+==================================================
+A. FIX /more PAGE ORGANIZATION
+==============================
+
+Current issue:
+The /more page shows “الأخبار والمقالات” as one combined item.
+This is wrong.
+
+Required:
+Separate News and Articles into two different items.
+
+In /more under التطبيقات والخدمات, show:
+
+1. المحادثات
+
+* Opens: /chat
+* Must be active and working.
+
+2. الأخبار
+
+* Opens: /news
+* Must be active and working.
+
+3. المقالات
+
+* Opens: /articles
+* If Articles module is not implemented yet, open a clean placeholder page, not a 404.
+
+4. معلومات المطور
+
+* Opens: /developer-info
+* Must be active and working.
+
+Do not combine الأخبار and المقالات in one item anymore.
+
+==================================================
+B. ARTICLES PLACEHOLDER PAGE
+============================
+
+If /articles does not exist yet, create a simple protected placeholder page.
+
+Route:
+
+* /articles
+
+Page title:
+المقالات
+
+Message:
+قسم المقالات قيد التحضير وسيتم تفعيله قريباً.
+
+Design:
+
+* Arabic RTL
+* Mobile-first
+* Clean card
+* Back button or normal navigation
+* No 404
+* Bottom navigation must not cover content
+
+Do not build the full articles module now.
+
+==================================================
+C. BROADCAST MUST NOT APPEAR FOR NORMAL MEMBERS IN /more
+========================================================
+
+Current issue:
+The /more page shows “البث والإعلانات” or “البث” as if it is a normal user page.
+
+This is wrong.
+
+Broadcast is an administrative tool only.
+
+Allowed roles:
+
+* MODERATOR
+* ADMIN
+* SUPER_ADMIN
+
+Not allowed:
+
+* MEMBER
+
+Required behavior:
+
+* MEMBER must NOT see any broadcast/send-broadcast item in /more.
+* MODERATOR / ADMIN / SUPER_ADMIN may see an admin-only section in /more.
+
+Add a section visible only to MODERATOR / ADMIN / SUPER_ADMIN:
+
+Section title:
+الإدارة والإشراف
+
+Items:
+
+1. إرسال بث
+
+* Opens: /broadcast
+* Only visible to MODERATOR / ADMIN / SUPER_ADMIN
+
+Future placeholders may be listed later, but do not add them now unless needed.
+
+Do not show “البث” inside normal التطبيقات والخدمات for members.
+
+==================================================
+D. BROADCAST PAGE — LIMITED IMPLEMENTATION
+==========================================
+
+Create route:
+
+* /broadcast
+
+This route must be JWT protected and role protected.
+
+Access:
+
+* MODERATOR
+* ADMIN
+* SUPER_ADMIN only
+
+If MEMBER tries to open /broadcast manually:
+
+* Show Unauthorized page or redirect to /unauthorized.
+* Do not allow access.
+
+For this task, implement a simple but functional broadcast sending page if backend model already exists.
+
+Broadcast purpose:
+Admin/staff writes a short broadcast message.
+The active broadcast appears at the top of authenticated app pages in a small banner/card.
+
+Required fields:
+
+* title required
+* content required
+* expiresAt optional
+
+Page UI:
+
+* Title: إرسال بث
+* Field: عنوان البث
+* Field: نص رسالة البث
+* Field: تاريخ انتهاء الظهور optional
+* Button: إرسال البث
+* Success message in Arabic
+* Error messages in Arabic
+
+Allowed roles can create broadcast.
+MEMBER cannot create broadcast.
+
+If the broadcast table/model exists, use it.
+If it does not exist, create it safely with PostgreSQL + Drizzle.
+
+Suggested model fields:
+
+* id
+* title
+* content
+* createdById
+* createdAt
+* expiresAt
+* isActive
+
+Do not overbuild broadcast management now.
+No list/edit/delete UI required yet unless very easy and safe.
+Focus on creating one active broadcast and showing it.
+
+==================================================
+E. GLOBAL BROADCAST BANNER
+==========================
+
+Implement a global authenticated Broadcast Banner.
+
+Behavior:
+
+* Show at the top of authenticated app pages.
+* Do not show on /login.
+* Do not show on /register.
+* Do not show for unauthenticated users.
+* Show active, non-expired broadcast messages.
+* If no active broadcast exists, show nothing.
+
+Authenticated pages include:
+
+* /home
+* /news
+* /news/:id
+* /articles
+* /chat
+* /chat/public
+* /chat/admin
+* /more
+* /developer-info
+* /broadcast if staff
+
+Banner design:
+
+* Small clean card/banner near top of content.
+* Arabic RTL.
+* Title + content.
+* Not too large.
+* Does not block navigation.
+* Does not overlap bottom navigation.
+* Looks like an official SGMA alert.
+
+Text example:
+تنبيه من SGMA
+
+Backend endpoint:
+GET /api/broadcasts/active
+
+* JWT protected
+* returns active non-expired broadcasts
+
+POST /api/broadcasts
+
+* JWT + role protected
+* MODERATOR / ADMIN / SUPER_ADMIN only
+* MEMBER forbidden
+
+Optional:
+If multiple active broadcasts exist, show the newest one or a small list of up to 3.
+Keep UI clean.
+
+==================================================
+F. BACK BUTTON COMPONENT
+========================
+
+If a reusable BackButton component does not already exist, create one.
+
+Component:
+BackButton
+
+Behavior:
+
+* Uses browser history when possible.
+* Has fallback route prop.
+* Arabic label default: رجوع
+* Clean mobile style
+* Reusable across:
+
+  * /news/:id
+  * /articles
+  * /broadcast
+  * /developer-info if appropriate
+
+Do not overuse it where bottom navigation is enough.
+
+==================================================
+G. ROUTING REQUIREMENTS
+=======================
+
+Required active routes after this task:
+
+* /home
+* /news
+* /news/:id
+* /articles
+* /chat
+* /chat/public
+* /chat/admin
+* /more
+* /developer-info
+* /broadcast
+* /unauthorized
+
+No broken links.
+No old SGMA APP1 routes.
+No combined /news-and-articles route.
+
+==================================================
+H. OPENAPI / GENERATED CLIENT
+=============================
+
+If backend endpoints are added:
+
+* Update OpenAPI.
+* Regenerate client.
+* Do not manually edit generated files.
+* Run typecheck.
+
+Needed endpoints if not already present:
+
+* GET /api/broadcasts/active
+* POST /api/broadcasts
+
+Schemas:
+
+* BroadcastItem
+* CreateBroadcastInput
+* ActiveBroadcastResponse
+
+==================================================
+I. PERMISSIONS
+==============
+
+Broadcast:
+
+* Read active broadcast: authenticated users
+* Create broadcast: MODERATOR / ADMIN / SUPER_ADMIN only
+* MEMBER forbidden
+
+More page:
+
+* MEMBER sees:
+
+  * المحادثات
+  * الأخبار
+  * المقالات
+  * معلومات المطور
+  * تسجيل الخروج
+
+* MODERATOR / ADMIN / SUPER_ADMIN sees also:
+
+  * Section: الإدارة والإشراف
+  * إرسال بث
+
+Do not rely only on frontend hiding.
+Backend must enforce role permissions.
+
+==================================================
+J. TESTING REQUIREMENTS
+=======================
+
+Do not report completion until tested in Preview.
+
+Required tests:
+
+More page:
+
+1. Login as SUPER_ADMIN.
+2. /more shows:
+
+   * المحادثات
+   * الأخبار
+   * المقالات
+   * معلومات المطور
+   * section الإدارة والإشراف
+   * إرسال بث
+3. الأخبار opens /news.
+4. المقالات opens /articles placeholder.
+5. المحادثات opens /chat.
+6. معلومات المطور opens /developer-info.
+7. No combined “الأخبار والمقالات” remains.
+
+Broadcast:
+
+1. SUPER_ADMIN can open /broadcast.
+2. SUPER_ADMIN can create a broadcast.
+3. Broadcast banner appears at top of:
+
+   * /home
+   * /news
+   * /articles
+   * /chat
+   * /more
+4. Broadcast banner does not appear on:
+
+   * /login
+   * /register
+5. MEMBER cannot open /broadcast.
+6. MEMBER cannot create broadcast via API.
+7. Backend returns 403 for unauthorized broadcast creation.
+
+Regression:
+
+1. /login works.
+2. /register works.
+3. /home works.
+4. /news works.
+5. /news/:id works.
+6. /chat works.
+7. /chat/public works.
+8. /chat/admin works.
+9. /developer-info works.
+10. Typecheck passes.
+11. Backend starts cleanly.
+12. Preview Panel operational.
+
+==================================================
+K. REQUIRED REPORT
+==================
+
+After completion, provide:
+
+MORE + BROADCAST FIX REPORT
+
+1. What was wrong before
+2. What was fixed
+3. Files changed
+4. /more final structure
+5. Articles route status
+6. Broadcast route status
+7. Broadcast banner behavior
+8. Backend endpoints added/changed
+9. Database/table changes
+10. OpenAPI/client generation status
+11. Permission checks:
+
+* MEMBER visibility
+* MODERATOR visibility
+* ADMIN visibility
+* SUPER_ADMIN visibility
+
+12. Runtime test results:
+
+* /more
+* /articles
+* /broadcast
+* broadcast creation
+* global banner
+* MEMBER forbidden access
+* existing pages regression
+
+13. Preview status
+14. Known issues, if any
+15. Confirmation:
+
+* No Firebase
+* No MySQL migration
+* No Admin Dashboard started
+* No full Articles module started
+* No News management UI started
+* No Advertisement system started
+
+Important:
+Do not hide runtime failures behind typecheck success.
+If Preview breaks, stop and fix Preview first.

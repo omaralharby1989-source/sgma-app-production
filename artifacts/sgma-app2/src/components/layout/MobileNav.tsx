@@ -1,14 +1,16 @@
 import { Link, useLocation } from "wouter";
 import { UserCircle, Menu, MessageSquare, Newspaper, Radio } from "lucide-react";
+import { getStoredUser, isStaffRole } from "@/lib/auth";
 
 export function MobileNav() {
   const [location] = useLocation();
+  const isStaff = isStaffRole(getStoredUser()?.role);
 
   const navItems = [
     { href: "/home", icon: UserCircle, label: "حسابي" },
     { href: "/chat", icon: MessageSquare, label: "المحادثات" },
     { href: "/news", icon: Newspaper, label: "الأخبار" },
-    { href: "/broadcasts", icon: Radio, label: "البث", disabled: true },
+    ...(isStaff ? [{ href: "/broadcast", icon: Radio, label: "البث" }] : []),
     { href: "/more", icon: Menu, label: "المزيد" },
   ];
 
@@ -17,24 +19,12 @@ export function MobileNav() {
       <div className="flex justify-around items-center h-16 px-2">
         {navItems.map((item) => {
           const isActive = location === item.href;
-          const content = (
-            <div className={`flex flex-col items-center justify-center w-full h-full space-y-1 ${isActive ? "text-primary" : "text-muted-foreground"} ${item.disabled ? "opacity-50" : ""}`}>
-              <item.icon className="h-5 w-5" />
-              <span className="text-[10px] font-medium">{item.label}</span>
-            </div>
-          );
-
-          if (item.disabled) {
-            return (
-              <div key={item.href} className="flex-1 h-full cursor-not-allowed">
-                {content}
-              </div>
-            );
-          }
-
           return (
             <Link key={item.href} href={item.href} className="flex-1 h-full">
-              {content}
+              <div className={`flex flex-col items-center justify-center w-full h-full space-y-1 ${isActive ? "text-primary" : "text-muted-foreground"}`}>
+                <item.icon className="h-5 w-5" />
+                <span className="text-[10px] font-medium">{item.label}</span>
+              </div>
             </Link>
           );
         })}

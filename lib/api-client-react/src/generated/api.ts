@@ -20,11 +20,14 @@ import type {
 } from '@tanstack/react-query';
 
 import type {
+  ActiveBroadcastResponse,
   AdminConversation,
   AuthResponse,
   AvatarResponse,
   AvatarUpload,
+  BroadcastItem,
   ChatMessage,
+  CreateBroadcastInput,
   CreateNewsInput,
   DeveloperInfo,
   ErrorResponse,
@@ -1751,5 +1754,153 @@ export const useDeleteNews = <TError = ErrorType<ErrorResponse>,
         TContext
       > => {
       return useMutation(getDeleteNewsMutationOptions(options));
+    }
+
+export const getGetActiveBroadcastsUrl = () => {
+
+
+
+
+  return `/api/broadcasts/active`
+}
+
+/**
+ * @summary List active, non-expired broadcasts (newest first)
+ */
+export const getActiveBroadcasts = async ( options?: RequestInit): Promise<ActiveBroadcastResponse> => {
+
+  return customFetch<ActiveBroadcastResponse>(getGetActiveBroadcastsUrl(),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getGetActiveBroadcastsQueryKey = () => {
+    return [
+    `/api/broadcasts/active`
+    ] as const;
+    }
+
+
+export const getGetActiveBroadcastsQueryOptions = <TData = Awaited<ReturnType<typeof getActiveBroadcasts>>, TError = ErrorType<ErrorResponse>>( options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getActiveBroadcasts>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetActiveBroadcastsQueryKey();
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getActiveBroadcasts>>> = ({ signal }) => getActiveBroadcasts({ signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getActiveBroadcasts>>, TError, TData> & { queryKey: QueryKey }
+}
+
+export type GetActiveBroadcastsQueryResult = NonNullable<Awaited<ReturnType<typeof getActiveBroadcasts>>>
+export type GetActiveBroadcastsQueryError = ErrorType<ErrorResponse>
+
+
+/**
+ * @summary List active, non-expired broadcasts (newest first)
+ */
+
+export function useGetActiveBroadcasts<TData = Awaited<ReturnType<typeof getActiveBroadcasts>>, TError = ErrorType<ErrorResponse>>(
+  options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getActiveBroadcasts>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+
+ ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+
+  const queryOptions = getGetActiveBroadcastsQueryOptions(options)
+
+  const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
+
+  return { ...query, queryKey: queryOptions.queryKey };
+}
+
+
+
+
+
+
+
+export const getCreateBroadcastUrl = () => {
+
+
+
+
+  return `/api/broadcasts`
+}
+
+/**
+ * @summary Create a broadcast (staff only)
+ */
+export const createBroadcast = async (createBroadcastInput: CreateBroadcastInput, options?: RequestInit): Promise<BroadcastItem> => {
+
+  return customFetch<BroadcastItem>(getCreateBroadcastUrl(),
+  {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(
+      createBroadcastInput,)
+  }
+);}
+
+
+
+
+export const getCreateBroadcastMutationOptions = <TError = ErrorType<ErrorResponse>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof createBroadcast>>, TError,{data: BodyType<CreateBroadcastInput>}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof createBroadcast>>, TError,{data: BodyType<CreateBroadcastInput>}, TContext> => {
+
+const mutationKey = ['createBroadcast'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof createBroadcast>>, {data: BodyType<CreateBroadcastInput>}> = (props) => {
+          const {data} = props ?? {};
+
+          return  createBroadcast(data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type CreateBroadcastMutationResult = NonNullable<Awaited<ReturnType<typeof createBroadcast>>>
+    export type CreateBroadcastMutationBody = BodyType<CreateBroadcastInput>
+    export type CreateBroadcastMutationError = ErrorType<ErrorResponse>
+
+    /**
+ * @summary Create a broadcast (staff only)
+ */
+export const useCreateBroadcast = <TError = ErrorType<ErrorResponse>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof createBroadcast>>, TError,{data: BodyType<CreateBroadcastInput>}, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof createBroadcast>>,
+        TError,
+        {data: BodyType<CreateBroadcastInput>},
+        TContext
+      > => {
+      return useMutation(getCreateBroadcastMutationOptions(options));
     }
 

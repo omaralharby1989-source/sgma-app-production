@@ -89,11 +89,33 @@ News data model (`lib/db/src/schema/news.ts`):
 - API maps DB `coverImageUrl` → response field `imageUrl`; server always sets `authorId = req.user.userId`
 - Malformed `:id` → 400; valid-but-missing → 404; empty PATCH body → 400
 
+## More / Articles / Broadcast Module Status — COMPLETE
+
+More page (`/more`) organization:
+- `التطبيقات والخدمات`: المحادثات(/chat), الأخبار(/news), المقالات(/articles), معلومات المطور(/developer-info) — News and Articles are now SEPARATE items (no combined "الأخبار والمقالات")
+- Staff-only section `الإدارة والإشراف` (MODERATOR/ADMIN/SUPER_ADMIN): إرسال بث → /broadcast — NEVER shown to MEMBER
+- `الحساب`: تسجيل الخروج
+
+Articles (`/articles`): protected placeholder page (title المقالات, "قسم المقالات قيد التحضير وسيتم تفعيله قريباً") — NOT a 404. Full articles module not built.
+
+Broadcast:
+- `/broadcast` — JWT + role protected (staffOnly); MEMBER visiting manually → redirected to /unauthorized
+- Form: عنوان البث (required), نص رسالة البث (required), تاريخ انتهاء الظهور (optional date), إرسال البث
+- Global `BroadcastBanner` shows active non-expired broadcasts (newest first, max 3, session-dismissible) on authenticated pages via ProtectedLayout; also embedded directly in /developer-info (public route, banner is token-guarded so renders nothing when unauthenticated). NOT on /login, /register.
+- `MobileNav` shows البث tab (→/broadcast) ONLY for staff.
+
+Broadcast endpoints (`artifacts/api-server/src/routes/broadcasts.ts`, table `broadcast_messages`):
+- `GET /api/broadcasts/active` — any authenticated user; active + (no expiry OR expiry in future), newest first, limit 3
+- `POST /api/broadcasts` — staff only (403 for MEMBER); server sets authorId = req.user.userId; invalid/empty title|content → 400; bad expiresAt → 400
+
+Reusable `BackButton` (`src/components/BackButton.tsx`): default label رجوع, uses history when available, else `fallback` route prop.
+
 ## Test Accounts
 
 | account | email | password | role |
 |---------|-------|----------|------|
 | lordhygm | lordhygm@gmail.com | 123456 | SUPER_ADMIN |
+| testmember | testmember@example.com | 123456 | MEMBER |
 
 ## User preferences
 
