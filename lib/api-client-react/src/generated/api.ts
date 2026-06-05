@@ -31,10 +31,13 @@ import type {
   AuthResponse,
   AvatarResponse,
   AvatarUpload,
+  BoardMember,
+  BoardMembersResponse,
   BroadcastItem,
   BroadcastListResponse,
   ChatMessage,
   CreateArticleInput,
+  CreateBoardMemberInput,
   CreateBroadcastInput,
   CreateNewsInput,
   DeveloperInfo,
@@ -43,6 +46,7 @@ import type {
   GetAdminChatMessagesParams,
   GetAdminNewsParams,
   GetAdminUsersParams,
+  GetBoardMembersParams,
   HealthStatus,
   LoginInput,
   MemberProfile,
@@ -60,6 +64,7 @@ import type {
   SignupResponse,
   StaticPage,
   UpdateArticleInput,
+  UpdateBoardMemberInput,
   UpdateBroadcastInput,
   UpdateDeveloperInfoInput,
   UpdateNewsInput,
@@ -664,6 +669,380 @@ export function useGetMemberStats<TData = Awaited<ReturnType<typeof getMemberSta
 
 
 
+
+export const getGetBoardMembersUrl = (params?: GetBoardMembersParams,) => {
+  const normalizedParams = new URLSearchParams();
+
+  Object.entries(params || {}).forEach(([key, value]) => {
+
+    if (value !== undefined) {
+      normalizedParams.append(key, value === null ? 'null' : value.toString())
+    }
+  });
+
+  const stringifiedParams = normalizedParams.toString();
+
+  return stringifiedParams.length > 0 ? `/api/board/members?${stringifiedParams}` : `/api/board/members`
+}
+
+/**
+ * @summary List active board members
+ */
+export const getBoardMembers = async (params?: GetBoardMembersParams, options?: RequestInit): Promise<BoardMembersResponse> => {
+
+  return customFetch<BoardMembersResponse>(getGetBoardMembersUrl(params),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getGetBoardMembersQueryKey = (params?: GetBoardMembersParams,) => {
+    return [
+    `/api/board/members`, ...(params ? [params] : [])
+    ] as const;
+    }
+
+
+export const getGetBoardMembersQueryOptions = <TData = Awaited<ReturnType<typeof getBoardMembers>>, TError = ErrorType<ErrorResponse>>(params?: GetBoardMembersParams, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getBoardMembers>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetBoardMembersQueryKey(params);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getBoardMembers>>> = ({ signal }) => getBoardMembers(params, { signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getBoardMembers>>, TError, TData> & { queryKey: QueryKey }
+}
+
+export type GetBoardMembersQueryResult = NonNullable<Awaited<ReturnType<typeof getBoardMembers>>>
+export type GetBoardMembersQueryError = ErrorType<ErrorResponse>
+
+
+/**
+ * @summary List active board members
+ */
+
+export function useGetBoardMembers<TData = Awaited<ReturnType<typeof getBoardMembers>>, TError = ErrorType<ErrorResponse>>(
+ params?: GetBoardMembersParams, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getBoardMembers>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+
+ ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+
+  const queryOptions = getGetBoardMembersQueryOptions(params,options)
+
+  const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
+
+  return { ...query, queryKey: queryOptions.queryKey };
+}
+
+
+
+
+
+
+
+export const getCreateBoardMemberUrl = () => {
+
+
+
+
+  return `/api/board/members`
+}
+
+/**
+ * @summary Create a board member (ADMIN/SUPER_ADMIN only)
+ */
+export const createBoardMember = async (createBoardMemberInput: CreateBoardMemberInput, options?: RequestInit): Promise<BoardMember> => {
+
+  return customFetch<BoardMember>(getCreateBoardMemberUrl(),
+  {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(
+      createBoardMemberInput,)
+  }
+);}
+
+
+
+
+export const getCreateBoardMemberMutationOptions = <TError = ErrorType<ErrorResponse>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof createBoardMember>>, TError,{data: BodyType<CreateBoardMemberInput>}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof createBoardMember>>, TError,{data: BodyType<CreateBoardMemberInput>}, TContext> => {
+
+const mutationKey = ['createBoardMember'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof createBoardMember>>, {data: BodyType<CreateBoardMemberInput>}> = (props) => {
+          const {data} = props ?? {};
+
+          return  createBoardMember(data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type CreateBoardMemberMutationResult = NonNullable<Awaited<ReturnType<typeof createBoardMember>>>
+    export type CreateBoardMemberMutationBody = BodyType<CreateBoardMemberInput>
+    export type CreateBoardMemberMutationError = ErrorType<ErrorResponse>
+
+    /**
+ * @summary Create a board member (ADMIN/SUPER_ADMIN only)
+ */
+export const useCreateBoardMember = <TError = ErrorType<ErrorResponse>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof createBoardMember>>, TError,{data: BodyType<CreateBoardMemberInput>}, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof createBoardMember>>,
+        TError,
+        {data: BodyType<CreateBoardMemberInput>},
+        TContext
+      > => {
+      return useMutation(getCreateBoardMemberMutationOptions(options));
+    }
+
+export const getGetBoardMemberUrl = (id: number,) => {
+
+
+
+
+  return `/api/board/members/${id}`
+}
+
+/**
+ * @summary Get one active board member
+ */
+export const getBoardMember = async (id: number, options?: RequestInit): Promise<BoardMember> => {
+
+  return customFetch<BoardMember>(getGetBoardMemberUrl(id),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getGetBoardMemberQueryKey = (id: number,) => {
+    return [
+    `/api/board/members/${id}`
+    ] as const;
+    }
+
+
+export const getGetBoardMemberQueryOptions = <TData = Awaited<ReturnType<typeof getBoardMember>>, TError = ErrorType<ErrorResponse>>(id: number, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getBoardMember>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetBoardMemberQueryKey(id);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getBoardMember>>> = ({ signal }) => getBoardMember(id, { signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, enabled: !!(id), ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getBoardMember>>, TError, TData> & { queryKey: QueryKey }
+}
+
+export type GetBoardMemberQueryResult = NonNullable<Awaited<ReturnType<typeof getBoardMember>>>
+export type GetBoardMemberQueryError = ErrorType<ErrorResponse>
+
+
+/**
+ * @summary Get one active board member
+ */
+
+export function useGetBoardMember<TData = Awaited<ReturnType<typeof getBoardMember>>, TError = ErrorType<ErrorResponse>>(
+ id: number, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getBoardMember>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+
+ ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+
+  const queryOptions = getGetBoardMemberQueryOptions(id,options)
+
+  const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
+
+  return { ...query, queryKey: queryOptions.queryKey };
+}
+
+
+
+
+
+
+
+export const getUpdateBoardMemberUrl = (id: number,) => {
+
+
+
+
+  return `/api/board/members/${id}`
+}
+
+/**
+ * @summary Update a board member (ADMIN/SUPER_ADMIN only)
+ */
+export const updateBoardMember = async (id: number,
+    updateBoardMemberInput: UpdateBoardMemberInput, options?: RequestInit): Promise<BoardMember> => {
+
+  return customFetch<BoardMember>(getUpdateBoardMemberUrl(id),
+  {
+    ...options,
+    method: 'PATCH',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(
+      updateBoardMemberInput,)
+  }
+);}
+
+
+
+
+export const getUpdateBoardMemberMutationOptions = <TError = ErrorType<ErrorResponse>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof updateBoardMember>>, TError,{id: number;data: BodyType<UpdateBoardMemberInput>}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof updateBoardMember>>, TError,{id: number;data: BodyType<UpdateBoardMemberInput>}, TContext> => {
+
+const mutationKey = ['updateBoardMember'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof updateBoardMember>>, {id: number;data: BodyType<UpdateBoardMemberInput>}> = (props) => {
+          const {id,data} = props ?? {};
+
+          return  updateBoardMember(id,data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type UpdateBoardMemberMutationResult = NonNullable<Awaited<ReturnType<typeof updateBoardMember>>>
+    export type UpdateBoardMemberMutationBody = BodyType<UpdateBoardMemberInput>
+    export type UpdateBoardMemberMutationError = ErrorType<ErrorResponse>
+
+    /**
+ * @summary Update a board member (ADMIN/SUPER_ADMIN only)
+ */
+export const useUpdateBoardMember = <TError = ErrorType<ErrorResponse>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof updateBoardMember>>, TError,{id: number;data: BodyType<UpdateBoardMemberInput>}, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof updateBoardMember>>,
+        TError,
+        {id: number;data: BodyType<UpdateBoardMemberInput>},
+        TContext
+      > => {
+      return useMutation(getUpdateBoardMemberMutationOptions(options));
+    }
+
+export const getDeleteBoardMemberUrl = (id: number,) => {
+
+
+
+
+  return `/api/board/members/${id}`
+}
+
+/**
+ * @summary Soft-delete (deactivate) a board member (ADMIN/SUPER_ADMIN only)
+ */
+export const deleteBoardMember = async (id: number, options?: RequestInit): Promise<BoardMember> => {
+
+  return customFetch<BoardMember>(getDeleteBoardMemberUrl(id),
+  {
+    ...options,
+    method: 'DELETE'
+
+
+  }
+);}
+
+
+
+
+export const getDeleteBoardMemberMutationOptions = <TError = ErrorType<ErrorResponse>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof deleteBoardMember>>, TError,{id: number}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof deleteBoardMember>>, TError,{id: number}, TContext> => {
+
+const mutationKey = ['deleteBoardMember'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof deleteBoardMember>>, {id: number}> = (props) => {
+          const {id} = props ?? {};
+
+          return  deleteBoardMember(id,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type DeleteBoardMemberMutationResult = NonNullable<Awaited<ReturnType<typeof deleteBoardMember>>>
+
+    export type DeleteBoardMemberMutationError = ErrorType<ErrorResponse>
+
+    /**
+ * @summary Soft-delete (deactivate) a board member (ADMIN/SUPER_ADMIN only)
+ */
+export const useDeleteBoardMember = <TError = ErrorType<ErrorResponse>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof deleteBoardMember>>, TError,{id: number}, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof deleteBoardMember>>,
+        TError,
+        {id: number},
+        TContext
+      > => {
+      return useMutation(getDeleteBoardMemberMutationOptions(options));
+    }
 
 export const getGetStaticPageUrl = (slug: string,) => {
 

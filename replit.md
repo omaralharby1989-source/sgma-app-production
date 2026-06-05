@@ -202,6 +202,27 @@ Regression note: `POST /api/broadcasts` was TIGHTENED from staff (incl. MODERATO
 
 Admin routes live in `artifacts/api-server/src/routes/admin/` (index, stats, users, articles, news, broadcasts), registered via `routes/index.ts`. Frontend pages in `artifacts/sgma-app2/src/pages/admin/`. ProtectedRoute supports `allowedRoles?: string[]`.
 
+## Board of Directors Module Status — COMPLETE
+
+مجلس الإدارة — read for any authenticated user, manage (create/edit/soft-delete) for ADMIN/SUPER_ADMIN only (MODERATOR + MEMBER are view-only):
+- `/board` — landing with 3 cards: المجلس الحالي(/board/current), المجالس السابقة(/board/previous), تاريخ المجلس(/board/history). All ProtectedRoute (any authenticated role).
+- `/board/current` — member cards (image or initials fallback); ADMIN/SUPER_ADMIN see add/edit dialog (base64 image upload + active Switch) and a soft-delete AlertDialog. Previous/history are placeholders.
+- `/more` section renamed to `الجمعية والمعلومات`: من نحن / مجلس الإدارة / سياسة الخصوصية / الشروط والأحكام / معلومات المطور (معلومات المطور moved here).
+
+Board data model (`lib/db/src/schema/boardMembers.ts`, table `board_members`):
+- Columns: id, name, position, bio, phone, email, imageUrl, boardType (text, default CURRENT), displayOrder, isActive, createdById, updatedById, createdAt, updatedAt.
+- `boardType` is a plain text column (CURRENT/PREVIOUS/HISTORY validated in code), NOT a Postgres enum.
+
+Board security/validation (`artifacts/api-server/src/routes/board.ts`):
+- Writes gated on `isAdminOrSuper(req.user.role)` read straight from the JWT — role is in the JWT, no DB lookup needed → 403 for MEMBER/MODERATOR.
+- Server ALWAYS sets created/updatedById from `req.user.userId` (never trusts client).
+- Soft-delete: DELETE sets `isActive=false`; GET list + detail return active members only.
+- `ensureSeeded()` inserts 3 sample CURRENT members ONLY when the table is completely empty (count=0) — never re-seeds after an admin deactivates members.
+- Backend validation (NOT just frontend): required `name/position/bio` rejected as 400 if whitespace-only after trim; optional `email` must match email format; `imageUrl` must be a base64 data URI with mime image/jpeg|png|webp and ≤2MB decoded — bypassing the UI with raw payloads is rejected.
+- Express 5: coerce `req.params.id` with `Number()` and guard `Number.isInteger` → 400 on bad id; valid-but-missing → 404.
+
+Codegen note: zod bodies are `CreateBoardMemberBody`/`UpdateBoardMemberBody` (NOT ...Input); react types are `CreateBoardMemberInput`/`UpdateBoardMemberInput`/`BoardMember`; hooks `useGetBoardMembers`/`useGetBoardMember`/`useCreateBoardMember`/`useUpdateBoardMember`/`useDeleteBoardMember`/`getGetBoardMembersQueryKey`.
+
 ## Test Accounts
 
 | account | email | password | role |

@@ -228,6 +228,188 @@ paths:
               schema:
                 $ref: "#/components/schemas/ErrorResponse"
 
+  /board/members:
+    get:
+      operationId: getBoardMembers
+      tags: [board]
+      summary: List active board members
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: boardType
+          in: query
+          required: false
+          schema:
+            $ref: "#/components/schemas/BoardType"
+      responses:
+        "200":
+          description: Board members
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/BoardMembersResponse"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+    post:
+      operationId: createBoardMember
+      tags: [board]
+      summary: Create a board member (ADMIN/SUPER_ADMIN only)
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateBoardMemberInput"
+      responses:
+        "201":
+          description: Created board member
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/BoardMember"
+        "400":
+          description: Invalid input
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "403":
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+  /board/members/{id}:
+    get:
+      operationId: getBoardMember
+      tags: [board]
+      summary: Get one active board member
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Board member
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/BoardMember"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "404":
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+    patch:
+      operationId: updateBoardMember
+      tags: [board]
+      summary: Update a board member (ADMIN/SUPER_ADMIN only)
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateBoardMemberInput"
+      responses:
+        "200":
+          description: Updated board member
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/BoardMember"
+        "400":
+          description: Invalid input
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "403":
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "404":
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+    delete:
+      operationId: deleteBoardMember
+      tags: [board]
+      summary: Soft-delete (deactivate) a board member (ADMIN/SUPER_ADMIN only)
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Deactivated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/BoardMember"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "403":
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "404":
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
   /static-pages/{slug}:
     get:
       operationId: getStaticPage
@@ -2290,6 +2472,97 @@ components:
           type: string
           format: email
           minLength: 1
+
+    BoardType:
+      type: string
+      enum: [CURRENT, PREVIOUS, HISTORY]
+
+    BoardMember:
+      type: object
+      required: [id, name, position, bio, boardType, displayOrder, isActive]
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+        position:
+          type: string
+        bio:
+          type: string
+        phone:
+          type: ["string", "null"]
+        email:
+          type: ["string", "null"]
+        imageUrl:
+          type: ["string", "null"]
+        boardType:
+          $ref: "#/components/schemas/BoardType"
+        displayOrder:
+          type: integer
+        isActive:
+          type: boolean
+        createdAt:
+          type: ["string", "null"]
+          format: date-time
+        updatedAt:
+          type: ["string", "null"]
+          format: date-time
+
+    BoardMembersResponse:
+      type: array
+      items:
+        $ref: "#/components/schemas/BoardMember"
+
+    CreateBoardMemberInput:
+      type: object
+      required: [name, position, bio]
+      properties:
+        name:
+          type: string
+          minLength: 1
+        position:
+          type: string
+          minLength: 1
+        bio:
+          type: string
+          minLength: 1
+        phone:
+          type: ["string", "null"]
+        email:
+          type: ["string", "null"]
+        imageUrl:
+          type: ["string", "null"]
+        boardType:
+          $ref: "#/components/schemas/BoardType"
+        displayOrder:
+          type: integer
+        isActive:
+          type: boolean
+
+    UpdateBoardMemberInput:
+      type: object
+      properties:
+        name:
+          type: string
+          minLength: 1
+        position:
+          type: string
+          minLength: 1
+        bio:
+          type: string
+          minLength: 1
+        phone:
+          type: ["string", "null"]
+        email:
+          type: ["string", "null"]
+        imageUrl:
+          type: ["string", "null"]
+        boardType:
+          $ref: "#/components/schemas/BoardType"
+        displayOrder:
+          type: integer
+        isActive:
+          type: boolean
 
     StaticPage:
       type: object

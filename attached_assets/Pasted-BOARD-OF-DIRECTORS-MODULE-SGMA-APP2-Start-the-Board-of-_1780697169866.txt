@@ -1,0 +1,606 @@
+BOARD OF DIRECTORS MODULE — SGMA APP2
+
+Start the Board of Directors Module now.
+
+Scope:
+Add a new “مجلس الإدارة” section to the app.
+
+This module must allow users to view Board of Directors information in beautiful professional cards, and allow only ADMIN / SUPER_ADMIN to manage board members and their photos.
+
+Do not add unrelated features.
+Do not break existing modules:
+
+* login
+* register
+* home/my account
+* news
+* articles
+* chat
+* broadcast
+* admin dashboard
+* more page
+* developer-info
+* membership approval flow
+* privacy/terms/about pages if already added
+
+Current architecture:
+
+* PostgreSQL + Drizzle
+* JWT auth
+* Arabic RTL
+* Mobile-first
+* Existing bottom navigation
+* No Firebase
+* No MySQL migration
+* No old SGMA APP1 routes
+
+==================================================
+A. MODULE PURPOSE
+=================
+
+The app needs a new section called:
+
+مجلس الإدارة
+
+Users should access it from /more.
+
+When the user opens it, they should see category options such as:
+
+* مجلس الإدارة الحالي
+* مجلس الإدارة السابق
+* تاريخ مجالس الإدارة / أرشيف المجالس
+
+For now, fully implement:
+
+* مجلس الإدارة الحالي
+
+Create clean placeholders for:
+
+* مجلس الإدارة السابق
+* أرشيف المجالس
+
+When the user opens مجلس الإدارة الحالي, show a professional card grid/list with board member cards.
+
+Each board member card must show:
+
+* photo
+* full name
+* position/title
+* short bio
+* phone
+* email
+* contact buttons
+
+==================================================
+B. REQUIRED ROUTES
+==================
+
+Create these routes:
+
+1. /board
+   Board landing page.
+
+Shows category cards:
+
+* مجلس الإدارة الحالي → /board/current
+* مجلس الإدارة السابق → /board/previous
+* أرشيف المجالس → /board/history
+
+2. /board/current
+   Current Board of Directors page.
+
+Fully implemented:
+
+* lists current board members as cards
+* supports admin/super-admin management UI
+
+3. /board/previous
+   Placeholder page:
+   مجلس الإدارة السابق قيد التحضير
+
+4. /board/history
+   Placeholder page:
+   أرشيف مجالس الإدارة قيد التحضير
+
+All routes must be JWT protected for now because the app is membership-based.
+
+Unauthenticated users redirect to /login.
+
+==================================================
+C. /MORE PAGE UPDATE
+====================
+
+Update /more and add a new item:
+
+مجلس الإدارة
+Route: /board
+
+Place it in a suitable section, preferably:
+الجمعية والمعلومات
+
+Suggested section structure in /more:
+
+* من نحن
+* مجلس الإدارة
+* سياسة الخصوصية
+* الشروط والأحكام
+* معلومات المطور
+
+Keep all existing /more items working:
+
+* المحادثات
+* الأخبار
+* المقالات
+* الإدارة والإشراف based on role
+* تسجيل الخروج
+
+Do not remove existing features.
+
+==================================================
+D. DATABASE MODEL
+=================
+
+Create or use a table:
+
+board_members
+
+Fields:
+
+* id
+* name
+* position
+* bio
+* phone
+* email
+* imageUrl or imageData
+* boardType
+* displayOrder
+* isActive
+* createdAt
+* updatedAt
+* createdById optional
+* updatedById optional
+
+Recommended enum:
+boardType:
+
+* CURRENT
+* PREVIOUS
+* HISTORY
+
+For this phase:
+
+* /board/current shows only:
+  boardType = CURRENT
+  isActive = true
+
+Do not create duplicate tables.
+Use PostgreSQL + Drizzle.
+Use safe migrations/db push.
+
+==================================================
+E. IMAGE STRATEGY
+=================
+
+Use a simple stable image strategy.
+
+Preferred for now:
+
+* Store member image as base64/data URL in database field imageUrl or imageData.
+* Accept jpg, jpeg, png, webp.
+* Limit size to 1–2 MB.
+* Show Arabic error if too large:
+  حجم الصورة كبير جداً، يرجى اختيار صورة أصغر
+
+If no image exists:
+
+* Show initials fallback from the member name.
+* Do not show broken image icons.
+
+Do not use:
+
+* Firebase Storage
+* S3
+* External upload services
+
+==================================================
+F. PUBLIC VIEW — /BOARD
+=======================
+
+/board page design:
+
+Title:
+مجلس الإدارة
+
+Subtitle:
+تعرف على مجلس إدارة الجمعية الطبية السورية الألمانية SGMA
+
+Category cards:
+
+1. مجلس الإدارة الحالي
+   Description:
+   أعضاء مجلس الإدارة الحالي للجمعية.
+   Button:
+   عرض المجلس الحالي
+
+2. مجلس الإدارة السابق
+   Description:
+   استعراض المجالس السابقة للجمعية.
+   Button:
+   قيد التحضير
+
+3. أرشيف المجالس
+   Description:
+   توثيق تاريخي لدورات مجلس الإدارة.
+   Button:
+   قيد التحضير
+
+Design:
+
+* Arabic RTL
+* Mobile-first
+* Elegant cards
+* Professional association style
+* BackButton if appropriate
+* No 404
+* No broken links
+
+==================================================
+G. CURRENT BOARD PAGE — /BOARD/CURRENT
+======================================
+
+Page title:
+مجلس الإدارة الحالي
+
+Subtitle:
+أعضاء مجلس إدارة الجمعية الطبية السورية الألمانية SGMA
+
+Display board members as cards.
+
+Each card must show:
+
+* photo or initials fallback
+* name
+* position
+* bio
+* phone
+* email
+
+Contact buttons:
+
+* اتصال
+  tel: link
+* بريد إلكتروني
+  mailto: link
+
+If phone or email missing:
+
+* hide the relevant button or show “غير متوفر” cleanly.
+
+Card design:
+
+* Professional
+* Official
+* Clean
+* Mobile-first
+* Not table-like
+* Not crowded
+* Cards should support 10–17 members cleanly.
+* Use displayOrder for ordering.
+
+Empty state:
+لا توجد بيانات منشورة حالياً لمجلس الإدارة.
+
+==================================================
+H. MANAGEMENT UI FOR ADMIN / SUPER_ADMIN
+========================================
+
+Only these roles can manage board members:
+
+* ADMIN
+* SUPER_ADMIN
+
+MODERATOR:
+
+* view only
+* no add/edit/delete buttons
+
+MEMBER:
+
+* view only
+* no add/edit/delete buttons
+
+For ADMIN/SUPER_ADMIN, on /board/current show:
+
+* زر إضافة عضو
+* تعديل on each card
+* إخفاء/حذف on each card
+* Optional ترتيب if easy
+
+Add/Edit form fields:
+
+* name required
+  الاسم الكامل
+* position required
+  المنصب
+* bio required
+  نبذة قصيرة
+* phone optional
+  رقم الهاتف
+* email optional but if provided must be valid
+  البريد الإلكتروني
+* image required or optional? Make optional for now.
+  صورة العضو
+* displayOrder optional number
+  ترتيب الظهور
+* isActive checkbox/toggle
+  إظهار العضو
+
+Buttons:
+
+* حفظ
+* إلغاء
+
+Delete behavior:
+Preferred: soft delete / deactivate:
+
+* isActive = false
+  Do not hard-delete unless existing project pattern uses hard delete.
+
+Arabic success messages:
+
+* تم إضافة عضو مجلس الإدارة بنجاح
+* تم تحديث بيانات العضو بنجاح
+* تم إخفاء العضو من الصفحة
+
+==================================================
+I. BACKEND API REQUIREMENTS
+===========================
+
+Create clean JWT-protected APIs.
+
+Public/member read:
+GET /api/board/members
+Query:
+
+* boardType optional, default CURRENT
+
+Returns active members only, ordered by displayOrder then createdAt.
+
+GET /api/board/members/:id
+Returns one active member if needed.
+
+Admin/Super management:
+POST /api/board/members
+
+* ADMIN / SUPER_ADMIN only
+* creates board member
+* validates fields
+* image optional
+* server sets createdById from JWT if field exists
+
+PATCH /api/board/members/:id
+
+* ADMIN / SUPER_ADMIN only
+* updates board member
+* server sets updatedById from JWT if field exists
+
+DELETE /api/board/members/:id
+
+* ADMIN / SUPER_ADMIN only
+* soft delete:
+  isActive = false
+
+Security:
+
+* MEMBER cannot create/edit/delete
+* MODERATOR cannot create/edit/delete
+* Backend must return 403 for unauthorized actions
+* Do not rely only on frontend hiding
+
+Status codes:
+
+* 400 invalid input
+* 401 unauthenticated
+* 403 unauthorized
+* 404 not found
+
+==================================================
+J. OPENAPI / GENERATED CLIENT
+=============================
+
+Update OpenAPI.
+
+Add schemas:
+
+* BoardMember
+* BoardMembersResponse
+* CreateBoardMemberInput
+* UpdateBoardMemberInput
+* BoardType
+
+Add endpoints:
+
+* GET /api/board/members
+* GET /api/board/members/{id}
+* POST /api/board/members
+* PATCH /api/board/members/{id}
+* DELETE /api/board/members/{id}
+
+Then:
+
+* Regenerate client
+* Do not manually edit generated files
+* Run typecheck
+
+==================================================
+K. SEED SAMPLE DATA
+===================
+
+If board_members table is empty, seed 3 sample CURRENT board members for visual testing only.
+
+Use generic/demo data if real names are not provided.
+
+Example:
+
+1. د. أحمد محمد — رئيس مجلس الإدارة
+2. د. هدى خالد — نائبة الرئيس
+3. عمر الحربي — عضو مجلس الإدارة
+
+For Omar:
+Name:
+عمر الحربي
+
+Position:
+عضو مجلس الإدارة
+
+Bio:
+منسق عام لجنة المساعدين الطبيين والتمريض، وممرض اختصاص تخدير وعناية مركزة، يساهم في تطوير العمل التنظيمي والرقمي داخل SGMA.
+
+Phone:
+017634443419
+
+Email:
+[lordhygm@gmail.com](mailto:lordhygm@gmail.com)
+
+Mark test/demo content clearly if not official.
+
+Do not make unsupported official claims beyond provided data.
+
+==================================================
+L. UI QUALITY REQUIREMENTS
+==========================
+
+All pages must be:
+
+* Arabic RTL
+* Mobile-first
+* Professional
+* Clean and official
+* Card-based
+* Good with 10–17 members
+* No horizontal overflow
+* No broken images
+* Bottom navigation must not cover content
+* Broadcast banner must not break layout
+* BackButton where useful
+
+The current board page should feel polished and official.
+
+Do not use a table as the main public view.
+
+==================================================
+M. PERMISSION RULES
+===================
+
+Read access:
+
+* Authenticated users can view board pages.
+
+Management access:
+
+* ADMIN can create/edit/deactivate board members.
+* SUPER_ADMIN can create/edit/deactivate board members.
+* MODERATOR cannot manage board members.
+* MEMBER cannot manage board members.
+
+Backend enforcement is mandatory.
+
+==================================================
+N. TESTING REQUIRED
+===================
+
+Do not report completion until tested in Preview.
+
+Required tests:
+
+Routes:
+
+1. /more shows مجلس الإدارة.
+2. /board opens.
+3. /board/current opens.
+4. /board/previous opens placeholder.
+5. /board/history opens placeholder.
+
+Current board:
+
+1. Board member cards display.
+2. Photo or initials fallback works.
+3. Phone tel link works if phone exists.
+4. Email mailto link works if email exists.
+5. 10–17 cards layout remains usable if data exists.
+
+Admin/Super:
+
+1. SUPER_ADMIN sees add/edit/deactivate controls.
+2. ADMIN sees add/edit/deactivate controls.
+3. Add board member works.
+4. Edit board member works.
+5. Deactivate board member hides it from public view.
+6. Image upload/base64 works.
+7. Refresh page: data persists.
+
+Moderator/Member:
+
+1. MODERATOR can view board pages.
+2. MODERATOR cannot see management controls.
+3. MODERATOR API create/edit/delete returns 403.
+4. MEMBER can view board pages.
+5. MEMBER cannot see management controls.
+6. MEMBER API create/edit/delete returns 403.
+
+Regression:
+
+1. /login works.
+2. /register works.
+3. /home works.
+4. /news works.
+5. /articles works.
+6. /chat works.
+7. /broadcast works for allowed roles.
+8. /admin works.
+9. /developer-info works.
+10. /more works.
+11. Typecheck passes.
+12. Backend starts cleanly.
+13. Preview works.
+14. External public link still does not show removeChild translation error.
+
+==================================================
+O. REQUIRED REPORT
+==================
+
+After completion, provide:
+
+BOARD MODULE REPORT
+
+1. What was implemented
+2. Files changed
+3. Database/table changes
+4. Routes added
+5. /more update status
+6. Board landing page status
+7. Current board page status
+8. Previous/history placeholders status
+9. Management UI status
+10. Image upload/storage behavior
+11. Backend API endpoints
+12. OpenAPI/client generation status
+13. Permission test results:
+
+* SUPER_ADMIN
+* ADMIN
+* MODERATOR
+* MEMBER
+
+14. Runtime test results
+15. Preview status
+16. Known issues, if any
+17. Confirmation:
+
+* No Firebase
+* No MySQL migration
+* No unrelated features added
+* Existing modules still work
+
+Do not report success until /board and /board/current work visually in Preview and permission checks are verified.

@@ -488,6 +488,73 @@ export interface UpdateDeveloperInfoInput {
   email: string;
 }
 
+export type BoardType = typeof BoardType[keyof typeof BoardType];
+
+
+export const BoardType = {
+  CURRENT: 'CURRENT',
+  PREVIOUS: 'PREVIOUS',
+  HISTORY: 'HISTORY',
+} as const;
+
+export interface BoardMember {
+  id: number;
+  name: string;
+  position: string;
+  bio: string;
+  /** @nullable */
+  phone?: string | null;
+  /** @nullable */
+  email?: string | null;
+  /** @nullable */
+  imageUrl?: string | null;
+  boardType: BoardType;
+  displayOrder: number;
+  isActive: boolean;
+  /** @nullable */
+  createdAt?: string | null;
+  /** @nullable */
+  updatedAt?: string | null;
+}
+
+export type BoardMembersResponse = BoardMember[];
+
+export interface CreateBoardMemberInput {
+  /** @minLength 1 */
+  name: string;
+  /** @minLength 1 */
+  position: string;
+  /** @minLength 1 */
+  bio: string;
+  /** @nullable */
+  phone?: string | null;
+  /** @nullable */
+  email?: string | null;
+  /** @nullable */
+  imageUrl?: string | null;
+  boardType?: BoardType;
+  displayOrder?: number;
+  isActive?: boolean;
+}
+
+export interface UpdateBoardMemberInput {
+  /** @minLength 1 */
+  name?: string;
+  /** @minLength 1 */
+  position?: string;
+  /** @minLength 1 */
+  bio?: string;
+  /** @nullable */
+  phone?: string | null;
+  /** @nullable */
+  email?: string | null;
+  /** @nullable */
+  imageUrl?: string | null;
+  boardType?: BoardType;
+  displayOrder?: number;
+  isActive?: boolean;
+}
+
 export interface StaticPage {
   id: number;
   slug: string;
@@ -673,6 +740,10 @@ export interface UpdateBroadcastInput {
   expiresAt?: string | null;
   isActive?: boolean;
 }
+
+export type GetBoardMembersParams = {
+boardType?: BoardType;
+};
 
 export type GetAdminChatMessagesParams = {
 /**

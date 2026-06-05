@@ -204,6 +204,137 @@ export const GetMemberStatsResponse = zod.object({
 
 
 /**
+ * @summary List active board members
+ */
+export const GetBoardMembersQueryParams = zod.object({
+  "boardType": zod.enum(['CURRENT', 'PREVIOUS', 'HISTORY']).optional()
+})
+
+export const GetBoardMembersResponseItem = zod.object({
+  "id": zod.number(),
+  "name": zod.string(),
+  "position": zod.string(),
+  "bio": zod.string(),
+  "phone": zod.string().nullish(),
+  "email": zod.string().nullish(),
+  "imageUrl": zod.string().nullish(),
+  "boardType": zod.enum(['CURRENT', 'PREVIOUS', 'HISTORY']),
+  "displayOrder": zod.number(),
+  "isActive": zod.boolean(),
+  "createdAt": zod.coerce.date().nullish(),
+  "updatedAt": zod.coerce.date().nullish()
+})
+export const GetBoardMembersResponse = zod.array(GetBoardMembersResponseItem)
+
+
+/**
+ * @summary Create a board member (ADMIN/SUPER_ADMIN only)
+ */
+
+
+
+
+
+export const CreateBoardMemberBody = zod.object({
+  "name": zod.string().min(1),
+  "position": zod.string().min(1),
+  "bio": zod.string().min(1),
+  "phone": zod.string().nullish(),
+  "email": zod.string().nullish(),
+  "imageUrl": zod.string().nullish(),
+  "boardType": zod.enum(['CURRENT', 'PREVIOUS', 'HISTORY']).optional(),
+  "displayOrder": zod.number().optional(),
+  "isActive": zod.boolean().optional()
+})
+
+
+/**
+ * @summary Get one active board member
+ */
+export const GetBoardMemberParams = zod.object({
+  "id": zod.coerce.number()
+})
+
+export const GetBoardMemberResponse = zod.object({
+  "id": zod.number(),
+  "name": zod.string(),
+  "position": zod.string(),
+  "bio": zod.string(),
+  "phone": zod.string().nullish(),
+  "email": zod.string().nullish(),
+  "imageUrl": zod.string().nullish(),
+  "boardType": zod.enum(['CURRENT', 'PREVIOUS', 'HISTORY']),
+  "displayOrder": zod.number(),
+  "isActive": zod.boolean(),
+  "createdAt": zod.coerce.date().nullish(),
+  "updatedAt": zod.coerce.date().nullish()
+})
+
+
+/**
+ * @summary Update a board member (ADMIN/SUPER_ADMIN only)
+ */
+export const UpdateBoardMemberParams = zod.object({
+  "id": zod.coerce.number()
+})
+
+
+
+
+
+
+export const UpdateBoardMemberBody = zod.object({
+  "name": zod.string().min(1).optional(),
+  "position": zod.string().min(1).optional(),
+  "bio": zod.string().min(1).optional(),
+  "phone": zod.string().nullish(),
+  "email": zod.string().nullish(),
+  "imageUrl": zod.string().nullish(),
+  "boardType": zod.enum(['CURRENT', 'PREVIOUS', 'HISTORY']).optional(),
+  "displayOrder": zod.number().optional(),
+  "isActive": zod.boolean().optional()
+})
+
+export const UpdateBoardMemberResponse = zod.object({
+  "id": zod.number(),
+  "name": zod.string(),
+  "position": zod.string(),
+  "bio": zod.string(),
+  "phone": zod.string().nullish(),
+  "email": zod.string().nullish(),
+  "imageUrl": zod.string().nullish(),
+  "boardType": zod.enum(['CURRENT', 'PREVIOUS', 'HISTORY']),
+  "displayOrder": zod.number(),
+  "isActive": zod.boolean(),
+  "createdAt": zod.coerce.date().nullish(),
+  "updatedAt": zod.coerce.date().nullish()
+})
+
+
+/**
+ * @summary Soft-delete (deactivate) a board member (ADMIN/SUPER_ADMIN only)
+ */
+export const DeleteBoardMemberParams = zod.object({
+  "id": zod.coerce.number()
+})
+
+export const DeleteBoardMemberResponse = zod.object({
+  "id": zod.number(),
+  "name": zod.string(),
+  "position": zod.string(),
+  "bio": zod.string(),
+  "phone": zod.string().nullish(),
+  "email": zod.string().nullish(),
+  "imageUrl": zod.string().nullish(),
+  "boardType": zod.enum(['CURRENT', 'PREVIOUS', 'HISTORY']),
+  "displayOrder": zod.number(),
+  "isActive": zod.boolean(),
+  "createdAt": zod.coerce.date().nullish(),
+  "updatedAt": zod.coerce.date().nullish()
+})
+
+
+/**
  * @summary Get a static page by slug
  */
 export const GetStaticPageParams = zod.object({

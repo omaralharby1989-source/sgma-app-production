@@ -24,6 +24,10 @@ import ArticleDetail from "./pages/article-detail";
 import Broadcast from "./pages/broadcast";
 import DeveloperInfo from "./pages/developer-info";
 import StaticPage from "./pages/static-page";
+import Board from "./pages/board";
+import BoardCurrent from "./pages/board-current";
+import BoardPrevious from "./pages/board-previous";
+import BoardHistory from "./pages/board-history";
 import Unauthorized from "./pages/unauthorized";
 import { ProtectedLayout } from "./components/layout/ProtectedLayout";
 import { getStoredUser, isStaffRole } from "./lib/auth";
@@ -145,6 +149,19 @@ function Router() {
       <Route path="/articles/:id">
         <ProtectedRoute component={ArticleDetail} />
       </Route>
+      <Route path="/board">
+        <ProtectedRoute component={Board} />
+      </Route>
+      <Route path="/board/current">
+        <ProtectedRoute component={BoardCurrent} />
+      </Route>
+      <Route path="/board/previous">
+        <ProtectedRoute component={BoardPrevious} />
+      </Route>
+      <Route path="/board/history">
+        <ProtectedRoute component={BoardHistory} />
+      </Route>
+
       <Route path="/broadcast">
         <ProtectedRoute component={Broadcast} allowedRoles={["ADMIN", "SUPER_ADMIN"]} />
       </Route>

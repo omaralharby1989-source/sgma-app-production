@@ -2,7 +2,7 @@ import { Link, useLocation } from "wouter";
 import { useGetMemberProfile } from "@workspace/api-client-react";
 import { Card } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Info, LogOut, MessageSquare, Newspaper, FileText, Radio, ChevronLeft, LayoutDashboard, Users, Building2, ShieldCheck, ScrollText } from "lucide-react";
+import { Info, LogOut, MessageSquare, Newspaper, FileText, Radio, ChevronLeft, LayoutDashboard, Users, Building2, ShieldCheck, ScrollText, Landmark } from "lucide-react";
 import { getStoredUser, isStaffRole, isAdminOrSuper } from "@/lib/auth";
 
 export default function More() {
@@ -34,15 +34,16 @@ export default function More() {
         { icon: MessageSquare, label: "المحادثات", href: "/chat" },
         { icon: Newspaper, label: "الأخبار", href: "/news" },
         { icon: FileText, label: "المقالات", href: "/articles" },
-        { icon: Info, label: "معلومات المطور", href: "/developer-info" },
       ],
     },
     {
-      title: "القانونية والمعلومات",
+      title: "الجمعية والمعلومات",
       items: [
         { icon: Building2, label: "من نحن", href: "/about-sgma" },
+        { icon: Landmark, label: "مجلس الإدارة", href: "/board" },
         { icon: ShieldCheck, label: "سياسة الخصوصية", href: "/privacy-policy" },
         { icon: ScrollText, label: "الشروط والأحكام", href: "/terms" },
+        { icon: Info, label: "معلومات المطور", href: "/developer-info" },
       ],
     },
     ...(isStaff
