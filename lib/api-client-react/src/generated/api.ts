@@ -20,7 +20,9 @@ import type {
 } from '@tanstack/react-query';
 
 import type {
+  ActiveAdsResponse,
   ActiveBroadcastResponse,
+  AdSettings,
   AdminConversation,
   AdminDashboardStats,
   AdminUpdateUserInput,
@@ -41,10 +43,14 @@ import type {
   CreateArticleInput,
   CreateBoardMemberInput,
   CreateBroadcastInput,
+  CreateCustomAdInput,
   CreateNewsInput,
   CreateVolunteerDelegationRequestInput,
+  CustomAd,
+  CustomAdListResponse,
   DeveloperInfo,
   ErrorResponse,
+  GetActiveAdsParams,
   GetAdminArticlesParams,
   GetAdminChatMessagesParams,
   GetAdminNewsParams,
@@ -68,9 +74,11 @@ import type {
   SignupInput,
   SignupResponse,
   StaticPage,
+  UpdateAdSettingsInput,
   UpdateArticleInput,
   UpdateBoardMemberInput,
   UpdateBroadcastInput,
+  UpdateCustomAdInput,
   UpdateDeveloperInfoInput,
   UpdateNewsInput,
   UpdateStaticPageInput,
@@ -4564,5 +4572,527 @@ export const useDeleteAdminBroadcast = <TError = ErrorType<ErrorResponse>,
         TContext
       > => {
       return useMutation(getDeleteAdminBroadcastMutationOptions(options));
+    }
+
+export const getGetActiveAdsUrl = (params?: GetActiveAdsParams,) => {
+  const normalizedParams = new URLSearchParams();
+
+  Object.entries(params || {}).forEach(([key, value]) => {
+
+    if (value !== undefined) {
+      normalizedParams.append(key, value === null ? 'null' : value.toString())
+    }
+  });
+
+  const stringifiedParams = normalizedParams.toString();
+
+  return stringifiedParams.length > 0 ? `/api/ads/active?${stringifiedParams}` : `/api/ads/active`
+}
+
+/**
+ * @summary Get ad settings + active custom ads for a placement (any authenticated user)
+ */
+export const getActiveAds = async (params?: GetActiveAdsParams, options?: RequestInit): Promise<ActiveAdsResponse> => {
+
+  return customFetch<ActiveAdsResponse>(getGetActiveAdsUrl(params),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getGetActiveAdsQueryKey = (params?: GetActiveAdsParams,) => {
+    return [
+    `/api/ads/active`, ...(params ? [params] : [])
+    ] as const;
+    }
+
+
+export const getGetActiveAdsQueryOptions = <TData = Awaited<ReturnType<typeof getActiveAds>>, TError = ErrorType<ErrorResponse>>(params?: GetActiveAdsParams, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getActiveAds>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetActiveAdsQueryKey(params);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getActiveAds>>> = ({ signal }) => getActiveAds(params, { signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getActiveAds>>, TError, TData> & { queryKey: QueryKey }
+}
+
+export type GetActiveAdsQueryResult = NonNullable<Awaited<ReturnType<typeof getActiveAds>>>
+export type GetActiveAdsQueryError = ErrorType<ErrorResponse>
+
+
+/**
+ * @summary Get ad settings + active custom ads for a placement (any authenticated user)
+ */
+
+export function useGetActiveAds<TData = Awaited<ReturnType<typeof getActiveAds>>, TError = ErrorType<ErrorResponse>>(
+ params?: GetActiveAdsParams, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getActiveAds>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+
+ ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+
+  const queryOptions = getGetActiveAdsQueryOptions(params,options)
+
+  const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
+
+  return { ...query, queryKey: queryOptions.queryKey };
+}
+
+
+
+
+
+
+
+export const getGetAdminAdSettingsUrl = () => {
+
+
+
+
+  return `/api/admin/ads/settings`
+}
+
+/**
+ * @summary Get ad settings (SUPER_ADMIN only)
+ */
+export const getAdminAdSettings = async ( options?: RequestInit): Promise<AdSettings> => {
+
+  return customFetch<AdSettings>(getGetAdminAdSettingsUrl(),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getGetAdminAdSettingsQueryKey = () => {
+    return [
+    `/api/admin/ads/settings`
+    ] as const;
+    }
+
+
+export const getGetAdminAdSettingsQueryOptions = <TData = Awaited<ReturnType<typeof getAdminAdSettings>>, TError = ErrorType<ErrorResponse>>( options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getAdminAdSettings>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetAdminAdSettingsQueryKey();
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getAdminAdSettings>>> = ({ signal }) => getAdminAdSettings({ signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getAdminAdSettings>>, TError, TData> & { queryKey: QueryKey }
+}
+
+export type GetAdminAdSettingsQueryResult = NonNullable<Awaited<ReturnType<typeof getAdminAdSettings>>>
+export type GetAdminAdSettingsQueryError = ErrorType<ErrorResponse>
+
+
+/**
+ * @summary Get ad settings (SUPER_ADMIN only)
+ */
+
+export function useGetAdminAdSettings<TData = Awaited<ReturnType<typeof getAdminAdSettings>>, TError = ErrorType<ErrorResponse>>(
+  options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getAdminAdSettings>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+
+ ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+
+  const queryOptions = getGetAdminAdSettingsQueryOptions(options)
+
+  const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
+
+  return { ...query, queryKey: queryOptions.queryKey };
+}
+
+
+
+
+
+
+
+export const getUpdateAdminAdSettingsUrl = () => {
+
+
+
+
+  return `/api/admin/ads/settings`
+}
+
+/**
+ * @summary Update ad settings (SUPER_ADMIN only)
+ */
+export const updateAdminAdSettings = async (updateAdSettingsInput: UpdateAdSettingsInput, options?: RequestInit): Promise<AdSettings> => {
+
+  return customFetch<AdSettings>(getUpdateAdminAdSettingsUrl(),
+  {
+    ...options,
+    method: 'PATCH',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(
+      updateAdSettingsInput,)
+  }
+);}
+
+
+
+
+export const getUpdateAdminAdSettingsMutationOptions = <TError = ErrorType<ErrorResponse>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof updateAdminAdSettings>>, TError,{data: BodyType<UpdateAdSettingsInput>}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof updateAdminAdSettings>>, TError,{data: BodyType<UpdateAdSettingsInput>}, TContext> => {
+
+const mutationKey = ['updateAdminAdSettings'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof updateAdminAdSettings>>, {data: BodyType<UpdateAdSettingsInput>}> = (props) => {
+          const {data} = props ?? {};
+
+          return  updateAdminAdSettings(data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type UpdateAdminAdSettingsMutationResult = NonNullable<Awaited<ReturnType<typeof updateAdminAdSettings>>>
+    export type UpdateAdminAdSettingsMutationBody = BodyType<UpdateAdSettingsInput>
+    export type UpdateAdminAdSettingsMutationError = ErrorType<ErrorResponse>
+
+    /**
+ * @summary Update ad settings (SUPER_ADMIN only)
+ */
+export const useUpdateAdminAdSettings = <TError = ErrorType<ErrorResponse>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof updateAdminAdSettings>>, TError,{data: BodyType<UpdateAdSettingsInput>}, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof updateAdminAdSettings>>,
+        TError,
+        {data: BodyType<UpdateAdSettingsInput>},
+        TContext
+      > => {
+      return useMutation(getUpdateAdminAdSettingsMutationOptions(options));
+    }
+
+export const getGetAdminCustomAdsUrl = () => {
+
+
+
+
+  return `/api/admin/ads/custom`
+}
+
+/**
+ * @summary List all custom ads (SUPER_ADMIN only)
+ */
+export const getAdminCustomAds = async ( options?: RequestInit): Promise<CustomAdListResponse> => {
+
+  return customFetch<CustomAdListResponse>(getGetAdminCustomAdsUrl(),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getGetAdminCustomAdsQueryKey = () => {
+    return [
+    `/api/admin/ads/custom`
+    ] as const;
+    }
+
+
+export const getGetAdminCustomAdsQueryOptions = <TData = Awaited<ReturnType<typeof getAdminCustomAds>>, TError = ErrorType<ErrorResponse>>( options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getAdminCustomAds>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetAdminCustomAdsQueryKey();
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getAdminCustomAds>>> = ({ signal }) => getAdminCustomAds({ signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getAdminCustomAds>>, TError, TData> & { queryKey: QueryKey }
+}
+
+export type GetAdminCustomAdsQueryResult = NonNullable<Awaited<ReturnType<typeof getAdminCustomAds>>>
+export type GetAdminCustomAdsQueryError = ErrorType<ErrorResponse>
+
+
+/**
+ * @summary List all custom ads (SUPER_ADMIN only)
+ */
+
+export function useGetAdminCustomAds<TData = Awaited<ReturnType<typeof getAdminCustomAds>>, TError = ErrorType<ErrorResponse>>(
+  options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getAdminCustomAds>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+
+ ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+
+  const queryOptions = getGetAdminCustomAdsQueryOptions(options)
+
+  const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
+
+  return { ...query, queryKey: queryOptions.queryKey };
+}
+
+
+
+
+
+
+
+export const getCreateAdminCustomAdUrl = () => {
+
+
+
+
+  return `/api/admin/ads/custom`
+}
+
+/**
+ * @summary Create a custom ad (SUPER_ADMIN only)
+ */
+export const createAdminCustomAd = async (createCustomAdInput: CreateCustomAdInput, options?: RequestInit): Promise<CustomAd> => {
+
+  return customFetch<CustomAd>(getCreateAdminCustomAdUrl(),
+  {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(
+      createCustomAdInput,)
+  }
+);}
+
+
+
+
+export const getCreateAdminCustomAdMutationOptions = <TError = ErrorType<ErrorResponse>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof createAdminCustomAd>>, TError,{data: BodyType<CreateCustomAdInput>}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof createAdminCustomAd>>, TError,{data: BodyType<CreateCustomAdInput>}, TContext> => {
+
+const mutationKey = ['createAdminCustomAd'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof createAdminCustomAd>>, {data: BodyType<CreateCustomAdInput>}> = (props) => {
+          const {data} = props ?? {};
+
+          return  createAdminCustomAd(data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type CreateAdminCustomAdMutationResult = NonNullable<Awaited<ReturnType<typeof createAdminCustomAd>>>
+    export type CreateAdminCustomAdMutationBody = BodyType<CreateCustomAdInput>
+    export type CreateAdminCustomAdMutationError = ErrorType<ErrorResponse>
+
+    /**
+ * @summary Create a custom ad (SUPER_ADMIN only)
+ */
+export const useCreateAdminCustomAd = <TError = ErrorType<ErrorResponse>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof createAdminCustomAd>>, TError,{data: BodyType<CreateCustomAdInput>}, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof createAdminCustomAd>>,
+        TError,
+        {data: BodyType<CreateCustomAdInput>},
+        TContext
+      > => {
+      return useMutation(getCreateAdminCustomAdMutationOptions(options));
+    }
+
+export const getUpdateAdminCustomAdUrl = (id: number,) => {
+
+
+
+
+  return `/api/admin/ads/custom/${id}`
+}
+
+/**
+ * @summary Update a custom ad (SUPER_ADMIN only)
+ */
+export const updateAdminCustomAd = async (id: number,
+    updateCustomAdInput: UpdateCustomAdInput, options?: RequestInit): Promise<CustomAd> => {
+
+  return customFetch<CustomAd>(getUpdateAdminCustomAdUrl(id),
+  {
+    ...options,
+    method: 'PATCH',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(
+      updateCustomAdInput,)
+  }
+);}
+
+
+
+
+export const getUpdateAdminCustomAdMutationOptions = <TError = ErrorType<ErrorResponse>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof updateAdminCustomAd>>, TError,{id: number;data: BodyType<UpdateCustomAdInput>}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof updateAdminCustomAd>>, TError,{id: number;data: BodyType<UpdateCustomAdInput>}, TContext> => {
+
+const mutationKey = ['updateAdminCustomAd'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof updateAdminCustomAd>>, {id: number;data: BodyType<UpdateCustomAdInput>}> = (props) => {
+          const {id,data} = props ?? {};
+
+          return  updateAdminCustomAd(id,data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type UpdateAdminCustomAdMutationResult = NonNullable<Awaited<ReturnType<typeof updateAdminCustomAd>>>
+    export type UpdateAdminCustomAdMutationBody = BodyType<UpdateCustomAdInput>
+    export type UpdateAdminCustomAdMutationError = ErrorType<ErrorResponse>
+
+    /**
+ * @summary Update a custom ad (SUPER_ADMIN only)
+ */
+export const useUpdateAdminCustomAd = <TError = ErrorType<ErrorResponse>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof updateAdminCustomAd>>, TError,{id: number;data: BodyType<UpdateCustomAdInput>}, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof updateAdminCustomAd>>,
+        TError,
+        {id: number;data: BodyType<UpdateCustomAdInput>},
+        TContext
+      > => {
+      return useMutation(getUpdateAdminCustomAdMutationOptions(options));
+    }
+
+export const getDeleteAdminCustomAdUrl = (id: number,) => {
+
+
+
+
+  return `/api/admin/ads/custom/${id}`
+}
+
+/**
+ * @summary Soft-delete (deactivate) a custom ad (SUPER_ADMIN only)
+ */
+export const deleteAdminCustomAd = async (id: number, options?: RequestInit): Promise<MessageResponse> => {
+
+  return customFetch<MessageResponse>(getDeleteAdminCustomAdUrl(id),
+  {
+    ...options,
+    method: 'DELETE'
+
+
+  }
+);}
+
+
+
+
+export const getDeleteAdminCustomAdMutationOptions = <TError = ErrorType<ErrorResponse>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof deleteAdminCustomAd>>, TError,{id: number}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof deleteAdminCustomAd>>, TError,{id: number}, TContext> => {
+
+const mutationKey = ['deleteAdminCustomAd'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof deleteAdminCustomAd>>, {id: number}> = (props) => {
+          const {id} = props ?? {};
+
+          return  deleteAdminCustomAd(id,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type DeleteAdminCustomAdMutationResult = NonNullable<Awaited<ReturnType<typeof deleteAdminCustomAd>>>
+
+    export type DeleteAdminCustomAdMutationError = ErrorType<ErrorResponse>
+
+    /**
+ * @summary Soft-delete (deactivate) a custom ad (SUPER_ADMIN only)
+ */
+export const useDeleteAdminCustomAd = <TError = ErrorType<ErrorResponse>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof deleteAdminCustomAd>>, TError,{id: number}, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof deleteAdminCustomAd>>,
+        TError,
+        {id: number},
+        TContext
+      > => {
+      return useMutation(getDeleteAdminCustomAdMutationOptions(options));
     }
 

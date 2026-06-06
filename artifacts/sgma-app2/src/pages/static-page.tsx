@@ -14,6 +14,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { FileText, Pencil, Save, X, Loader2, CalendarDays } from "lucide-react";
 import { BackButton } from "@/components/BackButton";
 import { BroadcastBanner } from "@/components/BroadcastBanner";
+import { AdBanner } from "@/components/AdBanner";
 import { useToast } from "@/hooks/use-toast";
 import { getStoredUser, isDeveloperUser } from "@/lib/auth";
 
@@ -174,6 +175,7 @@ export default function StaticPage({ slug }: { slug: string }) {
           )}
         </div>
       )}
+      <AdBanner />
     </div>
   );
 }

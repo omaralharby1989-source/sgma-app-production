@@ -1482,3 +1482,196 @@ export const DeleteAdminBroadcastResponse = zod.object({
 })
 
 
+/**
+ * @summary Get ad settings + active custom ads for a placement (any authenticated user)
+ */
+export const GetActiveAdsQueryParams = zod.object({
+  "placement": zod.coerce.string().optional()
+})
+
+export const GetActiveAdsResponse = zod.object({
+  "adsEnabled": zod.boolean(),
+  "googleAdsEnabled": zod.boolean(),
+  "showOnHome": zod.boolean().optional(),
+  "showOnNews": zod.boolean().optional(),
+  "showOnArticles": zod.boolean().optional(),
+  "showOnBoard": zod.boolean().optional(),
+  "showOnMore": zod.boolean().optional(),
+  "showOnStaticPages": zod.boolean().optional(),
+  "showOnChat": zod.boolean().optional(),
+  "showOnAdmin": zod.boolean().optional(),
+  "showOnAuthPages": zod.boolean().optional(),
+  "ads": zod.array(zod.object({
+  "id": zod.number(),
+  "title": zod.string(),
+  "content": zod.string(),
+  "imageUrl": zod.string().nullish(),
+  "linkUrl": zod.string().nullish(),
+  "placement": zod.string()
+}))
+})
+
+
+/**
+ * @summary Get ad settings (SUPER_ADMIN only)
+ */
+export const GetAdminAdSettingsResponse = zod.object({
+  "id": zod.number(),
+  "adsEnabled": zod.boolean(),
+  "googleAdsEnabled": zod.boolean(),
+  "googlePublisherId": zod.string().nullish(),
+  "googleAdSlotBottom": zod.string().nullish(),
+  "showOnHome": zod.boolean(),
+  "showOnNews": zod.boolean(),
+  "showOnArticles": zod.boolean(),
+  "showOnBoard": zod.boolean(),
+  "showOnMore": zod.boolean(),
+  "showOnStaticPages": zod.boolean(),
+  "showOnChat": zod.boolean(),
+  "showOnAdmin": zod.boolean(),
+  "showOnAuthPages": zod.boolean(),
+  "updatedById": zod.number().nullish(),
+  "updatedAt": zod.coerce.date().nullish()
+})
+
+
+/**
+ * @summary Update ad settings (SUPER_ADMIN only)
+ */
+export const UpdateAdminAdSettingsBody = zod.object({
+  "adsEnabled": zod.boolean().optional(),
+  "googleAdsEnabled": zod.boolean().optional(),
+  "googlePublisherId": zod.string().nullish(),
+  "googleAdSlotBottom": zod.string().nullish(),
+  "showOnHome": zod.boolean().optional(),
+  "showOnNews": zod.boolean().optional(),
+  "showOnArticles": zod.boolean().optional(),
+  "showOnBoard": zod.boolean().optional(),
+  "showOnMore": zod.boolean().optional(),
+  "showOnStaticPages": zod.boolean().optional(),
+  "showOnChat": zod.boolean().optional(),
+  "showOnAdmin": zod.boolean().optional(),
+  "showOnAuthPages": zod.boolean().optional()
+})
+
+export const UpdateAdminAdSettingsResponse = zod.object({
+  "id": zod.number(),
+  "adsEnabled": zod.boolean(),
+  "googleAdsEnabled": zod.boolean(),
+  "googlePublisherId": zod.string().nullish(),
+  "googleAdSlotBottom": zod.string().nullish(),
+  "showOnHome": zod.boolean(),
+  "showOnNews": zod.boolean(),
+  "showOnArticles": zod.boolean(),
+  "showOnBoard": zod.boolean(),
+  "showOnMore": zod.boolean(),
+  "showOnStaticPages": zod.boolean(),
+  "showOnChat": zod.boolean(),
+  "showOnAdmin": zod.boolean(),
+  "showOnAuthPages": zod.boolean(),
+  "updatedById": zod.number().nullish(),
+  "updatedAt": zod.coerce.date().nullish()
+})
+
+
+/**
+ * @summary List all custom ads (SUPER_ADMIN only)
+ */
+export const GetAdminCustomAdsResponseItem = zod.object({
+  "id": zod.number(),
+  "title": zod.string(),
+  "content": zod.string(),
+  "imageUrl": zod.string().nullish(),
+  "linkUrl": zod.string().nullish(),
+  "placement": zod.string(),
+  "priority": zod.number(),
+  "isActive": zod.boolean(),
+  "startAt": zod.coerce.date().nullish(),
+  "endAt": zod.coerce.date().nullish(),
+  "createdById": zod.number().nullish(),
+  "updatedById": zod.number().nullish(),
+  "createdAt": zod.coerce.date().nullish(),
+  "updatedAt": zod.coerce.date().nullish()
+})
+export const GetAdminCustomAdsResponse = zod.array(GetAdminCustomAdsResponseItem)
+
+
+/**
+ * @summary Create a custom ad (SUPER_ADMIN only)
+ */
+export const createAdminCustomAdBodyTitleMax = 200;
+
+export const createAdminCustomAdBodyContentMax = 2000;
+
+
+
+
+export const CreateAdminCustomAdBody = zod.object({
+  "title": zod.string().min(1).max(createAdminCustomAdBodyTitleMax),
+  "content": zod.string().min(1).max(createAdminCustomAdBodyContentMax),
+  "imageUrl": zod.string().nullish(),
+  "linkUrl": zod.string().nullish(),
+  "placement": zod.string().min(1),
+  "priority": zod.number().optional(),
+  "isActive": zod.boolean().optional(),
+  "startAt": zod.string().nullish(),
+  "endAt": zod.string().nullish()
+})
+
+
+/**
+ * @summary Update a custom ad (SUPER_ADMIN only)
+ */
+export const UpdateAdminCustomAdParams = zod.object({
+  "id": zod.coerce.number()
+})
+
+export const updateAdminCustomAdBodyTitleMax = 200;
+
+export const updateAdminCustomAdBodyContentMax = 2000;
+
+
+
+
+export const UpdateAdminCustomAdBody = zod.object({
+  "title": zod.string().min(1).max(updateAdminCustomAdBodyTitleMax).optional(),
+  "content": zod.string().min(1).max(updateAdminCustomAdBodyContentMax).optional(),
+  "imageUrl": zod.string().nullish(),
+  "linkUrl": zod.string().nullish(),
+  "placement": zod.string().min(1).optional(),
+  "priority": zod.number().optional(),
+  "isActive": zod.boolean().optional(),
+  "startAt": zod.string().nullish(),
+  "endAt": zod.string().nullish()
+})
+
+export const UpdateAdminCustomAdResponse = zod.object({
+  "id": zod.number(),
+  "title": zod.string(),
+  "content": zod.string(),
+  "imageUrl": zod.string().nullish(),
+  "linkUrl": zod.string().nullish(),
+  "placement": zod.string(),
+  "priority": zod.number(),
+  "isActive": zod.boolean(),
+  "startAt": zod.coerce.date().nullish(),
+  "endAt": zod.coerce.date().nullish(),
+  "createdById": zod.number().nullish(),
+  "updatedById": zod.number().nullish(),
+  "createdAt": zod.coerce.date().nullish(),
+  "updatedAt": zod.coerce.date().nullish()
+})
+
+
+/**
+ * @summary Soft-delete (deactivate) a custom ad (SUPER_ADMIN only)
+ */
+export const DeleteAdminCustomAdParams = zod.object({
+  "id": zod.coerce.number()
+})
+
+export const DeleteAdminCustomAdResponse = zod.object({
+  "message": zod.string()
+})
+
+

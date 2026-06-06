@@ -881,6 +881,150 @@ export interface UpdateBroadcastInput {
   isActive?: boolean;
 }
 
+export interface AdSettings {
+  id: number;
+  adsEnabled: boolean;
+  googleAdsEnabled: boolean;
+  /** @nullable */
+  googlePublisherId?: string | null;
+  /** @nullable */
+  googleAdSlotBottom?: string | null;
+  showOnHome: boolean;
+  showOnNews: boolean;
+  showOnArticles: boolean;
+  showOnBoard: boolean;
+  showOnMore: boolean;
+  showOnStaticPages: boolean;
+  showOnChat: boolean;
+  showOnAdmin: boolean;
+  showOnAuthPages: boolean;
+  /** @nullable */
+  updatedById?: number | null;
+  /** @nullable */
+  updatedAt?: string | null;
+}
+
+export interface UpdateAdSettingsInput {
+  adsEnabled?: boolean;
+  googleAdsEnabled?: boolean;
+  /** @nullable */
+  googlePublisherId?: string | null;
+  /** @nullable */
+  googleAdSlotBottom?: string | null;
+  showOnHome?: boolean;
+  showOnNews?: boolean;
+  showOnArticles?: boolean;
+  showOnBoard?: boolean;
+  showOnMore?: boolean;
+  showOnStaticPages?: boolean;
+  showOnChat?: boolean;
+  showOnAdmin?: boolean;
+  showOnAuthPages?: boolean;
+}
+
+export interface CustomAd {
+  id: number;
+  title: string;
+  content: string;
+  /** @nullable */
+  imageUrl?: string | null;
+  /** @nullable */
+  linkUrl?: string | null;
+  placement: string;
+  priority: number;
+  isActive: boolean;
+  /** @nullable */
+  startAt?: string | null;
+  /** @nullable */
+  endAt?: string | null;
+  /** @nullable */
+  createdById?: number | null;
+  /** @nullable */
+  updatedById?: number | null;
+  /** @nullable */
+  createdAt?: string | null;
+  /** @nullable */
+  updatedAt?: string | null;
+}
+
+export type CustomAdListResponse = CustomAd[];
+
+export interface CreateCustomAdInput {
+  /**
+     * @minLength 1
+     * @maxLength 200
+     */
+  title: string;
+  /**
+     * @minLength 1
+     * @maxLength 2000
+     */
+  content: string;
+  /** @nullable */
+  imageUrl?: string | null;
+  /** @nullable */
+  linkUrl?: string | null;
+  /** @minLength 1 */
+  placement: string;
+  priority?: number;
+  isActive?: boolean;
+  /** @nullable */
+  startAt?: string | null;
+  /** @nullable */
+  endAt?: string | null;
+}
+
+export interface UpdateCustomAdInput {
+  /**
+     * @minLength 1
+     * @maxLength 200
+     */
+  title?: string;
+  /**
+     * @minLength 1
+     * @maxLength 2000
+     */
+  content?: string;
+  /** @nullable */
+  imageUrl?: string | null;
+  /** @nullable */
+  linkUrl?: string | null;
+  /** @minLength 1 */
+  placement?: string;
+  priority?: number;
+  isActive?: boolean;
+  /** @nullable */
+  startAt?: string | null;
+  /** @nullable */
+  endAt?: string | null;
+}
+
+export interface ActiveAdCustom {
+  id: number;
+  title: string;
+  content: string;
+  /** @nullable */
+  imageUrl?: string | null;
+  /** @nullable */
+  linkUrl?: string | null;
+  placement: string;
+}
+
+export interface ActiveAdsResponse {
+  adsEnabled: boolean;
+  googleAdsEnabled: boolean;
+  showOnHome?: boolean;
+  showOnNews?: boolean;
+  showOnArticles?: boolean;
+  showOnBoard?: boolean;
+  showOnMore?: boolean;
+  showOnStaticPages?: boolean;
+  showOnChat?: boolean;
+  showOnAdmin?: boolean;
+  showOnAuthPages?: boolean;
+  ads: ActiveAdCustom[];
+}
+
 export type GetBoardMembersParams = {
 boardType?: BoardType;
 };
@@ -937,4 +1081,8 @@ export const GetAdminNewsStatus = {
   PUBLISHED: 'PUBLISHED',
   ARCHIVED: 'ARCHIVED',
 } as const;
+
+export type GetActiveAdsParams = {
+placement?: string;
+};
 

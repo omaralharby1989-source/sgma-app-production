@@ -2,8 +2,8 @@ import { Link, useLocation } from "wouter";
 import { useGetMemberProfile } from "@workspace/api-client-react";
 import { Card } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Info, LogOut, MessageSquare, Newspaper, FileText, Radio, ChevronLeft, LayoutDashboard, Users, Building2, ShieldCheck, ScrollText, Landmark, HandHeart } from "lucide-react";
-import { getStoredUser, isStaffRole, isAdminOrSuper } from "@/lib/auth";
+import { Info, LogOut, MessageSquare, Newspaper, FileText, Radio, ChevronLeft, LayoutDashboard, Users, Building2, ShieldCheck, ScrollText, Landmark, HandHeart, Megaphone } from "lucide-react";
+import { getStoredUser, isStaffRole, isAdminOrSuper, isSuperAdminRole } from "@/lib/auth";
 
 export default function More() {
   const [, setLocation] = useLocation();
@@ -11,6 +11,7 @@ export default function More() {
   const role = getStoredUser()?.role;
   const isStaff = isStaffRole(role);
   const adminOrSuper = isAdminOrSuper(role);
+  const superAdmin = isSuperAdminRole(role);
 
   const handleLogout = () => {
     localStorage.removeItem("sgma_auth_token");
@@ -61,6 +62,9 @@ export default function More() {
               { icon: HandHeart, label: "طلبات الوفود التطوعية", href: "/admin/volunteer-delegations" },
               ...(adminOrSuper
                 ? ([{ icon: Radio, label: "إدارة البث", href: "/admin/broadcasts" }] as MenuItem[])
+                : []),
+              ...(superAdmin
+                ? ([{ icon: Megaphone, label: "إدارة الإعلانات", href: "/admin/ads" }] as MenuItem[])
                 : []),
             ] as MenuItem[],
           },

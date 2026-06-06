@@ -14,6 +14,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { Phone, Mail, Briefcase, UserRound, Building2, Pencil, Save, X, Loader2 } from "lucide-react";
 import { BackButton } from "@/components/BackButton";
 import { BroadcastBanner } from "@/components/BroadcastBanner";
+import { AdBanner } from "@/components/AdBanner";
 import { useToast } from "@/hooks/use-toast";
 import { getStoredUser, isDeveloperUser } from "@/lib/auth";
 
@@ -297,6 +298,7 @@ export default function DeveloperInfo() {
           )}
         </div>
       )}
+      <AdBanner />
     </div>
   );
 }

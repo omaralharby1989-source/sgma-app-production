@@ -2115,6 +2115,249 @@ paths:
               schema:
                 $ref: "#/components/schemas/ErrorResponse"
 
+  /ads/active:
+    get:
+      operationId: getActiveAds
+      tags: [ads]
+      summary: Get ad settings + active custom ads for a placement (any authenticated user)
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: placement
+          in: query
+          required: false
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Active ads payload
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ActiveAdsResponse"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /admin/ads/settings:
+    get:
+      operationId: getAdminAdSettings
+      tags: [ads]
+      summary: Get ad settings (SUPER_ADMIN only)
+      security:
+        - BearerAuth: []
+      responses:
+        "200":
+          description: Ad settings
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AdSettings"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "403":
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+    patch:
+      operationId: updateAdminAdSettings
+      tags: [ads]
+      summary: Update ad settings (SUPER_ADMIN only)
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateAdSettingsInput"
+      responses:
+        "200":
+          description: Updated settings
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AdSettings"
+        "400":
+          description: Invalid input
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "403":
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /admin/ads/custom:
+    get:
+      operationId: getAdminCustomAds
+      tags: [ads]
+      summary: List all custom ads (SUPER_ADMIN only)
+      security:
+        - BearerAuth: []
+      responses:
+        "200":
+          description: All custom ads
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CustomAdListResponse"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "403":
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+    post:
+      operationId: createAdminCustomAd
+      tags: [ads]
+      summary: Create a custom ad (SUPER_ADMIN only)
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateCustomAdInput"
+      responses:
+        "201":
+          description: Created custom ad
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CustomAd"
+        "400":
+          description: Invalid input
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "403":
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /admin/ads/custom/{id}:
+    patch:
+      operationId: updateAdminCustomAd
+      tags: [ads]
+      summary: Update a custom ad (SUPER_ADMIN only)
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateCustomAdInput"
+      responses:
+        "200":
+          description: Updated custom ad
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CustomAd"
+        "400":
+          description: Invalid input
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "403":
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "404":
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+    delete:
+      operationId: deleteAdminCustomAd
+      tags: [ads]
+      summary: Soft-delete (deactivate) a custom ad (SUPER_ADMIN only)
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Deactivated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MessageResponse"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "403":
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "404":
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
 components:
   securitySchemes:
     BearerAuth:
@@ -3281,3 +3524,234 @@ components:
           description: Optional expiry timestamp (ISO date or date-time), or null to clear
         isActive:
           type: boolean
+
+    AdSettings:
+      type: object
+      required:
+        - id
+        - adsEnabled
+        - googleAdsEnabled
+        - showOnHome
+        - showOnNews
+        - showOnArticles
+        - showOnBoard
+        - showOnMore
+        - showOnStaticPages
+        - showOnChat
+        - showOnAdmin
+        - showOnAuthPages
+      properties:
+        id:
+          type: integer
+        adsEnabled:
+          type: boolean
+        googleAdsEnabled:
+          type: boolean
+        googlePublisherId:
+          type: ["string", "null"]
+        googleAdSlotBottom:
+          type: ["string", "null"]
+        showOnHome:
+          type: boolean
+        showOnNews:
+          type: boolean
+        showOnArticles:
+          type: boolean
+        showOnBoard:
+          type: boolean
+        showOnMore:
+          type: boolean
+        showOnStaticPages:
+          type: boolean
+        showOnChat:
+          type: boolean
+        showOnAdmin:
+          type: boolean
+        showOnAuthPages:
+          type: boolean
+        updatedById:
+          type: ["integer", "null"]
+        updatedAt:
+          type: ["string", "null"]
+          format: date-time
+
+    UpdateAdSettingsInput:
+      type: object
+      properties:
+        adsEnabled:
+          type: boolean
+        googleAdsEnabled:
+          type: boolean
+        googlePublisherId:
+          type: ["string", "null"]
+        googleAdSlotBottom:
+          type: ["string", "null"]
+        showOnHome:
+          type: boolean
+        showOnNews:
+          type: boolean
+        showOnArticles:
+          type: boolean
+        showOnBoard:
+          type: boolean
+        showOnMore:
+          type: boolean
+        showOnStaticPages:
+          type: boolean
+        showOnChat:
+          type: boolean
+        showOnAdmin:
+          type: boolean
+        showOnAuthPages:
+          type: boolean
+
+    CustomAd:
+      type: object
+      required:
+        - id
+        - title
+        - content
+        - placement
+        - priority
+        - isActive
+      properties:
+        id:
+          type: integer
+        title:
+          type: string
+        content:
+          type: string
+        imageUrl:
+          type: ["string", "null"]
+        linkUrl:
+          type: ["string", "null"]
+        placement:
+          type: string
+        priority:
+          type: integer
+        isActive:
+          type: boolean
+        startAt:
+          type: ["string", "null"]
+          format: date-time
+        endAt:
+          type: ["string", "null"]
+          format: date-time
+        createdById:
+          type: ["integer", "null"]
+        updatedById:
+          type: ["integer", "null"]
+        createdAt:
+          type: ["string", "null"]
+          format: date-time
+        updatedAt:
+          type: ["string", "null"]
+          format: date-time
+
+    CustomAdListResponse:
+      type: array
+      items:
+        $ref: "#/components/schemas/CustomAd"
+
+    CreateCustomAdInput:
+      type: object
+      required: [title, content, placement]
+      properties:
+        title:
+          type: string
+          minLength: 1
+          maxLength: 200
+        content:
+          type: string
+          minLength: 1
+          maxLength: 2000
+        imageUrl:
+          type: ["string", "null"]
+        linkUrl:
+          type: ["string", "null"]
+        placement:
+          type: string
+          minLength: 1
+        priority:
+          type: integer
+        isActive:
+          type: boolean
+        startAt:
+          type: ["string", "null"]
+        endAt:
+          type: ["string", "null"]
+
+    UpdateCustomAdInput:
+      type: object
+      properties:
+        title:
+          type: string
+          minLength: 1
+          maxLength: 200
+        content:
+          type: string
+          minLength: 1
+          maxLength: 2000
+        imageUrl:
+          type: ["string", "null"]
+        linkUrl:
+          type: ["string", "null"]
+        placement:
+          type: string
+          minLength: 1
+        priority:
+          type: integer
+        isActive:
+          type: boolean
+        startAt:
+          type: ["string", "null"]
+        endAt:
+          type: ["string", "null"]
+
+    ActiveAdCustom:
+      type: object
+      required: [id, title, content, placement]
+      properties:
+        id:
+          type: integer
+        title:
+          type: string
+        content:
+          type: string
+        imageUrl:
+          type: ["string", "null"]
+        linkUrl:
+          type: ["string", "null"]
+        placement:
+          type: string
+
+    ActiveAdsResponse:
+      type: object
+      required: [adsEnabled, googleAdsEnabled, ads]
+      properties:
+        adsEnabled:
+          type: boolean
+        googleAdsEnabled:
+          type: boolean
+        showOnHome:
+          type: boolean
+        showOnNews:
+          type: boolean
+        showOnArticles:
+          type: boolean
+        showOnBoard:
+          type: boolean
+        showOnMore:
+          type: boolean
+        showOnStaticPages:
+          type: boolean
+        showOnChat:
+          type: boolean
+        showOnAdmin:
+          type: boolean
+        showOnAuthPages:
+          type: boolean
+        ads:
+          type: array
+          items:
+            $ref: "#/components/schemas/ActiveAdCustom"

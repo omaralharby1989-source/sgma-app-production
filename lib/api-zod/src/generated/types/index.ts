@@ -6,6 +6,8 @@
  * OpenAPI spec version: 0.1.0
  */
 
+export * from './activeAdCustom';
+export * from './activeAdsResponse';
 export * from './activeBroadcastResponse';
 export * from './adminConversation';
 export * from './adminDashboardStats';
@@ -21,6 +23,7 @@ export * from './adminUserItemStatus';
 export * from './adminUsersListResponse';
 export * from './adminVolunteerDelegationRequest';
 export * from './adminVolunteerDelegationsResponse';
+export * from './adSettings';
 export * from './articleDetail';
 export * from './articleItem';
 export * from './articleListResponse';
@@ -38,12 +41,16 @@ export * from './createArticleInput';
 export * from './createArticleInputStatus';
 export * from './createBoardMemberInput';
 export * from './createBroadcastInput';
+export * from './createCustomAdInput';
 export * from './createNewsInput';
 export * from './createNewsInputStatus';
 export * from './createVolunteerDelegationFileInput';
 export * from './createVolunteerDelegationRequestInput';
+export * from './customAd';
+export * from './customAdListResponse';
 export * from './developerInfo';
 export * from './errorResponse';
+export * from './getActiveAdsParams';
 export * from './getAdminArticlesParams';
 export * from './getAdminChatMessagesParams';
 export * from './getAdminNewsParams';
@@ -76,10 +83,12 @@ export * from './signupInput';
 export * from './signupResponse';
 export * from './signupResponseStatus';
 export * from './staticPage';
+export * from './updateAdSettingsInput';
 export * from './updateArticleInput';
 export * from './updateArticleInputStatus';
 export * from './updateBoardMemberInput';
 export * from './updateBroadcastInput';
+export * from './updateCustomAdInput';
 export * from './updateDeveloperInfoInput';
 export * from './updateNewsInput';
 export * from './updateNewsInputStatus';

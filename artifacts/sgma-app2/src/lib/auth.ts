@@ -34,3 +34,7 @@ export function isStaffRole(role: string | undefined | null): boolean {
 export function isAdminOrSuper(role: string | undefined | null): boolean {
   return role === "ADMIN" || role === "SUPER_ADMIN";
 }
+
+export function isSuperAdminRole(role: string | undefined | null): boolean {
+  return role === "SUPER_ADMIN";
+}

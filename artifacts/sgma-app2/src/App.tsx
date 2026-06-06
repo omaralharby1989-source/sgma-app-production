@@ -38,6 +38,7 @@ import AdminUsers from "./pages/admin/users";
 import AdminArticles from "./pages/admin/articles";
 import AdminNews from "./pages/admin/news";
 import AdminBroadcasts from "./pages/admin/broadcasts";
+import AdminAds from "./pages/admin/ads";
 
 setAuthTokenGetter(() => localStorage.getItem("sgma_auth_token"));
 
@@ -188,6 +189,9 @@ function Router() {
       </Route>
       <Route path="/admin/volunteer-delegations">
         <ProtectedRoute component={AdminVolunteerDelegations} staffOnly />
+      </Route>
+      <Route path="/admin/ads">
+        <ProtectedRoute component={AdminAds} allowedRoles={["SUPER_ADMIN"]} />
       </Route>
 
       <Route component={NotFound} />
