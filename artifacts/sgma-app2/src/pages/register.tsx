@@ -11,7 +11,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
 import { Loader2 } from "lucide-react";
-import sgmaLogo from "@/assets/sgma-logo.png";
+import sgmaLogo from "@/assets/sgma-logo-clean-transparent.png";
 import { PROFESSION_GROUPS } from "@/lib/constants";
 
 const registerSchema = z
@@ -106,14 +106,12 @@ export default function Register() {
     <div className="min-h-[100dvh] flex flex-col justify-center px-6 py-12 bg-background">
       <div className="sm:mx-auto sm:w-full sm:max-w-md">
         <div className="flex justify-center mb-6">
-          <div className="rounded-2xl bg-black p-3 shadow-lg ring-1 ring-white/10">
-            <img
-              src={sgmaLogo}
-              alt="شعار الجمعية الطبية السورية الألمانية SGMA"
-              className="h-auto w-[120px] max-w-[160px] select-none"
-              draggable={false}
-            />
-          </div>
+          <img
+            src={sgmaLogo}
+            alt="شعار الجمعية الطبية السورية الألمانية SGMA"
+            className="h-auto w-[150px] max-w-[60vw] object-contain select-none drop-shadow-xl"
+            draggable={false}
+          />
         </div>
         <h2 className="text-center text-2xl font-bold tracking-tight text-foreground">
           إنشاء حساب جديد

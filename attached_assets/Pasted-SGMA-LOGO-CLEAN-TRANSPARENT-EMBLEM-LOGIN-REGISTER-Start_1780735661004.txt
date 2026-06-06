@@ -1,0 +1,195 @@
+SGMA LOGO CLEAN TRANSPARENT EMBLEM — LOGIN / REGISTER
+
+Start this task now.
+
+Goal:
+Improve the Login/Register logo display.
+
+Current problem:
+The logo appears as a black square image, and the small text under SGMA is too dark and not suitable for a clean white login page.
+
+Required final result:
+Use only the clean SGMA emblem / main logo area without the small bottom text, with transparent background, so it appears like a floating 3D logo.
+
+Do not generate a new logo.
+Use the existing uploaded SGMA logo image already in the project.
+
+==================================================
+A. IMAGE PROCESSING REQUIREMENTS
+================================
+
+Create a new transparent PNG asset from the current SGMA logo.
+
+Required output:
+src/assets/sgma-logo-clean-transparent.png
+
+Processing rules:
+
+1. Remove the black background.
+2. Crop out the small bottom text:
+
+   * "Syrian German Medical Association"
+   * Arabic small text under it
+3. Keep:
+
+   * blue/green medical emblem
+   * main SGMA wordmark
+4. Preserve the 3D style.
+5. Preserve edges cleanly.
+6. Do not stretch or distort.
+7. Keep transparent background.
+8. Keep enough padding around the logo so it does not feel cropped.
+
+Recommended crop:
+
+* Keep from the top of the emblem down through the large SGMA wordmark.
+* Remove the lower dark small bilingual text area.
+* Center the remaining logo.
+
+Recommended tools:
+Use ImageMagick or Python/Pillow.
+
+Suggested approach:
+
+* Start from the existing SGMA logo image file.
+* Crop to the area containing the emblem + large SGMA wordmark.
+* Convert near-black background pixels to transparent.
+* Use a careful threshold so dark blue edges are not destroyed.
+* Export as PNG with alpha transparency.
+
+If removing the black background damages small dark details:
+Prioritize preserving:
+
+* emblem
+* SGMA wordmark
+  and remove the small bottom text entirely.
+
+==================================================
+B. LOGIN PAGE UPDATE
+====================
+
+Update /login:
+
+* Replace the current full black-square logo with:
+  sgma-logo-clean-transparent.png
+
+* Remove any black rounded logo container/wrapper.
+
+* Logo should sit directly on the page background.
+
+* Use CSS only for subtle shadow if needed.
+
+* Do not put it inside a black card.
+
+Suggested display:
+
+* width: 190px to 230px
+* max-width: 70vw
+* height: auto
+* object-contain
+* margin-bottom: appropriate spacing
+
+Title remains:
+SGMA APP
+
+Subtitle remains:
+بوابة أعضاء الجمعية الطبية السورية الألمانية
+
+==================================================
+C. REGISTER PAGE UPDATE
+=======================
+
+Update /register:
+
+* Use the same clean transparent logo.
+* Remove black rounded container/wrapper.
+* Keep it smaller than login so the form stays usable.
+
+Suggested display:
+
+* width: 130px to 170px
+* max-width: 60vw
+* height: auto
+* object-contain
+
+Title remains:
+إنشاء حساب جديد
+
+Subtitle remains:
+انضم إلى SGMA APP
+
+==================================================
+D. KEEP ICON/FAVICON AS IS UNLESS NEEDED
+========================================
+
+Do not change favicon/app icon unless the current one looks broken.
+
+For favicon/app icon:
+
+* It is acceptable to keep the emblem version with black background if it looks good.
+* This task is mainly for Login/Register visual logo.
+
+==================================================
+E. DO NOT CHANGE APP LOGIC
+==========================
+
+Do not touch:
+
+* auth
+* database
+* backend routes
+* permissions
+* OpenAPI
+* admin dashboard
+* news
+* articles
+* chat
+* board
+* volunteer delegations
+* ads
+* static pages
+
+This is frontend asset/UI cleanup only.
+
+==================================================
+F. TESTING REQUIRED
+===================
+
+After implementation, verify:
+
+1. /login shows clean transparent SGMA logo.
+2. No black square appears behind the logo.
+3. The small bottom text is removed.
+4. The 3D emblem and SGMA wordmark remain visible.
+5. Logo is not distorted.
+6. Logo is readable on the white/light page background.
+7. /register shows the same clean logo, smaller.
+8. Mobile layout remains clean.
+9. No broken image paths.
+10. Typecheck passes.
+11. Preview works.
+
+==================================================
+G. REQUIRED REPORT
+==================
+
+After completion, provide:
+
+CLEAN LOGO TRANSPARENCY REPORT
+
+Include:
+
+1. Source image used
+2. New asset created
+3. Crop area/strategy
+4. Background removal method
+5. Login page status
+6. Register page status
+7. Screenshot/preview verification
+8. Known limitations if any
+9. Confirmation:
+
+   * no backend changed
+   * no database changed
+   * no app logic changed
+   * only frontend logo/assets updated
