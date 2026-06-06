@@ -12,3 +12,27 @@ id = "UrGvvHYhPWFdCKfo9VLvD"
 uri = "file://sgma-app-db-backup-2026-06-06.sql.gz"
 type = "unspecified"
 title = "SGMA APP — Database Backup (gzipped SQL dump)"
+
+[[outputs]]
+id = "e36UjkjiWSargVfjfYP36"
+uri = "file://SGMA_APP_User_Guide_AR.pdf"
+type = "pdf"
+title = "دليل استخدام تطبيق SGMA APP (PDF)"
+
+[[outputs]]
+id = "3OFKi8w5OK_wzUZgwqazn"
+uri = "file://SGMA_APP_User_Guide_AR.docx"
+type = "word_document"
+title = "دليل استخدام تطبيق SGMA APP (Word)"
+
+[[outputs]]
+id = "S1dlEuxPtX9VQMacSGHZr"
+uri = "file://SGMA_APP_Final_Readiness_Report.pdf"
+type = "pdf"
+title = "SGMA APP — Final Readiness Report (PDF)"
+
+[[outputs]]
+id = "bSRzskYglx7iF0sFDDQwk"
+uri = "file://SGMA_APP_Final_Readiness_Report.md"
+type = "text"
+title = "SGMA APP — Final Readiness Report (Markdown)"
