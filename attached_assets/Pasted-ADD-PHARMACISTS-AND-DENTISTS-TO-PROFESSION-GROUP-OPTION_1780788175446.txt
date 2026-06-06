@@ -1,0 +1,178 @@
+ADD PHARMACISTS AND DENTISTS TO PROFESSION GROUP OPTIONS — SGMA APP
+
+Start this small fix now.
+
+Scope:
+Add two missing profession group options to the registration/profile/admin profession lists:
+
+1. صيادلة
+2. أطباء أسنان
+
+Do not add unrelated features.
+Do not change database schema unless absolutely necessary.
+Do not change authentication, permissions, routes, or business logic.
+
+Current architecture:
+
+* PostgreSQL + Drizzle
+* JWT auth
+* Arabic RTL
+* Mobile-first
+* No Firebase
+* No MySQL migration
+
+==================================================
+A. CURRENT PROBLEM
+==================
+
+In the registration page, the “المجموعة المهنية” / professionGroup dropdown does not include:
+
+* Pharmacists / صيادلة
+* Dentists / أطباء أسنان
+
+These must be added.
+
+==================================================
+B. REQUIRED OPTIONS
+===================
+
+Update the shared profession group options wherever they are defined.
+
+Add:
+
+* value: PHARMACY
+  Arabic label: صيادلة
+  Optional bilingual label if current app uses bilingual style:
+  Pharmazie / صيادلة
+
+* value: DENTISTRY
+  Arabic label: أطباء أسنان
+  Optional bilingual label:
+  Zahnmedizin / أطباء أسنان
+
+Keep existing options:
+
+* Arzt / طبيب
+* Pflege / تمريض
+* ATA
+* OTA
+* Physiotherapie / علاج فيزيائي
+* Labor / مخبر
+* Radiologie / أشعة
+* Medizintechnik / هندسة طبية
+* Rettungsdienst / إسعاف
+* Student / طالب
+* Andere / أخرى
+
+Do not remove “أخرى / Andere”.
+
+==================================================
+C. WHERE TO UPDATE
+==================
+
+Find the shared profession options file if it exists, likely something like:
+
+* src/lib/constants.ts
+* shared constants file
+* registration options list
+
+Update it once centrally if possible.
+
+Make sure the new options appear in:
+
+1. /register
+
+* professionGroup dropdown
+
+2. /home
+
+* My Account profile edit professionGroup dropdown
+
+3. /admin/users
+
+* Admin user edit professionGroup dropdown if present
+
+4. /volunteer-delegations
+
+* Volunteer delegation profession dropdown if it uses the same list
+
+Any other page that uses professionGroup should automatically pick up the shared list.
+
+==================================================
+D. BACKEND / VALIDATION
+=======================
+
+Check backend validation for professionGroup.
+
+If backend only treats professionGroup as a string:
+
+* No schema change needed.
+
+If backend validates allowed professionGroup values:
+
+* Add PHARMACY and DENTISTRY there too.
+
+Important:
+Frontend and backend must accept the same values.
+
+Do not break existing users with existing professionGroup values.
+
+==================================================
+E. OPENAPI / GENERATED CLIENT
+=============================
+
+If professionGroup is only a string:
+
+* No OpenAPI change required.
+
+If there is an enum in OpenAPI:
+
+* Add PHARMACY and DENTISTRY.
+* Regenerate client.
+* Do not manually edit generated files.
+
+Run typecheck either way.
+
+==================================================
+F. TESTING REQUIRED
+===================
+
+Test in Preview:
+
+1. /register opens.
+2. professionGroup dropdown includes:
+
+   * صيادلة
+   * أطباء أسنان
+   * أخرى
+3. Registration works with professionGroup = PHARMACY.
+4. Registration works with professionGroup = DENTISTRY.
+5. /home edit profile can display/save these values if applicable.
+6. /admin/users can display/edit these values if applicable.
+7. /volunteer-delegations dropdown includes these values.
+8. Typecheck passes.
+9. Backend starts cleanly.
+10. Existing pages still work.
+
+==================================================
+G. REQUIRED REPORT
+==================
+
+After completion, provide:
+
+PROFESSION GROUP OPTIONS UPDATE REPORT
+
+1. What was changed
+2. Files changed
+3. New options added
+4. Where the options now appear
+5. Backend validation status
+6. OpenAPI/client generation status
+7. Runtime test results
+8. Preview status
+9. Confirmation:
+
+   * No Firebase
+   * No MySQL migration
+   * No unrelated features added
+   * Existing modules still work

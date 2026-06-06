@@ -1,5 +1,7 @@
 export const PROFESSION_GROUPS = [
   "Arzt / طبيب",
+  "Zahnmedizin / أطباء أسنان",
+  "Pharmazie / صيادلة",
   "Pflege / تمريض",
   "ATA",
   "OTA",
