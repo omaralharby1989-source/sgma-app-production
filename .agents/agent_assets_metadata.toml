@@ -1,0 +1,14 @@
+uploads = []
+generated = []
+
+[[outputs]]
+id = "CK0GZ7-uJN3pGZRnn3DIy"
+uri = "file://sgma-app-stable-beta-backup-2026-06-06.zip"
+type = "unspecified"
+title = "SGMA APP — Stable Beta Code Backup (zip)"
+
+[[outputs]]
+id = "UrGvvHYhPWFdCKfo9VLvD"
+uri = "file://sgma-app-db-backup-2026-06-06.sql.gz"
+type = "unspecified"
+title = "SGMA APP — Database Backup (gzipped SQL dump)"

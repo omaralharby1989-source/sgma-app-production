@@ -1,0 +1,170 @@
+STABLE BETA BACKUP — SGMA APP
+
+Create a safe backup of the current stable SGMA APP project before any further changes.
+
+Important:
+Do NOT add features.
+Do NOT modify app logic.
+Do NOT change database schema.
+Do NOT change routes.
+Do NOT change secrets.
+Do NOT run migrations.
+Do NOT delete anything.
+
+This task is only for creating a safe backup and reporting the result.
+
+Current app status:
+The app is stable and tested.
+We need to preserve this version before external beta testing and before any future development.
+
+==================================================
+A. CREATE A REPLIT CHECKPOINT
+=============================
+
+First, create a clear checkpoint if available.
+
+Checkpoint name:
+SGMA APP stable beta before external testing
+
+If automatic checkpoint creation is not available, clearly tell me:
+“Please create a manual Replit checkpoint now.”
+
+==================================================
+B. CREATE A CODE BACKUP ZIP
+===========================
+
+Create a compressed backup file of the project source code.
+
+Suggested filename:
+sgma-app-stable-beta-backup-YYYY-MM-DD.zip
+
+The backup must include:
+
+* frontend source code
+* backend source code
+* database schema files
+* OpenAPI spec
+* package files
+* configuration files needed to rebuild the project
+* docs if useful
+
+The backup must exclude:
+
+* node_modules
+* .git if present and too large
+* dist/build output
+* cache folders
+* logs
+* temporary files
+* .env files
+* secrets
+* database passwords
+* DATABASE_URL
+* API keys
+* uploaded private test files if not needed
+
+Do not include any Replit Secrets.
+
+==================================================
+C. VERIFY NO SECRETS ARE INCLUDED
+=================================
+
+Before finalizing the zip, scan the backup contents for sensitive values.
+
+Check for:
+
+* DATABASE_URL
+* password
+* secret
+* token
+* private key
+* ca-pub if not needed
+* Aiven credentials
+* any .env files
+
+If any secret is found:
+
+* remove it from the backup
+* recreate the zip
+* report what type of secret was excluded, without printing the secret value
+
+Do NOT print secrets in logs or report.
+
+==================================================
+D. OPTIONAL DATABASE BACKUP / EXPORT CHECK
+==========================================
+
+Do not dump the database unless it is safe and supported.
+
+Check whether a PostgreSQL database dump/export is possible without exposing secrets.
+
+If possible, provide instructions or create a database dump file excluding secrets.
+
+Suggested filename:
+sgma-app-db-backup-YYYY-MM-DD.sql
+
+Important:
+
+* Do not print DATABASE_URL.
+* Do not expose credentials.
+* If database dump is not safely possible, say so clearly and tell me how to export it from Replit/Postgres manually.
+
+Minimum requirement:
+Report whether database backup/export is available or not.
+
+==================================================
+E. VERIFY BACKUP FILE
+=====================
+
+After creating the zip:
+
+* confirm the file exists
+* show file size
+* list top-level folders/files included
+* confirm excluded folders/files
+* confirm no secrets found
+
+If possible, test the zip can be opened/listed.
+
+==================================================
+F. DO NOT BREAK CURRENT APP
+===========================
+
+After backup:
+Verify the app still works:
+
+* backend health check works
+* /login opens
+* /register opens
+* /home still works after login if easy
+* /more opens
+* no workflows broken
+
+Do not restart workflows unless necessary.
+
+==================================================
+G. REQUIRED REPORT
+==================
+
+After completion, provide:
+
+STABLE BETA BACKUP REPORT
+
+1. Checkpoint status
+2. Backup zip filename
+3. Backup zip location/path
+4. Backup zip size
+5. What was included
+6. What was excluded
+7. Secret scan result
+8. Database backup/export status
+9. App health check after backup
+10. Any warnings
+11. Confirmation:
+
+* no app logic changed
+* no database schema changed
+* no secrets exposed
+* current stable version preserved
+
+Do not continue with any other task after the backup.
