@@ -1174,6 +1174,81 @@ export interface AdminUserItem {
 
 export type AdminUsersListResponse = AdminUserItem[];
 
+export interface AdminMemberActivity {
+  articlesTotal: number;
+  articlesApproved: number;
+  articlesPending: number;
+  newsCreated: number;
+  tasksAssigned: number;
+  taskReports: number;
+  volunteerRequests: number;
+  publicMessages: number;
+  adminMessages: number;
+}
+
+export type AdminMemberExportItemRole = typeof AdminMemberExportItemRole[keyof typeof AdminMemberExportItemRole];
+
+
+export const AdminMemberExportItemRole = {
+  MEMBER: 'MEMBER',
+  MODERATOR: 'MODERATOR',
+  ADMIN: 'ADMIN',
+  SUPER_ADMIN: 'SUPER_ADMIN',
+} as const;
+
+export type AdminMemberExportItemStatus = typeof AdminMemberExportItemStatus[keyof typeof AdminMemberExportItemStatus];
+
+
+export const AdminMemberExportItemStatus = {
+  PENDING: 'PENDING',
+  ACTIVE: 'ACTIVE',
+  SUSPENDED: 'SUSPENDED',
+} as const;
+
+export type AdminMemberExportItemAccessScope = typeof AdminMemberExportItemAccessScope[keyof typeof AdminMemberExportItemAccessScope];
+
+
+export const AdminMemberExportItemAccessScope = {
+  FULL_APP: 'FULL_APP',
+  SYRIA_ACADEMY_ONLY: 'SYRIA_ACADEMY_ONLY',
+} as const;
+
+export interface AdminMemberExportItem {
+  id: number;
+  fullName: string;
+  account: string;
+  email: string;
+  role: AdminMemberExportItemRole;
+  status: AdminMemberExportItemStatus;
+  isActive: boolean;
+  isDeveloper: boolean;
+  /** @nullable */
+  phone?: string | null;
+  /** @nullable */
+  whatsapp?: string | null;
+  /** @nullable */
+  birthDate?: string | null;
+  /** @nullable */
+  address?: string | null;
+  /** @nullable */
+  professionGroup?: string | null;
+  /** @nullable */
+  specialtyText?: string | null;
+  /** @nullable */
+  bio?: string | null;
+  /** @nullable */
+  membershipNumber?: string | null;
+  accessScope: AdminMemberExportItemAccessScope;
+  /** @nullable */
+  academySpecialty?: string | null;
+  academyAllowedSpecialties?: string[];
+  createdAt: string;
+  updatedAt: string;
+  activity?: AdminMemberActivity | null;
+}
+
+export type AdminMembersExportResponse = AdminMemberExportItem[];
+
 export type AdminUserDetailRole = typeof AdminUserDetailRole[keyof typeof AdminUserDetailRole];
 
 
@@ -1663,6 +1738,58 @@ export const GetAdminUsersStatus = {
   PENDING: 'PENDING',
   ACTIVE: 'ACTIVE',
   SUSPENDED: 'SUSPENDED',
+} as const;
+
+export type ExportAdminMembersParams = {
+q?: string;
+role?: ExportAdminMembersRole;
+status?: ExportAdminMembersStatus;
+accessScope?: ExportAdminMembersAccessScope;
+professionGroup?: string;
+academySpecialty?: string;
+/**
+ * Comma-separated user ids to restrict the export to.
+ */
+selectedIds?: string;
+/**
+ * Include per-user activity counts (default true).
+ */
+includeActivity?: ExportAdminMembersIncludeActivity;
+};
+
+export type ExportAdminMembersRole = typeof ExportAdminMembersRole[keyof typeof ExportAdminMembersRole];
+
+
+export const ExportAdminMembersRole = {
+  MEMBER: 'MEMBER',
+  MODERATOR: 'MODERATOR',
+  ADMIN: 'ADMIN',
+  SUPER_ADMIN: 'SUPER_ADMIN',
+} as const;
+
+export type ExportAdminMembersStatus = typeof ExportAdminMembersStatus[keyof typeof ExportAdminMembersStatus];
+
+
+export const ExportAdminMembersStatus = {
+  PENDING: 'PENDING',
+  ACTIVE: 'ACTIVE',
+  SUSPENDED: 'SUSPENDED',
+} as const;
+
+export type ExportAdminMembersAccessScope = typeof ExportAdminMembersAccessScope[keyof typeof ExportAdminMembersAccessScope];
+
+
+export const ExportAdminMembersAccessScope = {
+  FULL_APP: 'FULL_APP',
+  SYRIA_ACADEMY_ONLY: 'SYRIA_ACADEMY_ONLY',
+} as const;
+
+export type ExportAdminMembersIncludeActivity = typeof ExportAdminMembersIncludeActivity[keyof typeof ExportAdminMembersIncludeActivity];
+
+
+export const ExportAdminMembersIncludeActivity = {
+  true: 'true',
+  false: 'false',
 } as const;
 
 export type GetAdminArticlesParams = {

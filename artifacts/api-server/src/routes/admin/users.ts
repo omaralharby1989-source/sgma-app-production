@@ -1,6 +1,16 @@
 import { Router } from "express";
-import { db, usersTable } from "@workspace/db";
-import { eq, and, or, ne, ilike, sql } from "drizzle-orm";
+import {
+  db,
+  usersTable,
+  articlesTable,
+  newsTable,
+  taskAssigneesTable,
+  taskReportsTable,
+  volunteerDelegationRequestsTable,
+  publicChatMessagesTable,
+  adminDirectChatMessagesTable,
+} from "@workspace/db";
+import { eq, and, or, ne, ilike, inArray, sql } from "drizzle-orm";
 import { UpdateAdminUserBody } from "@workspace/api-zod";
 import { requireAuth } from "../../middlewares/auth";
 import {
@@ -157,6 +167,236 @@ router.get("/admin/users", requireAuth, async (req, res): Promise<void> => {
   } catch (err) {
     req.log.error({ err }, "Admin list users error");
     res.status(500).json({ error: "تعذر تحميل الأعضاء" });
+  }
+});
+
+// ---- Members export ----------------------------------------------------------
+
+type Activity = {
+  articlesTotal: number;
+  articlesApproved: number;
+  articlesPending: number;
+  newsCreated: number;
+  tasksAssigned: number;
+  taskReports: number;
+  volunteerRequests: number;
+  publicMessages: number;
+  adminMessages: number;
+};
+
+function emptyActivity(): Activity {
+  return {
+    articlesTotal: 0,
+    articlesApproved: 0,
+    articlesPending: 0,
+    newsCreated: 0,
+    tasksAssigned: 0,
+    taskReports: 0,
+    volunteerRequests: 0,
+    publicMessages: 0,
+    adminMessages: 0,
+  };
+}
+
+// Compute per-user activity counts with a handful of GROUP BY queries scoped to
+// the exported user ids (no N+1). Returns a map id -> Activity.
+async function computeActivity(ids: number[]): Promise<Map<number, Activity>> {
+  const map = new Map<number, Activity>();
+  const get = (id: number): Activity => {
+    let v = map.get(id);
+    if (!v) {
+      v = emptyActivity();
+      map.set(id, v);
+    }
+    return v;
+  };
+
+  const articleRows = await db
+    .select({
+      k: articlesTable.authorId,
+      total: sql<number>`count(*)::int`,
+      approved: sql<number>`sum(case when ${articlesTable.status} = 'APPROVED' then 1 else 0 end)::int`,
+      pending: sql<number>`sum(case when ${articlesTable.status} = 'PENDING' then 1 else 0 end)::int`,
+    })
+    .from(articlesTable)
+    .where(inArray(articlesTable.authorId, ids))
+    .groupBy(articlesTable.authorId);
+  for (const r of articleRows) {
+    if (r.k == null) continue;
+    const a = get(r.k);
+    a.articlesTotal = r.total ?? 0;
+    a.articlesApproved = r.approved ?? 0;
+    a.articlesPending = r.pending ?? 0;
+  }
+
+  const newsRows = await db
+    .select({ k: newsTable.authorId, c: sql<number>`count(*)::int` })
+    .from(newsTable)
+    .where(inArray(newsTable.authorId, ids))
+    .groupBy(newsTable.authorId);
+  for (const r of newsRows) if (r.k != null) get(r.k).newsCreated = r.c ?? 0;
+
+  const taskAssignRows = await db
+    .select({
+      k: taskAssigneesTable.userId,
+      c: sql<number>`count(distinct ${taskAssigneesTable.taskId})::int`,
+    })
+    .from(taskAssigneesTable)
+    .where(and(inArray(taskAssigneesTable.userId, ids), eq(taskAssigneesTable.isActive, true)))
+    .groupBy(taskAssigneesTable.userId);
+  for (const r of taskAssignRows) if (r.k != null) get(r.k).tasksAssigned = r.c ?? 0;
+
+  const taskReportRows = await db
+    .select({ k: taskReportsTable.authorId, c: sql<number>`count(*)::int` })
+    .from(taskReportsTable)
+    .where(inArray(taskReportsTable.authorId, ids))
+    .groupBy(taskReportsTable.authorId);
+  for (const r of taskReportRows) if (r.k != null) get(r.k).taskReports = r.c ?? 0;
+
+  const volunteerRows = await db
+    .select({ k: volunteerDelegationRequestsTable.userId, c: sql<number>`count(*)::int` })
+    .from(volunteerDelegationRequestsTable)
+    .where(inArray(volunteerDelegationRequestsTable.userId, ids))
+    .groupBy(volunteerDelegationRequestsTable.userId);
+  for (const r of volunteerRows) if (r.k != null) get(r.k).volunteerRequests = r.c ?? 0;
+
+  const publicRows = await db
+    .select({ k: publicChatMessagesTable.senderId, c: sql<number>`count(*)::int` })
+    .from(publicChatMessagesTable)
+    .where(
+      and(inArray(publicChatMessagesTable.senderId, ids), eq(publicChatMessagesTable.isDeleted, false)),
+    )
+    .groupBy(publicChatMessagesTable.senderId);
+  for (const r of publicRows) if (r.k != null) get(r.k).publicMessages = r.c ?? 0;
+
+  const adminRows = await db
+    .select({ k: adminDirectChatMessagesTable.senderId, c: sql<number>`count(*)::int` })
+    .from(adminDirectChatMessagesTable)
+    .where(
+      and(
+        inArray(adminDirectChatMessagesTable.senderId, ids),
+        eq(adminDirectChatMessagesTable.isDeleted, false),
+      ),
+    )
+    .groupBy(adminDirectChatMessagesTable.senderId);
+  for (const r of adminRows) if (r.k != null) get(r.k).adminMessages = r.c ?? 0;
+
+  return map;
+}
+
+// GET /admin/users/export — admin/super only. MUST be registered BEFORE
+// "/admin/users/:id" so the literal "export" path isn't captured as an :id.
+// Returns sanitized member rows (NEVER passwordHash/avatar) + optional activity
+// counts. ADMIN actors can NEVER export SUPER_ADMIN accounts.
+router.get("/admin/users/export", requireAuth, async (req, res): Promise<void> => {
+  const actorRole = req.user!.role;
+  if (!isAdminOrSuper(actorRole)) {
+    res.status(403).json({ error: "ليس لديك صلاحية لتصدير الأعضاء" });
+    return;
+  }
+
+  try {
+    const q = typeof req.query.q === "string" ? req.query.q.trim() : "";
+    const roleFilter = typeof req.query.role === "string" ? req.query.role : "";
+    const statusFilter = typeof req.query.status === "string" ? req.query.status : "";
+    const accessScopeFilter =
+      typeof req.query.accessScope === "string" ? req.query.accessScope : "";
+    const professionGroupFilter =
+      typeof req.query.professionGroup === "string" ? req.query.professionGroup.trim() : "";
+    const academySpecialtyFilter =
+      typeof req.query.academySpecialty === "string" ? req.query.academySpecialty.trim() : "";
+    const includeActivity = req.query.includeActivity !== "false"; // default true
+
+    const selectedIds =
+      typeof req.query.selectedIds === "string" && req.query.selectedIds.trim()
+        ? req.query.selectedIds
+            .split(",")
+            .map((s) => Number(s.trim()))
+            .filter((n) => Number.isInteger(n))
+        : [];
+
+    const conditions = [];
+
+    // ADMIN actors can NEVER export SUPER_ADMIN accounts, regardless of any
+    // client-supplied role filter. The SUPER_ADMIN role filter is therefore only
+    // ever honored for a SUPER_ADMIN actor.
+    if (actorRole === "ADMIN") {
+      conditions.push(ne(usersTable.role, "SUPER_ADMIN"));
+    }
+    if (roleFilter && VALID_ROLES.includes(roleFilter)) {
+      conditions.push(eq(usersTable.role, roleFilter as Role));
+    }
+    if (statusFilter && VALID_STATUSES.includes(statusFilter)) {
+      conditions.push(eq(usersTable.status, statusFilter as Status));
+    }
+    if (accessScopeFilter && VALID_ACCESS_SCOPES.includes(accessScopeFilter)) {
+      conditions.push(eq(usersTable.accessScope, accessScopeFilter));
+    }
+    if (professionGroupFilter) {
+      conditions.push(eq(usersTable.professionGroup, professionGroupFilter));
+    }
+    if (academySpecialtyFilter) {
+      conditions.push(eq(usersTable.academySpecialty, academySpecialtyFilter));
+    }
+    if (selectedIds.length > 0) {
+      conditions.push(inArray(usersTable.id, selectedIds));
+    }
+    if (q) {
+      const like = `%${q}%`;
+      conditions.push(
+        or(
+          ilike(usersTable.fullName, like),
+          ilike(usersTable.account, like),
+          ilike(usersTable.email, like),
+          ilike(usersTable.membershipNumber, like),
+          ilike(usersTable.phone, like),
+        )!,
+      );
+    }
+
+    const base = db.select().from(usersTable);
+    const rows = conditions.length
+      ? await base
+          .where(and(...conditions))
+          .orderBy(sql`${usersTable.createdAt} DESC`, sql`${usersTable.id} DESC`)
+          .limit(2000)
+      : await base
+          .orderBy(sql`${usersTable.createdAt} DESC`, sql`${usersTable.id} DESC`)
+          .limit(2000);
+
+    const ids = rows.map((r) => r.id);
+    const activity =
+      includeActivity && ids.length > 0 ? await computeActivity(ids) : null;
+
+    res.json(
+      rows.map((row) => ({
+        id: row.id,
+        fullName: row.fullName,
+        account: row.account,
+        email: row.email,
+        role: row.role,
+        status: row.status,
+        isActive: row.isActive,
+        isDeveloper: row.isDeveloper,
+        phone: row.phone ?? null,
+        whatsapp: row.whatsapp ?? null,
+        birthDate: row.birthDate ?? null,
+        address: row.address ?? null,
+        professionGroup: row.professionGroup ?? null,
+        specialtyText: row.specialtyText ?? null,
+        bio: row.bio ?? null,
+        membershipNumber: row.membershipNumber ?? null,
+        accessScope: row.accessScope ?? "FULL_APP",
+        academySpecialty: row.academySpecialty ?? null,
+        academyAllowedSpecialties: parseSpecialties(row.academyAllowedSpecialties),
+        createdAt: row.createdAt.toISOString(),
+        updatedAt: row.updatedAt.toISOString(),
+        activity: activity ? activity.get(row.id) ?? emptyActivity() : null,
+      })),
+    );
+  } catch (err) {
+    req.log.error({ err }, "Admin users export error");
+    res.status(500).json({ error: "تعذر تصدير الأعضاء" });
   }
 });
 

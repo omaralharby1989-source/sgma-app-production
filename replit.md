@@ -270,6 +270,10 @@ Additive module (polling-based, no WebSockets): view counts + reactions for news
 - Presence: `POST /chat/presence` (heartbeat upsert), `GET /chat/presence?roomType=&roomKey=` (users active in last 60s). roomType PUBLIC_CHAT (roomKey "PUBLIC") / ADMIN_DIRECT_CHAT (roomKey=conversationUserId); members only their own room, staff any.
 - Frontend: `components/engagement/{ReactionBar,ViewCountBadge,ChatPresencePanel}.tsx`, `lib/reactions.ts` (labels/emojis + Arabic number formatter). Wired into NewsCard/ArticleCard (views + total reactions), news-detail/article-detail (ReactionBar + ViewCountBadge; article bar only when APPROVED), chat-public (presence panel, 20s heartbeat+poll). ReactionBar uses server response as source of truth + invalidates list/detail keys.
 
+## Admin Members Export Module — COMPLETE
+
+`GET /api/admin/users/export` (routes/admin/users.ts, registered BEFORE `:id`): admin/super only (`isAdminOrSuper` → 403). ADMIN actor ALWAYS pushes `ne(role,'SUPER_ADMIN')` before any client role filter → ADMIN can never export SUPER_ADMIN (incl. via `?role=SUPER_ADMIN` or selectedIds). Filters: q (name/account/email/membershipNumber/phone), role, status, accessScope, professionGroup, academySpecialty, selectedIds (csv ints), includeActivity (default true). Returns SANITIZED rows (NEVER passwordHash/avatarUrl) + per-user `activity` (scoped GROUP BY counts: articles total/approved/pending, news, tasks assigned, task reports, volunteer requests, public/admin chat). Frontend `/admin/users` export card: mode (filters/all/selected) + export-only filters + include-activity toggle + selection checkboxes (select-all-visible/clear); CSV (UTF-8 BOM, formula-injection guarded) + printable HTML→PDF (window.open). Generated hook fn `exportAdminMembers`.
+
 ## Test Accounts
 
 | account | email | password | role |

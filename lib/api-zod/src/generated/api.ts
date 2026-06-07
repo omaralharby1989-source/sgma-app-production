@@ -1744,6 +1744,57 @@ export const GetAdminUsersResponse = zod.array(GetAdminUsersResponseItem)
 
 
 /**
+ * @summary Export members (admin/super only). ADMIN excludes SUPER_ADMIN rows.
+ */
+export const ExportAdminMembersQueryParams = zod.object({
+  "q": zod.coerce.string().optional(),
+  "role": zod.enum(['MEMBER', 'MODERATOR', 'ADMIN', 'SUPER_ADMIN']).optional(),
+  "status": zod.enum(['PENDING', 'ACTIVE', 'SUSPENDED']).optional(),
+  "accessScope": zod.enum(['FULL_APP', 'SYRIA_ACADEMY_ONLY']).optional(),
+  "professionGroup": zod.coerce.string().optional(),
+  "academySpecialty": zod.coerce.string().optional(),
+  "selectedIds": zod.coerce.string().optional().describe('Comma-separated user ids to restrict the export to.'),
+  "includeActivity": zod.enum(['true', 'false']).optional().describe('Include per-user activity counts (default true).')
+})
+
+export const ExportAdminMembersResponseItem = zod.object({
+  "id": zod.number(),
+  "fullName": zod.string(),
+  "account": zod.string(),
+  "email": zod.string(),
+  "role": zod.enum(['MEMBER', 'MODERATOR', 'ADMIN', 'SUPER_ADMIN']),
+  "status": zod.enum(['PENDING', 'ACTIVE', 'SUSPENDED']),
+  "isActive": zod.boolean(),
+  "isDeveloper": zod.boolean(),
+  "phone": zod.string().nullish(),
+  "whatsapp": zod.string().nullish(),
+  "birthDate": zod.string().nullish(),
+  "address": zod.string().nullish(),
+  "professionGroup": zod.string().nullish(),
+  "specialtyText": zod.string().nullish(),
+  "bio": zod.string().nullish(),
+  "membershipNumber": zod.string().nullish(),
+  "accessScope": zod.enum(['FULL_APP', 'SYRIA_ACADEMY_ONLY']),
+  "academySpecialty": zod.string().nullish(),
+  "academyAllowedSpecialties": zod.array(zod.string()).optional(),
+  "createdAt": zod.coerce.date(),
+  "updatedAt": zod.coerce.date(),
+  "activity": zod.union([zod.object({
+  "articlesTotal": zod.number(),
+  "articlesApproved": zod.number(),
+  "articlesPending": zod.number(),
+  "newsCreated": zod.number(),
+  "tasksAssigned": zod.number(),
+  "taskReports": zod.number(),
+  "volunteerRequests": zod.number(),
+  "publicMessages": zod.number(),
+  "adminMessages": zod.number()
+}),zod.null()]).optional()
+})
+export const ExportAdminMembersResponse = zod.array(ExportAdminMembersResponseItem)
+
+
+/**
  * @summary Get one user (admin/super only)
  */
 export const GetAdminUserParams = zod.object({

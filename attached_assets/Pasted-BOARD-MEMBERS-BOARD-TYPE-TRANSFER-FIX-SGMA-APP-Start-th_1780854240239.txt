@@ -1,0 +1,304 @@
+BOARD MEMBERS BOARD-TYPE TRANSFER FIX — SGMA APP
+
+Start this task now.
+
+Scope:
+Improve Board of Directors management so each board member card can be moved between board sections instead of deleting/recreating cards.
+
+Current problem:
+When a new board cycle starts, admins currently would need to delete/recreate board member cards. This is wrong. Each board member card should have a selectable board category/type, and changing it should immediately move the card to the selected page/section.
+
+Required:
+Add or improve a board type selector for each board member:
+
+1. مجلس الإدارة الحالي
+2. مجلس الإدارة السابق
+3. أرشيف مجالس الإدارة
+
+Do not rebuild the board module from scratch.
+Do not change unrelated modules.
+Do not break current board management, images, bio bullet formatting, or permissions.
+
+Current architecture:
+
+* PostgreSQL + Drizzle
+* JWT auth
+* Arabic RTL
+* Mobile-first
+* No Firebase
+* No MySQL migration
+
+==================================================
+A. REQUIRED BEHAVIOR
+====================
+
+Each board member record must have a boardType/category.
+
+Allowed boardType values:
+
+* CURRENT
+  Label: مجلس الإدارة الحالي
+
+* PREVIOUS
+  Label: مجلس الإدارة السابق
+
+* ARCHIVE
+  Label: أرشيف مجالس الإدارة
+
+Behavior:
+
+* If admin changes boardType from CURRENT to PREVIOUS, the card disappears from current board page and appears in previous board page.
+* If admin changes boardType to ARCHIVE, it appears in archive page.
+* No deletion/recreation needed.
+* The member card data stays the same:
+
+  * name
+  * position
+  * bio
+  * phone
+  * email
+  * image
+  * displayOrder
+  * active status
+
+==================================================
+B. ROUTES / PAGES
+=================
+
+Ensure these routes/pages work:
+
+1. /board
+   Landing page with options:
+
+* مجلس الإدارة الحالي
+* مجلس الإدارة السابق
+* أرشيف مجالس الإدارة
+
+2. /board/current
+   Shows boardType = CURRENT
+
+3. /board/previous
+   Shows boardType = PREVIOUS
+
+4. /board/archive
+   Shows boardType = ARCHIVE
+
+If /board/previous or /board/archive currently are placeholders, make them functional now.
+
+Each page should show cards from the matching boardType only.
+
+==================================================
+C. ADMIN MANAGEMENT UI
+======================
+
+In board member add/edit form, add selector:
+
+Label:
+تصنيف مجلس الإدارة
+
+Options:
+
+* مجلس الإدارة الحالي
+* مجلس الإدارة السابق
+* أرشيف مجالس الإدارة
+
+Default for new card:
+CURRENT
+
+When editing an existing card:
+
+* show its current boardType
+* allow ADMIN / SUPER_ADMIN to change it
+* saving immediately moves the card to the correct page
+
+Add a small helper text:
+يمكنك نقل البطاقة بين مجلس الإدارة الحالي أو السابق أو الأرشيف دون حذفها أو إعادة إنشائها.
+
+==================================================
+D. QUICK MOVE ACTION ON CARD
+============================
+
+On each board member management card, add a quick action if easy:
+
+Label:
+نقل إلى
+
+Dropdown options:
+
+* الحالي
+* السابق
+* الأرشيف
+
+This can either:
+
+* update boardType directly
+  or
+* open the edit dialog with boardType preselected
+
+Preferred:
+Direct quick update if already safe and simple.
+
+Do not overcomplicate.
+
+==================================================
+E. BACKEND / DATABASE
+=====================
+
+Check current board_members schema.
+
+If boardType already exists:
+
+* Reuse it.
+* Ensure API supports filtering by boardType and updating boardType.
+
+If boardType does not exist:
+
+* Add boardType column with default CURRENT.
+* Existing board members should default to CURRENT.
+
+API requirements:
+
+* GET /api/board/members?boardType=CURRENT|PREVIOUS|ARCHIVE
+* POST /api/board/members accepts boardType
+* PATCH /api/board/members/:id accepts boardType
+
+Validation:
+
+* Reject invalid boardType with 400.
+* Default missing boardType to CURRENT.
+* Only ADMIN / SUPER_ADMIN can create/update/move board members.
+* Public/member read remains allowed according to current board access rules.
+
+==================================================
+F. BOARD CARD DISPLAY
+=====================
+
+Keep current board card improvements:
+
+* image support
+* contact info
+* bio bullet list formatting
+* Arabic RTL
+* mobile clean design
+
+Do not lose existing fields.
+
+For previous/archive pages:
+
+* same card design
+* optionally show a badge:
+
+  * مجلس سابق
+  * أرشيف
+
+==================================================
+G. EXPORT / ORDERING
+====================
+
+Keep displayOrder behavior if present.
+
+Ordering:
+
+* sort by displayOrder ascending
+* then createdAt ascending or name if existing behavior
+
+Moving a card between board types should preserve displayOrder.
+
+==================================================
+H. PERMISSIONS
+==============
+
+ADMIN:
+
+* can create/edit/move board member cards.
+* can manage CURRENT / PREVIOUS / ARCHIVE.
+
+SUPER_ADMIN:
+
+* same.
+
+MODERATOR:
+
+* no board management unless current rules already allow it. Do not expand permissions.
+
+MEMBER:
+
+* read only.
+
+Backend enforcement mandatory.
+
+==================================================
+I. OPENAPI / GENERATED CLIENT
+=============================
+
+If boardType is not already in OpenAPI:
+
+* Add enum/schema for BoardType:
+  CURRENT, PREVIOUS, ARCHIVE
+* Add boardType to BoardMember, CreateBoardMemberInput, UpdateBoardMemberInput
+* Add boardType query param to GET board members if not present
+
+Then:
+
+* Regenerate client
+* Do not manually edit generated files
+* Run typecheck
+
+If boardType already exists in OpenAPI:
+
+* Verify all endpoints/forms use it correctly.
+
+==================================================
+J. TESTING REQUIRED
+===================
+
+Test before reporting:
+
+1. /board shows three options.
+2. /board/current shows only CURRENT members.
+3. /board/previous shows only PREVIOUS members.
+4. /board/archive shows only ARCHIVE members.
+5. Admin add form has boardType selector.
+6. Admin edit form has boardType selector.
+7. Changing card from CURRENT to PREVIOUS moves it immediately.
+8. Changing card to ARCHIVE moves it immediately.
+9. No card data is lost after moving.
+10. Bio bullet display remains intact.
+11. Image remains intact.
+12. ADMIN can manage board cards.
+13. SUPER_ADMIN can manage board cards.
+14. MEMBER cannot manage board cards.
+15. Typecheck passes.
+16. Preview works.
+17. Existing modules still work.
+
+==================================================
+K. REQUIRED REPORT
+==================
+
+After completion, provide:
+
+BOARD MEMBER TRANSFER REPORT
+
+1. What was changed
+2. Files changed
+3. Database/schema status
+4. boardType values implemented
+5. Pages status:
+
+   * current
+   * previous
+   * archive
+6. Admin add/edit selector status
+7. Quick move action status if implemented
+8. Data preservation test result
+9. Permission test results
+10. Runtime/preview test results
+11. Known issues, if any
+12. Confirmation:
+
+* no card deletion needed
+* moving card preserves all data
+* no Firebase
+* no MySQL migration
+* no unrelated modules changed

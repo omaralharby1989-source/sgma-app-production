@@ -2232,6 +2232,80 @@ paths:
               schema:
                 $ref: "#/components/schemas/ErrorResponse"
 
+  /admin/users/export:
+    get:
+      operationId: exportAdminMembers
+      tags: [admin]
+      summary: Export members (admin/super only). ADMIN excludes SUPER_ADMIN rows.
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: q
+          in: query
+          required: false
+          schema:
+            type: string
+        - name: role
+          in: query
+          required: false
+          schema:
+            type: string
+            enum: [MEMBER, MODERATOR, ADMIN, SUPER_ADMIN]
+        - name: status
+          in: query
+          required: false
+          schema:
+            type: string
+            enum: [PENDING, ACTIVE, SUSPENDED]
+        - name: accessScope
+          in: query
+          required: false
+          schema:
+            type: string
+            enum: [FULL_APP, SYRIA_ACADEMY_ONLY]
+        - name: professionGroup
+          in: query
+          required: false
+          schema:
+            type: string
+        - name: academySpecialty
+          in: query
+          required: false
+          schema:
+            type: string
+        - name: selectedIds
+          in: query
+          required: false
+          description: Comma-separated user ids to restrict the export to.
+          schema:
+            type: string
+        - name: includeActivity
+          in: query
+          required: false
+          description: Include per-user activity counts (default true).
+          schema:
+            type: string
+            enum: ["true", "false"]
+      responses:
+        "200":
+          description: Members export rows
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AdminMembersExportResponse"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "403":
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
   /admin/users/{id}:
     get:
       operationId: getAdminUser
@@ -4715,6 +4789,116 @@ components:
       type: array
       items:
         $ref: "#/components/schemas/AdminUserItem"
+
+    AdminMemberActivity:
+      type: object
+      required:
+        [
+          articlesTotal,
+          articlesApproved,
+          articlesPending,
+          newsCreated,
+          tasksAssigned,
+          taskReports,
+          volunteerRequests,
+          publicMessages,
+          adminMessages,
+        ]
+      properties:
+        articlesTotal:
+          type: integer
+        articlesApproved:
+          type: integer
+        articlesPending:
+          type: integer
+        newsCreated:
+          type: integer
+        tasksAssigned:
+          type: integer
+        taskReports:
+          type: integer
+        volunteerRequests:
+          type: integer
+        publicMessages:
+          type: integer
+        adminMessages:
+          type: integer
+
+    AdminMemberExportItem:
+      type: object
+      required:
+        [
+          id,
+          fullName,
+          account,
+          email,
+          role,
+          status,
+          isActive,
+          isDeveloper,
+          accessScope,
+          createdAt,
+          updatedAt,
+        ]
+      properties:
+        id:
+          type: integer
+        fullName:
+          type: string
+        account:
+          type: string
+        email:
+          type: string
+        role:
+          type: string
+          enum: [MEMBER, MODERATOR, ADMIN, SUPER_ADMIN]
+        status:
+          type: string
+          enum: [PENDING, ACTIVE, SUSPENDED]
+        isActive:
+          type: boolean
+        isDeveloper:
+          type: boolean
+        phone:
+          type: ["string", "null"]
+        whatsapp:
+          type: ["string", "null"]
+        birthDate:
+          type: ["string", "null"]
+        address:
+          type: ["string", "null"]
+        professionGroup:
+          type: ["string", "null"]
+        specialtyText:
+          type: ["string", "null"]
+        bio:
+          type: ["string", "null"]
+        membershipNumber:
+          type: ["string", "null"]
+        accessScope:
+          type: string
+          enum: [FULL_APP, SYRIA_ACADEMY_ONLY]
+        academySpecialty:
+          type: ["string", "null"]
+        academyAllowedSpecialties:
+          type: array
+          items:
+            type: string
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+        activity:
+          oneOf:
+            - $ref: "#/components/schemas/AdminMemberActivity"
+            - type: "null"
+
+    AdminMembersExportResponse:
+      type: array
+      items:
+        $ref: "#/components/schemas/AdminMemberExportItem"
 
     AdminUserDetail:
       type: object

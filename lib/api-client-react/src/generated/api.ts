@@ -28,6 +28,7 @@ import type {
   AdSettings,
   AdminConversation,
   AdminDashboardStats,
+  AdminMembersExportResponse,
   AdminUpdateUserInput,
   AdminUserDetail,
   AdminUsersListResponse,
@@ -59,6 +60,7 @@ import type {
   CustomAdListResponse,
   DeveloperInfo,
   ErrorResponse,
+  ExportAdminMembersParams,
   GetAcademyLecturesParams,
   GetActiveAdsParams,
   GetAdminAcademyLecturesParams,
@@ -4812,6 +4814,90 @@ export function useGetAdminUsers<TData = Awaited<ReturnType<typeof getAdminUsers
  ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
 
   const queryOptions = getGetAdminUsersQueryOptions(params,options)
+
+  const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
+
+  return { ...query, queryKey: queryOptions.queryKey };
+}
+
+
+
+
+
+
+
+export const getExportAdminMembersUrl = (params?: ExportAdminMembersParams,) => {
+  const normalizedParams = new URLSearchParams();
+
+  Object.entries(params || {}).forEach(([key, value]) => {
+
+    if (value !== undefined) {
+      normalizedParams.append(key, value === null ? 'null' : value.toString())
+    }
+  });
+
+  const stringifiedParams = normalizedParams.toString();
+
+  return stringifiedParams.length > 0 ? `/api/admin/users/export?${stringifiedParams}` : `/api/admin/users/export`
+}
+
+/**
+ * @summary Export members (admin/super only). ADMIN excludes SUPER_ADMIN rows.
+ */
+export const exportAdminMembers = async (params?: ExportAdminMembersParams, options?: RequestInit): Promise<AdminMembersExportResponse> => {
+
+  return customFetch<AdminMembersExportResponse>(getExportAdminMembersUrl(params),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getExportAdminMembersQueryKey = (params?: ExportAdminMembersParams,) => {
+    return [
+    `/api/admin/users/export`, ...(params ? [params] : [])
+    ] as const;
+    }
+
+
+export const getExportAdminMembersQueryOptions = <TData = Awaited<ReturnType<typeof exportAdminMembers>>, TError = ErrorType<ErrorResponse>>(params?: ExportAdminMembersParams, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof exportAdminMembers>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getExportAdminMembersQueryKey(params);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof exportAdminMembers>>> = ({ signal }) => exportAdminMembers(params, { signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof exportAdminMembers>>, TError, TData> & { queryKey: QueryKey }
+}
+
+export type ExportAdminMembersQueryResult = NonNullable<Awaited<ReturnType<typeof exportAdminMembers>>>
+export type ExportAdminMembersQueryError = ErrorType<ErrorResponse>
+
+
+/**
+ * @summary Export members (admin/super only). ADMIN excludes SUPER_ADMIN rows.
+ */
+
+export function useExportAdminMembers<TData = Awaited<ReturnType<typeof exportAdminMembers>>, TError = ErrorType<ErrorResponse>>(
+ params?: ExportAdminMembersParams, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof exportAdminMembers>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+
+ ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+
+  const queryOptions = getExportAdminMembersQueryOptions(params,options)
 
   const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
 

@@ -1,0 +1,532 @@
+ADMIN MEMBERS EXPORT — EXCEL / PDF — SGMA APP
+
+Start this task now.
+
+Scope:
+Add export functionality to the existing Admin Users / Member Management page.
+
+Goal:
+ADMIN and SUPER_ADMIN can export member data to Excel or PDF:
+
+* all members
+* selected members
+* filtered members by profession/specialty/access scope/role/status
+
+The exported file must include full member information and relevant activity summaries.
+
+Do not add unrelated features.
+Do not rebuild Admin Users from scratch.
+Do not change existing permissions except adding this export feature.
+Do not break current stable modules.
+
+Existing stable modules must remain working:
+
+* login
+* register
+* home/my account
+* news
+* articles
+* chat
+* broadcast
+* admin dashboard
+* board
+* volunteer delegations
+* task management
+* ads management
+* academy
+* more page
+* developer-info
+* static pages
+* membership approval flow
+* visual identity
+
+Current architecture:
+
+* PostgreSQL + Drizzle
+* JWT auth
+* Arabic RTL
+* Mobile-first
+* No Firebase
+* No MySQL migration
+
+==================================================
+A. LOCATION
+===========
+
+Add this feature inside:
+
+/admin/users
+
+Arabic section title:
+تصدير بيانات الأعضاء
+
+Buttons:
+
+* تصدير Excel
+* تصدير PDF
+
+Optional:
+
+* تصدير الأعضاء المحددين
+* تصدير حسب الفلاتر الحالية
+
+Do not create a separate route unless needed.
+
+==================================================
+B. PERMISSIONS
+==============
+
+Allowed:
+
+* ADMIN
+* SUPER_ADMIN
+
+Not allowed:
+
+* MODERATOR
+* MEMBER
+* SYRIA_ACADEMY_ONLY users
+
+Rules:
+
+1. ADMIN can export:
+
+   * MEMBER
+   * MODERATOR
+   * Syria Academy users
+   * filtered groups
+   * selected users
+   * all non-SUPER_ADMIN users if this matches current admin visibility
+
+2. ADMIN must NOT export SUPER_ADMIN full private data unless existing policy already allows it.
+   Recommended:
+
+   * ADMIN export excludes SUPER_ADMIN users.
+
+3. SUPER_ADMIN can export all users, including ADMIN / MODERATOR / MEMBER / Syria Academy users.
+
+Backend enforcement mandatory.
+Frontend hiding alone is not enough.
+
+==================================================
+C. EXPORT SELECTION OPTIONS
+===========================
+
+Add selection/filter controls:
+
+1. Export mode:
+
+* كل الأعضاء
+* الأعضاء المحددون
+* حسب الفلاتر الحالية
+
+2. Filters:
+
+* role:
+
+  * MEMBER
+  * MODERATOR
+  * ADMIN
+  * SUPER_ADMIN, only visible/usable by SUPER_ADMIN
+
+* status:
+
+  * PENDING
+  * ACTIVE
+  * SUSPENDED
+
+* accessScope:
+
+  * FULL_APP
+  * SYRIA_ACADEMY_ONLY
+
+* professionGroup:
+  existing profession list:
+
+  * Arzt / طبيب
+  * Zahnmedizin / أطباء أسنان
+  * Pharmazie / صيادلة
+  * Pflege / تمريض
+  * ATA
+  * OTA
+  * Physiotherapie / علاج فيزيائي
+  * Labor / مخبر
+  * Radiologie / أشعة
+  * Medizintechnik / هندسة طبية
+  * Rettungsdienst / إسعاف
+  * Student / طالب
+  * Andere / أخرى
+
+* academySpecialty:
+  all academy specialties if Academy module exists
+
+3. Search:
+
+* by fullName
+* account
+* email
+* membershipNumber
+* phone
+
+4. Selected users:
+
+* Add checkbox on each user row/card.
+* Add select all visible.
+* Add clear selection.
+
+==================================================
+D. EXPORT DATA CONTENT
+======================
+
+The export file should include complete member profile information and activity summaries.
+
+Member profile fields:
+
+* id
+* fullName
+* account
+* email
+* membershipNumber
+* role
+* status
+* isActive
+* isDeveloper
+* accessScope
+* academySpecialty
+* academyAllowedSpecialties
+* phone
+* whatsapp
+* birthDate
+* address
+* professionGroup
+* specialtyText
+* bio
+* createdAt
+* updatedAt
+
+Activity summary fields:
+
+* articlesCount
+* approvedArticlesCount
+* pendingArticlesCount
+* newsCreatedCount if relevant
+* tasksAssignedCount
+* taskReportsCount
+* volunteerDelegationRequestsCount
+* academyLecturesViewedCount if views table exists
+* academyAccessSummary
+* lastActivityAt if computable
+
+If some activity is not available or no table exists:
+
+* include 0 or "غير متاح"
+* document this clearly in report.
+
+Do not export:
+
+* passwordHash
+* JWT tokens
+* secrets
+* DATABASE_URL
+* private system config
+
+Privacy:
+
+* For chat, do NOT export full chat message contents by default.
+* If including chat, include only counts:
+
+  * publicChatMessagesCount
+  * adminDirectMessagesCount
+    Not full messages.
+
+==================================================
+E. EXCEL EXPORT
+===============
+
+Preferred:
+Generate .xlsx if library is available.
+
+If .xlsx is not available:
+CSV is acceptable, but label it clearly as CSV, not Excel.
+
+Arabic column labels required.
+
+Suggested filename:
+sgma-members-export-YYYY-MM-DD.xlsx
+
+or if CSV:
+sgma-members-export-YYYY-MM-DD.csv
+
+Excel/CSV columns should use Arabic labels, for example:
+
+* رقم المستخدم
+* الاسم الكامل
+* اسم الحساب
+* البريد الإلكتروني
+* رقم العضوية
+* الدور
+* الحالة
+* نوع الوصول
+* اختصاص الأكاديمية
+* الهاتف
+* الواتساب
+* المجموعة المهنية
+* التخصص
+* عدد المقالات
+* عدد المهام
+* عدد تقارير المهام
+* عدد طلبات الوفود
+* تاريخ التسجيل
+
+==================================================
+F. PDF EXPORT
+=============
+
+Generate a printable PDF or HTML-to-print report.
+
+Arabic title:
+تقرير بيانات الأعضاء
+
+Include:
+
+* export date
+* exported by admin name
+* applied filters
+* total members
+* member cards or compact table
+* activity summary per member
+
+For many members:
+
+* Use compact table layout.
+* Avoid huge unreadable cards.
+* If direct PDF generation is unstable, create printable HTML and trigger browser print/save as PDF.
+
+Suggested filename:
+sgma-members-export-YYYY-MM-DD.pdf
+
+==================================================
+G. BACKEND API REQUIREMENTS
+===========================
+
+Create backend endpoints:
+
+GET /api/admin/users/export
+Query params:
+
+* format: xlsx | csv | pdf | json
+* role optional
+* status optional
+* accessScope optional
+* professionGroup optional
+* academySpecialty optional
+* search optional
+* selectedIds optional comma-separated
+* includeActivity optional boolean default true
+
+Access:
+
+* ADMIN
+* SUPER_ADMIN
+
+Rules:
+
+* ADMIN cannot export SUPER_ADMIN users.
+* SUPER_ADMIN can export all.
+* Server must apply permission filters regardless of client request.
+* Never expose passwordHash or secrets.
+
+Response:
+
+* For xlsx/csv/pdf: downloadable file.
+* For json: preview data if useful.
+
+If implementing file generation on frontend is easier:
+
+* Backend may return JSON export data securely.
+* Frontend generates Excel/PDF.
+* But backend must still enforce data visibility and remove sensitive fields.
+
+Preferred:
+Backend returns sanitized export data; frontend generates file if already using client export patterns.
+Choose safest and fastest implementation.
+
+==================================================
+H. FRONTEND UI REQUIREMENTS
+===========================
+
+In /admin/users:
+
+Add export section/card:
+Title:
+تصدير بيانات الأعضاء
+
+Description:
+يمكنك تصدير بيانات الأعضاء حسب الفلاتر أو الأعضاء المحددين بصيغة Excel أو PDF.
+
+Controls:
+
+* filter summary
+* export selected
+* export current filters
+* export all allowed
+* Excel button
+* PDF button
+
+If no selected users:
+
+* export selected button disabled.
+* show message:
+  لم يتم تحديد أعضاء
+
+After export:
+
+* show success toast:
+  تم تجهيز ملف التصدير بنجاح
+
+On error:
+تعذر تجهيز ملف التصدير
+
+Mobile:
+
+* buttons stacked
+* no horizontal overflow
+* selected count visible:
+  عدد الأعضاء المحددين: X
+
+==================================================
+I. ACTIVITY SUMMARY LOGIC
+=========================
+
+Compute activity summaries from existing tables where available:
+
+Possible tables:
+
+* articles
+* news
+* public_chat_messages
+* admin_direct_chat_messages
+* tasks
+* task_assignees
+* task_reports
+* volunteer_delegation_requests
+* academy_lectures / academy_views if exists
+
+Required minimum:
+
+* articlesCount
+* tasksAssignedCount
+* taskReportsCount
+* volunteerDelegationRequestsCount
+
+If some tables differ in actual code:
+
+* inspect schema and adapt.
+* do not guess field names.
+* if a table does not exist, skip it and document.
+
+==================================================
+J. OPENAPI / GENERATED CLIENT
+=============================
+
+If backend API is added, update OpenAPI.
+
+Schemas:
+
+* AdminMemberExportItem
+* AdminMemberExportResponse
+* AdminMemberExportQuery if needed
+
+Endpoint:
+GET /api/admin/users/export
+
+Then:
+
+* regenerate client
+* do not manually edit generated files
+* run typecheck
+
+If file download is difficult through generated client:
+
+* it is acceptable to use fetch directly with auth token for this one export endpoint.
+* But still document it.
+
+==================================================
+K. TESTING REQUIRED
+===================
+
+Do not report completion until tested.
+
+Permission tests:
+
+1. SUPER_ADMIN can export all.
+2. ADMIN can export allowed users.
+3. ADMIN cannot export SUPER_ADMIN data.
+4. MODERATOR gets 403.
+5. MEMBER gets 403.
+6. Unauthenticated gets 401.
+
+Filter tests:
+
+1. export all allowed users.
+2. export by professionGroup.
+3. export by academySpecialty.
+4. export by role.
+5. export selected users.
+6. export search result.
+
+File tests:
+
+1. Excel/CSV downloads and opens.
+2. PDF/printable report generates.
+3. No passwordHash or secrets in export.
+4. Arabic labels appear correctly.
+5. Activity counts included.
+
+Regression:
+
+1. /login works.
+2. /register works.
+3. /admin/users still opens.
+4. user activation still works.
+5. academy user management fields still work.
+6. existing modules still typecheck.
+7. backend starts cleanly.
+8. preview works.
+
+==================================================
+L. REQUIRED REPORT
+==================
+
+After completion, provide:
+
+ADMIN MEMBERS EXPORT REPORT
+
+1. What was implemented
+2. Files changed
+3. Backend endpoint status
+4. Export formats supported
+5. Filter/selection options
+6. Data fields included
+7. Activity summaries included
+8. Permission test results:
+
+   * SUPER_ADMIN
+   * ADMIN
+   * MODERATOR
+   * MEMBER
+9. Privacy/security checks
+10. File generation test results
+11. Preview status
+12. Known limitations, if any
+13. Confirmation:
+
+* no passwordHash exported
+* no secrets exported
+* ADMIN cannot export SUPER_ADMIN users
+* SUPER_ADMIN can export all
+* no Firebase
+* no MySQL migration
+* no unrelated modules changed
+
+Do not report success until export by selected users, export by filter, and permission restrictions are verified.
