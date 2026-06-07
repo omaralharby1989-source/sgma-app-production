@@ -21,6 +21,8 @@ import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
+import { ImageInput } from "@/components/ImageInput";
+import { LectureThumbnail } from "@/components/LectureThumbnail";
 import { Textarea } from "@/components/ui/textarea";
 import { Switch } from "@/components/ui/switch";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -349,10 +351,13 @@ export default function AdminAcademy() {
           {lectures.map((l) => (
             <Card key={l.id} className="p-4 shadow-sm border-border/50 space-y-2">
               <div className="flex items-start justify-between gap-3">
-                <div className="min-w-0">
-                  <div className="font-semibold">{l.title}</div>
-                  <p className="text-sm text-muted-foreground mt-1 line-clamp-2">{l.description}</p>
-                  <p className="text-xs text-muted-foreground mt-1">{l.lecturerName}</p>
+                <div className="flex items-start gap-3 min-w-0">
+                  <LectureThumbnail src={l.thumbnailUrl} className="h-14 w-14 shrink-0" />
+                  <div className="min-w-0">
+                    <div className="font-semibold">{l.title}</div>
+                    <p className="text-sm text-muted-foreground mt-1 line-clamp-2">{l.description}</p>
+                    <p className="text-xs text-muted-foreground mt-1">{l.lecturerName}</p>
+                  </div>
                 </div>
                 <div className="flex flex-col items-end gap-1 shrink-0">
                   <Badge variant={ACADEMY_STATUS_VARIANT[l.status] ?? "secondary"}>
@@ -431,6 +436,16 @@ export default function AdminAcademy() {
               <p className="text-xs text-muted-foreground leading-relaxed">
                 تأكد أن ملف Google Drive قابل للعرض لمن يملك الرابط.
               </p>
+            </div>
+
+            <div className="space-y-1.5">
+              <ImageInput
+                label="صورة المحاضرة"
+                value={form.thumbnailUrl}
+                onChange={(v) => setForm((f) => ({ ...f, thumbnailUrl: v }))}
+                maxSizeMB={2}
+                helperText="اختياري — يمكنك إدخال رابط صورة أو رفع صورة من جهازك (JPG / PNG / WEBP، بحد أقصى 2 ميجابايت)."
+              />
             </div>
 
             <div className="flex items-center justify-between rounded-lg border border-border p-3">

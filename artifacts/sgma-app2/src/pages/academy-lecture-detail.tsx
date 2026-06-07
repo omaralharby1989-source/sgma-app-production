@@ -5,6 +5,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { BackButton } from "@/components/BackButton";
+import { LectureThumbnail } from "@/components/LectureThumbnail";
 import { useToast } from "@/hooks/use-toast";
 import { Calendar, User, Clock, FileText, Download, Video, ExternalLink } from "lucide-react";
 import { specialtyLabel, formatAcademyDate } from "@/lib/academyLabels";
@@ -146,6 +147,11 @@ export default function AcademyLectureDetail() {
                 </a>
               </Button>
             </Card>
+          ) : lecture.thumbnailUrl ? (
+            <LectureThumbnail
+              src={lecture.thumbnailUrl}
+              className="aspect-video w-full border border-border"
+            />
           ) : (
             <Card className="p-6 text-center text-sm text-muted-foreground">
               التسجيل غير متاح حالياً

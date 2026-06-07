@@ -4,8 +4,9 @@ import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { BackButton } from "@/components/BackButton";
-import { Megaphone, Calendar, Clock, User, ChevronLeft } from "lucide-react";
+import { Calendar, Clock, User, ChevronLeft } from "lucide-react";
 import { specialtyLabel, formatAcademyDate } from "@/lib/academyLabels";
+import { LectureThumbnail } from "@/components/LectureThumbnail";
 
 export default function AcademyAnnouncements() {
   const { data: items, isLoading, isError } = useGetAcademyAnnouncements({
@@ -54,9 +55,7 @@ export default function AcademyAnnouncements() {
             <Link key={item.id} href={`/academy/lectures/${item.id}`} className="block">
               <Card className="p-4 shadow-sm border-border/50 hover:bg-muted/40 transition-colors">
                 <div className="flex items-start gap-4">
-                  <div className="p-3 rounded-xl shrink-0 bg-amber-500/10 text-amber-600 dark:text-amber-400">
-                    <Megaphone className="h-6 w-6" />
-                  </div>
+                  <LectureThumbnail src={item.thumbnailUrl} className="h-16 w-16 shrink-0" />
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2 flex-wrap mb-1">
                       <h3 className="font-semibold leading-snug">{item.title}</h3>

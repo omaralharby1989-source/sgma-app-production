@@ -4,8 +4,9 @@ import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { BackButton } from "@/components/BackButton";
-import { Video, ChevronLeft, Calendar, User } from "lucide-react";
+import { ChevronLeft, Calendar, User } from "lucide-react";
 import { specialtyLabel, formatAcademyDate } from "@/lib/academyLabels";
+import { LectureThumbnail } from "@/components/LectureThumbnail";
 
 export default function AcademyLectures() {
   const { data: lectures, isLoading, isError } = useGetAcademyLectures(undefined, {
@@ -54,9 +55,7 @@ export default function AcademyLectures() {
             <Link key={lecture.id} href={`/academy/lectures/${lecture.id}`} className="block">
               <Card className="p-4 shadow-sm border-border/50 hover:bg-muted/40 transition-colors">
                 <div className="flex items-start gap-4">
-                  <div className="p-3 rounded-xl shrink-0 bg-primary/10 text-primary">
-                    <Video className="h-6 w-6" />
-                  </div>
+                  <LectureThumbnail src={lecture.thumbnailUrl} className="h-16 w-16 shrink-0" />
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2 flex-wrap mb-1">
                       <h3 className="font-semibold leading-snug">{lecture.title}</h3>

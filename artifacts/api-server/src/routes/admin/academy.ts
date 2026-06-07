@@ -13,6 +13,7 @@ import {
   toDriveEmbedUrl,
 } from "../../lib/academy";
 import { validatePdfFile, MAX_PDF_FILES } from "../../lib/pdfValidation";
+import { validateImageSource } from "../../lib/imageValidation";
 import { formatLecture, formatFileMeta } from "../academy";
 
 const router = Router();
@@ -126,6 +127,13 @@ router.post("/admin/academy/lectures", requireAuth, requireFullApp, async (req, 
     }
   }
 
+  const thumbnailUrl = d.thumbnailUrl?.trim() || null;
+  const thumbnailError = validateImageSource(thumbnailUrl);
+  if (thumbnailError) {
+    res.status(400).json({ error: thumbnailError });
+    return;
+  }
+
   const attachments = Array.isArray(d.attachments) ? d.attachments : [];
   if (attachments.length > MAX_PDF_FILES) {
     res.status(400).json({ error: "لا يمكن رفع أكثر من 5 ملفات" });
@@ -154,7 +162,7 @@ router.post("/admin/academy/lectures", requireAuth, requireFullApp, async (req, 
         liveMeetingUrl: d.liveMeetingUrl?.trim() || null,
         recordingDriveUrl,
         recordingEmbedUrl,
-        thumbnailUrl: d.thumbnailUrl?.trim() || null,
+        thumbnailUrl,
         allowedSpecialties: serializeSpecialties(d.allowedSpecialties),
         isGeneral: d.isGeneral ?? false,
         status: d.status ?? "DRAFT",
@@ -222,7 +230,15 @@ router.patch("/admin/academy/lectures/:id", requireAuth, requireFullApp, async (
     if (d.lectureTime !== undefined) updates.lectureTime = d.lectureTime?.trim() || null;
     if (d.isUpcoming !== undefined) updates.isUpcoming = d.isUpcoming;
     if (d.liveMeetingUrl !== undefined) updates.liveMeetingUrl = d.liveMeetingUrl?.trim() || null;
-    if (d.thumbnailUrl !== undefined) updates.thumbnailUrl = d.thumbnailUrl?.trim() || null;
+    if (d.thumbnailUrl !== undefined) {
+      const thumb = d.thumbnailUrl?.trim() || null;
+      const thumbError = validateImageSource(thumb);
+      if (thumbError) {
+        res.status(400).json({ error: thumbError });
+        return;
+      }
+      updates.thumbnailUrl = thumb;
+    }
     if (d.allowedSpecialties !== undefined) {
       updates.allowedSpecialties = serializeSpecialties(d.allowedSpecialties);
     }

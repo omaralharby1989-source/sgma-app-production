@@ -1,0 +1,237 @@
+ACADEMY LECTURE IMAGE UPLOAD FIX — SGMA APP
+
+Start this small fix now.
+
+Scope:
+Allow academy lecture announcements and recordings to use an image uploaded from phone/device, not only an image URL.
+
+Current problem:
+In SGMA Academy, when creating/editing a lecture announcement or recorded lecture, the thumbnail/image field should support uploading an image from the device.
+
+Required:
+In /admin/academy create/edit lecture form, the image/thumbnail field must support both:
+
+1. Image URL
+2. Upload image from phone/device
+
+Do not rebuild the Academy module.
+Do not change unrelated modules.
+Do not change academy permissions.
+Do not change video logic.
+Do not change Google Drive embed logic.
+Do not change accessScope/SY membership logic.
+
+Current architecture:
+
+* PostgreSQL + Drizzle
+* JWT auth
+* Arabic RTL
+* Mobile-first
+* No Firebase
+* No MySQL migration
+
+==================================================
+A. IMAGE INPUT REQUIREMENT
+==========================
+
+Update the Academy admin lecture form field:
+
+thumbnailUrl
+
+It must support:
+
+1. رابط صورة
+
+* Admin can paste an http/https image URL.
+
+2. رفع صورة من الجهاز
+
+* Admin can select an image from phone/gallery/device.
+
+Supported file types:
+
+* jpg
+* jpeg
+* png
+* webp
+
+Max size:
+
+* 2 MB
+
+When uploaded:
+
+* Convert the file to base64 data URL on the frontend.
+* Store it in the existing thumbnailUrl field.
+
+Do not add external storage.
+Do not add Firebase Storage.
+Do not add S3.
+Do not store videos in DB.
+
+==================================================
+B. REUSE EXISTING COMPONENT IF AVAILABLE
+========================================
+
+If the app already has reusable ImageInput from News/Articles, use it.
+
+Likely component:
+src/components/ImageInput.tsx
+
+Use it in:
+
+* /admin/academy create lecture form
+* /admin/academy edit lecture form
+
+Do not duplicate upload logic if ImageInput exists.
+
+ImageInput should show:
+
+* URL input
+* file picker
+* preview
+* remove image button
+
+Arabic labels:
+
+* صورة المحاضرة
+* رابط الصورة
+* أو ارفع صورة من جهازك
+* إزالة الصورة
+
+==================================================
+C. BACKEND VALIDATION
+=====================
+
+Backend must accept both:
+
+* http/https image URL
+* base64 data image URL
+
+For base64:
+Validate:
+
+* starts with data:image/
+* mime is jpeg/png/webp
+* decoded size <= 2 MB
+
+For URL:
+Validate:
+
+* http or https only
+* reject javascript:, file:, blob:, data:text/html, etc.
+
+If an existing shared validator exists, reuse it:
+artifacts/api-server/src/lib/imageValidation.ts
+or similar.
+
+Apply validation to:
+
+* POST /api/admin/academy/lectures
+* PATCH /api/admin/academy/lectures/:id
+
+If thumbnailUrl is empty/null:
+Allow it.
+
+==================================================
+D. FRONTEND DISPLAY
+===================
+
+Academy pages must display thumbnailUrl whether it is:
+
+* http/https URL
+* base64 data:image
+
+Affected pages:
+
+* /academy
+* /academy/announcements
+* /academy/lectures
+* /admin/academy list/cards
+
+If image is missing or broken:
+Show fallback icon/card background.
+Do not show broken image icon.
+
+==================================================
+E. MOBILE REQUIREMENTS
+======================
+
+This must work on phone.
+
+File input:
+accept="image/jpeg,image/png,image/webp"
+
+Do not force camera only.
+Allow gallery selection.
+
+Preview must not overflow.
+Image must not stretch.
+
+==================================================
+F. DO NOT CHANGE
+================
+
+Do not change:
+
+* auth
+* database schema unless absolutely necessary
+* accessScope
+* SY membership flow
+* academySpecialty filtering
+* Google Drive embed
+* watermark
+* PDF attachments
+* admin permissions
+* news/articles/chat/tasks/board/volunteer modules
+
+This is only an image upload enhancement for Academy lecture thumbnails.
+
+==================================================
+G. TESTING REQUIRED
+===================
+
+Test before reporting:
+
+1. /admin/academy opens for MODERATOR/ADMIN/SUPER_ADMIN.
+2. Create lecture with image URL works.
+3. Create lecture with uploaded image from device/base64 works.
+4. Edit lecture image from URL to uploaded image works.
+5. Edit lecture image from uploaded image to URL works.
+6. Invalid image type rejected.
+7. Image larger than 2 MB rejected.
+8. Dangerous URL rejected.
+9. /academy shows lecture image.
+10. /academy/announcements shows announcement image if applicable.
+11. /academy/lectures shows recording image.
+12. Missing/broken image fallback works.
+13. Typecheck passes.
+14. Backend starts cleanly.
+15. Preview works.
+
+==================================================
+H. REQUIRED REPORT
+==================
+
+After completion, provide:
+
+ACADEMY IMAGE UPLOAD FIX REPORT
+
+1. What was changed
+2. Files changed
+3. Whether existing ImageInput was reused
+4. Backend validation status
+5. Create lecture image test results
+6. Edit lecture image test results
+7. Public academy display test results
+8. Validation test results
+9. Preview status
+10. Confirmation:
+
+* no Firebase
+* no MySQL migration
+* no unrelated modules changed
+* academy access rules unchanged
+* Google Drive/video logic unchanged
+
+Do not report success until academy lecture images work from both URL and phone upload.
