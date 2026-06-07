@@ -1,0 +1,954 @@
+SGMA ACADEMY SYRIA MODULE — SGMA APP
+
+Start this task carefully.
+
+This is a large module. Build it as an additive module without breaking the current stable app.
+
+Goal:
+Create an internal education platform inside SGMA APP named:
+
+أكاديمية سجما - سوريا
+
+The academy serves:
+
+1. SGMA full members in Germany / full app members.
+2. Syria Academy-only members who register using the special SY membership flow.
+
+Important:
+Do not add unrelated features.
+Do not rewrite existing modules.
+Do not break the stable app.
+
+Existing stable modules must remain working:
+
+* login
+* register
+* home/my account
+* news
+* articles
+* chat
+* broadcast
+* admin dashboard
+* board of directors
+* volunteer delegations
+* task management
+* ads management
+* more page
+* developer-info
+* static pages
+* membership approval flow
+* logo/branding
+
+Current architecture:
+
+* PostgreSQL + Drizzle
+* JWT auth
+* Arabic RTL
+* Mobile-first
+* No Firebase
+* No MySQL migration
+* No old SGMA APP1 routes
+
+==================================================
+A. CORE CONCEPT
+===============
+
+Add a new Academy module.
+
+Arabic name:
+أكاديمية سجما - سوريا
+
+English/internal name:
+SGMA Academy Syria
+
+Purpose:
+Provide online lecture announcements and recorded educational lectures for healthcare colleagues in Syria and SGMA members.
+
+The system must support:
+
+* Academy-only Syrian users.
+* Full SGMA app members.
+* Specialty-based lecture visibility.
+* Admin/moderator academy management.
+* Google Drive video embed inside the app.
+* Watermark overlay on video player.
+* PDF attachments for lectures.
+* Public app news/articles access rules depending on access scope.
+
+==================================================
+B. USER ACCESS MODEL
+====================
+
+Add a new user access field:
+
+accessScope
+
+Allowed values:
+
+* FULL_APP
+* SYRIA_ACADEMY_ONLY
+
+Default for existing users:
+FULL_APP
+
+Meaning:
+
+1. FULL_APP
+   Regular SGMA member.
+   Can use the normal app according to existing role permissions.
+   Can also access SGMA Academy.
+   Can view ALL academy lectures across ALL specialties.
+
+2. SYRIA_ACADEMY_ONLY
+   Syria Academy-only user.
+   Can access only:
+
+* Academy pages
+* public news list/detail
+* published articles list/detail in read-only mode
+* My Account
+* legal/static pages
+* developer info if currently public/allowed
+
+Cannot access:
+
+* write article
+* my articles
+* chat
+* admin direct chat
+* volunteer delegations
+* board of directors
+* task management
+* admin dashboard
+* broadcast management
+* ads management
+* any full-member-only feature
+
+Backend and frontend must both enforce this.
+Do not rely only on hidden links.
+
+==================================================
+C. MEMBERSHIP NUMBER RULES
+==========================
+
+Current rule for SGMA Germany/full members:
+Membership number is numeric only.
+
+Valid examples:
+
+* 1
+* 25
+* 798
+
+Invalid for full member registration:
+
+* SGMA123
+* DE123
+* random text
+
+New rule for Syria Academy registration:
+The user may enter exactly:
+
+SY
+
+in the membershipNumber field.
+
+If membershipNumber is exactly SY:
+
+* Treat the registration as a Syria Academy application.
+* Create the user as PENDING / inactive, same as current approval flow.
+* Set accessScope = SYRIA_ACADEMY_ONLY.
+* Store a temporary/pending membership marker as SY or equivalent until admin activation.
+* Do NOT issue token after signup.
+* Admin must activate the account.
+
+On admin activation:
+
+* Generate the final Syria academy membership number automatically:
+  SY1, SY2, SY3, ...
+* Use the next available number.
+* Save the final value in membershipNumber.
+* Activate the account:
+  status = ACTIVE
+  isActive = true
+
+Important:
+Do not let normal users choose SY1/SY2 manually during registration.
+At registration time, Syria users enter only SY.
+
+Registration helper text under membershipNumber:
+لأعضاء SGMA: أدخل رقم عضويتك فقط، مثال: 798.
+لأعضاء أكاديمية سوريا: أدخل SY فقط.
+
+==================================================
+D. ACADEMY SPECIALTY MODEL
+==========================
+
+Add academySpecialty to users.
+
+Values:
+
+* GENERAL
+* NURSING
+* ANESTHESIA_ICU
+* EMERGENCY
+* MEDICINE
+* SURGERY
+* INTERNAL_MEDICINE
+* PEDIATRICS
+* PHARMACY
+* DENTISTRY
+* RADIOLOGY
+* LAB
+* PHYSIOTHERAPY
+* MEDICAL_ENGINEERING
+* OTHER
+
+Arabic labels:
+
+* GENERAL: عام
+* NURSING: تمريض
+* ANESTHESIA_ICU: تخدير وعناية مركزة
+* EMERGENCY: إسعاف وطوارئ
+* MEDICINE: أطباء
+* SURGERY: جراحة
+* INTERNAL_MEDICINE: داخلية
+* PEDIATRICS: أطفال
+* PHARMACY: صيدلة
+* DENTISTRY: طب أسنان
+* RADIOLOGY: أشعة
+* LAB: مخبر
+* PHYSIOTHERAPY: علاج فيزيائي
+* MEDICAL_ENGINEERING: هندسة طبية
+* OTHER: أخرى
+
+For Syria Academy users:
+
+* The system should infer academySpecialty from the professionGroup selected during registration where possible.
+* Example:
+  Pflege / تمريض → NURSING
+  Pharmazie / صيادلة → PHARMACY
+  Zahnmedizin / أطباء أسنان → DENTISTRY
+  Radiologie / أشعة → RADIOLOGY
+  Labor / مخبر → LAB
+  Physiotherapie / علاج فيزيائي → PHYSIOTHERAPY
+  Medizintechnik / هندسة طبية → MEDICAL_ENGINEERING
+  Rettungsdienst / إسعاف → EMERGENCY
+  Arzt / طبيب → MEDICINE
+  Andere / أخرى → OTHER
+
+Admin must be able to adjust academySpecialty from user management before or during activation.
+
+Important:
+Syria user cannot change academySpecialty from My Account.
+Only admin/staff with user-management permissions can change it.
+
+==================================================
+E. EXTRA ACCESS OVERRIDES FOR SYRIA USERS
+=========================================
+
+Admin should be able to grant additional academy specialty access to Syria users.
+
+Add optional field/model:
+academyAllowedSpecialties
+
+For SYRIA_ACADEMY_ONLY user:
+Default lecture access:
+
+* GENERAL lectures
+* user.academySpecialty lectures
+
+Additional access:
+
+* any specialties listed in academyAllowedSpecialties
+
+Admin option:
+
+* Grant one or more extra specialties.
+* Grant all specialties if needed.
+
+Suggested special value:
+ALL
+
+Rules:
+
+* If academyAllowedSpecialties includes ALL, the Syria user can view all academy lectures.
+* If not, they can view only GENERAL + own academySpecialty + explicitly allowed specialties.
+
+FULL_APP users:
+Always view all academy lectures regardless of academySpecialty.
+
+==================================================
+F. REGISTRATION / LOGIN FLOW CHANGES
+====================================
+
+Registration:
+
+1. If membershipNumber is numeric:
+
+* Existing behavior continues.
+* User is pending until admin approval.
+* accessScope = FULL_APP unless admin changes it.
+
+2. If membershipNumber is SY:
+
+* User is pending.
+* accessScope = SYRIA_ACADEMY_ONLY.
+* academySpecialty inferred from professionGroup if possible.
+* Admin can adjust academySpecialty before activation.
+* On activation, generate final membershipNumber like SY1/SY2.
+
+3. If membershipNumber is invalid:
+   Reject signup with Arabic error:
+   رقم العضوية غير صحيح. أدخل رقم عضويتك الرقمي أو SY لأكاديمية سوريا.
+
+Login:
+
+* Pending/inactive behavior remains unchanged.
+* ACTIVE SYRIA_ACADEMY_ONLY users can log in.
+* After login, SYRIA_ACADEMY_ONLY users should be redirected to /academy, not /home.
+
+==================================================
+G. ROUTE ACCESS RULES
+=====================
+
+FULL_APP users:
+Existing access remains unchanged.
+They also can access:
+
+* /academy
+* /academy/announcements
+* /academy/lectures
+* /academy/lectures/:id
+
+SYRIA_ACADEMY_ONLY users:
+Allowed routes:
+
+* /academy
+* /academy/announcements
+* /academy/lectures
+* /academy/lectures/:id
+* /news
+* /news/:id
+* /articles
+* /articles/:id
+* /home
+* /more
+* /privacy-policy
+* /terms
+* /about-sgma
+* /developer-info if currently allowed
+
+Blocked routes:
+
+* /articles/new
+* /articles/my
+* /articles/:id/edit
+* /chat
+* /chat/public
+* /chat/admin
+* /volunteer-delegations
+* /admin/*
+* /board
+* /tasks
+* /admin/tasks
+* /broadcast
+* any staff/admin feature
+
+Important:
+Backend APIs must enforce these restrictions too.
+Do not rely on frontend route hiding only.
+
+==================================================
+H. ARTICLES RULE FOR SYRIA USERS
+================================
+
+SYRIA_ACADEMY_ONLY users:
+Can:
+
+* GET /api/articles
+* GET /api/articles/:id if published/approved
+
+Cannot:
+
+* POST /api/articles
+* PATCH own articles
+* access /articles/new
+* access /articles/my
+* submit articles
+* edit articles
+
+Frontend:
+
+* Hide “كتابة مقال”
+* Hide “مقالاتي”
+* If user manually opens /articles/new or /articles/my, redirect to /unauthorized.
+
+Backend:
+
+* If accessScope = SYRIA_ACADEMY_ONLY, reject article create/update/my endpoints with 403.
+
+==================================================
+I. NEWS RULE FOR SYRIA USERS
+============================
+
+SYRIA_ACADEMY_ONLY users:
+Can:
+
+* read public news list
+* open news detail
+
+Cannot:
+
+* create/edit/delete news
+* access admin news management
+
+Existing staff rules remain unchanged.
+
+==================================================
+J. ACADEMY MANAGEMENT PERMISSIONS
+=================================
+
+Academy management allowed for:
+
+* MODERATOR
+* ADMIN
+* SUPER_ADMIN
+
+For now:
+Do NOT create separate lecturer permission.
+Do NOT allow every lecturer to manage academy content.
+
+MODERATOR / ADMIN / SUPER_ADMIN can:
+
+* create lecture announcements
+* create lecture recordings
+* edit lectures
+* publish/hide lectures
+* upload/add PDF attachments
+* add Google Drive video link
+* set allowed specialties
+* set GENERAL/public academy access
+* manage academy content
+
+MEMBER with FULL_APP:
+Can view all academy content but cannot manage it.
+
+SYRIA_ACADEMY_ONLY:
+Can view only allowed academy content but cannot manage.
+
+==================================================
+K. ACADEMY ROUTES
+=================
+
+Create routes:
+
+1. /academy
+   Academy home page.
+
+Shows:
+
+* welcome card
+* upcoming lecture announcements
+* latest available recordings for the current user
+* shortcuts:
+
+  * إعلانات المحاضرات
+  * التسجيلات السابقة
+  * محاضرات اختصاصي
+
+2. /academy/announcements
+   List of upcoming lecture announcements.
+
+3. /academy/lectures
+   List of lecture recordings.
+
+For FULL_APP:
+
+* show all specialties and filters.
+
+For SYRIA_ACADEMY_ONLY:
+
+* show only GENERAL + allowed specialties.
+* do not show inaccessible specialty filters.
+
+4. /academy/lectures/:id
+   Lecture detail/watch page.
+
+5. /admin/academy
+   Academy management page for MODERATOR / ADMIN / SUPER_ADMIN.
+
+Optional if cleaner:
+
+* /admin/academy/new
+* /admin/academy/:id/edit
+
+But keep implementation stable and not overcomplicated.
+
+==================================================
+L. ACADEMY LECTURE MODEL
+========================
+
+Create table:
+academy_lectures
+
+Fields:
+
+* id
+* title
+* description
+* lecturerName
+* lectureDate nullable
+* lectureTime nullable
+* isUpcoming boolean default false
+* liveMeetingUrl nullable
+* recordingDriveUrl nullable
+* recordingEmbedUrl nullable
+* thumbnailUrl nullable
+* allowedSpecialties text/json
+* isGeneral boolean default false
+* status
+* createdById
+* updatedById nullable
+* createdAt
+* updatedAt
+
+Status values:
+
+* DRAFT
+* PUBLISHED
+* HIDDEN
+* ARCHIVED
+
+Rules:
+
+* Announcements are lectures with isUpcoming = true.
+* Recordings have recordingDriveUrl / recordingEmbedUrl.
+* Public display shows only status = PUBLISHED.
+* FULL_APP users can view all published lectures.
+* SYRIA_ACADEMY_ONLY users can view only allowed lectures.
+
+==================================================
+M. ACADEMY FILES MODEL
+======================
+
+Create table:
+academy_files
+
+Fields:
+
+* id
+* lectureId
+* fileName
+* mimeType
+* fileSize
+* fileData
+* createdAt
+
+Allowed:
+
+* PDF only for first implementation
+
+Max:
+
+* 5 files per lecture
+* 5MB per file
+
+Do not store videos in database.
+Only PDFs are stored as base64 like existing modules.
+
+==================================================
+N. GOOGLE DRIVE VIDEO EMBED
+===========================
+
+Academy manager enters a Google Drive video link.
+
+Backend or frontend should convert it to an embed URL if possible.
+
+Accepted examples:
+
+* https://drive.google.com/file/d/FILE_ID/view?usp=sharing
+* https://drive.google.com/open?id=FILE_ID
+
+Embed format:
+https://drive.google.com/file/d/FILE_ID/preview
+
+Store:
+
+* recordingDriveUrl original
+* recordingEmbedUrl generated preview URL
+
+Lecture watch page:
+
+* Show video inside the app using iframe.
+* Do not show a direct clickable Google Drive link to the user.
+* If embed URL invalid or missing, show Arabic message:
+  التسجيل غير متاح حالياً
+
+Important:
+Google Drive file permissions must allow viewing by link or the embed will not work. Add an admin helper note:
+تأكد أن ملف Google Drive قابل للعرض لمن يملك الرابط.
+
+==================================================
+O. VIDEO WATERMARK
+==================
+
+On /academy/lectures/:id, overlay a watermark on top of the video iframe.
+
+Watermark content:
+
+* user fullName
+* membershipNumber
+* email
+
+Example:
+Omar Alharby | SY12 | [email@example.com](mailto:email@example.com)
+
+Style:
+
+* fixed corner of video area
+* top-right or bottom-left
+* semi-transparent
+* readable
+* not covering lecture content too much
+* small to medium size
+* Arabic RTL compatible if name Arabic
+* pointer-events: none
+
+Important:
+This is an app overlay, not burned into the original video.
+It reduces sharing risk but does not prevent screen recording 100%.
+
+Add text below video:
+هذه التسجيلات مخصصة للأعضاء المصرح لهم فقط، ويُمنع تصويرها أو نشرها خارج المنصة. قد تظهر علامة مائية باسم المستخدم لحماية المحتوى.
+
+==================================================
+P. ACADEMY ADMIN UI
+===================
+
+Create /admin/academy.
+
+Access:
+
+* MODERATOR
+* ADMIN
+* SUPER_ADMIN
+
+Features:
+
+* list academy lectures
+* filter by status
+* filter by specialty
+* create new lecture/announcement
+* edit lecture
+* publish/hide/archive
+* add PDF attachments
+* set Google Drive video link
+* set live meeting link
+* set isUpcoming
+* set isGeneral
+* select allowedSpecialties
+
+Create/Edit form fields:
+
+* title required
+* description required
+* lecturerName required
+* lectureDate optional
+* lectureTime optional
+* isUpcoming toggle
+* liveMeetingUrl optional
+* recordingDriveUrl optional
+* thumbnailUrl optional, support URL or base64 if ImageInput exists
+* isGeneral toggle
+* allowedSpecialties multi-select
+* status
+* PDF attachments optional
+
+Validation:
+
+* title required
+* description required
+* lecturerName required
+* if not isGeneral, at least one allowedSpecialty required
+* recordingDriveUrl must be valid Google Drive link if provided
+* PDF validation as existing modules
+
+==================================================
+Q. USER MANAGEMENT UI CHANGES
+=============================
+
+Update /admin/users user management.
+
+Show:
+
+* accessScope
+* academySpecialty
+* academyAllowedSpecialties
+* membershipNumber
+
+For pending users:
+
+* If membershipNumber = SY, show badge:
+  طلب أكاديمية سوريا
+
+Admin can:
+
+* set accessScope
+* set academySpecialty
+* set academyAllowedSpecialties
+* activate user
+
+On activating SY pending user:
+
+* generate next SY number
+* set membershipNumber to generated value
+* keep accessScope = SYRIA_ACADEMY_ONLY unless admin explicitly changes it
+* set status ACTIVE / isActive true
+
+For FULL_APP members:
+
+* membershipNumber remains numeric only.
+
+Safety:
+
+* Do not break existing user management role protections.
+* ADMIN cannot modify SUPER_ADMIN protections remain unchanged.
+* Last active SUPER_ADMIN protections remain unchanged.
+
+==================================================
+R. BOTTOM NAV / MORE PAGE
+=========================
+
+Add academy navigation.
+
+For FULL_APP users:
+
+* Add أكاديمية سجما or الأكاديمية in /more.
+* Optional bottom nav item if space allows, but do not overload the bottom nav.
+
+For SYRIA_ACADEMY_ONLY users:
+Show simplified navigation:
+
+* الأكاديمية
+* الأخبار
+* المقالات
+* حسابي
+* المزيد
+
+Hide:
+
+* chat
+* tasks
+* board
+* volunteer delegations
+* admin controls
+* full app-only links
+
+In /more for Syria users:
+show only:
+
+* الأكاديمية
+* الأخبار
+* المقالات
+* حسابي
+* من نحن
+* سياسة الخصوصية
+* الشروط والأحكام
+* معلومات المطور
+* تسجيل الخروج
+
+==================================================
+S. BACKEND API REQUIREMENTS
+===========================
+
+Create APIs:
+
+Academy user APIs:
+GET /api/academy/lectures
+
+* returns only lectures visible to current user
+* FULL_APP: all published lectures
+* SYRIA_ACADEMY_ONLY: GENERAL + own specialty + allowed specialties
+* optional filters: specialty, type/upcoming/status public-safe
+
+GET /api/academy/lectures/:id
+
+* returns lecture if visible to current user
+* returns 404 or 403 if not allowed
+
+GET /api/academy/announcements
+
+* published upcoming lectures visible to current user
+
+GET /api/academy/files/:fileId
+
+* download PDF only if user can view the lecture
+
+Academy admin APIs:
+GET /api/admin/academy/lectures
+
+* MODERATOR / ADMIN / SUPER_ADMIN
+
+POST /api/admin/academy/lectures
+
+* MODERATOR / ADMIN / SUPER_ADMIN
+
+PATCH /api/admin/academy/lectures/:id
+
+* MODERATOR / ADMIN / SUPER_ADMIN
+
+DELETE /api/admin/academy/lectures/:id
+
+* MODERATOR / ADMIN / SUPER_ADMIN
+* soft hide/archive preferred
+
+GET /api/admin/academy/files/:fileId
+
+* MODERATOR / ADMIN / SUPER_ADMIN
+
+User/account APIs:
+Update signup/login/admin user APIs to support:
+
+* accessScope
+* academySpecialty
+* academyAllowedSpecialties
+* SY membership flow
+* generated SY number on activation
+
+==================================================
+T. OPENAPI / GENERATED CLIENT
+=============================
+
+Update OpenAPI.
+
+Schemas:
+
+* AccessScope
+* AcademySpecialty
+* AcademyLecture
+* AcademyLectureDetail
+* AcademyFile
+* CreateAcademyLectureInput
+* UpdateAcademyLectureInput
+* AcademyLecturesResponse
+* UpdateUserAcademyAccessInput if needed
+
+Update user schemas:
+
+* Signup
+* Login user response
+* MemberProfile
+* AdminUserItem/AdminUserDetail/AdminUpdateUserInput
+
+Then:
+
+* Regenerate client
+* Do not manually edit generated files
+* Run typecheck
+
+==================================================
+U. TESTING REQUIRED
+===================
+
+Do not report completion until tested.
+
+Registration/SY flow:
+
+1. Signup with numeric membership works as FULL_APP pending.
+2. Signup with SY works as SYRIA_ACADEMY_ONLY pending.
+3. Invalid membershipNumber rejected.
+4. Admin sees SY pending badge.
+5. Admin activates SY user.
+6. System generates SY1/SY2 next number.
+7. Activated Syria user logs in and lands on /academy.
+
+Access control:
+
+1. FULL_APP user can open academy and see all lectures.
+2. SYRIA_ACADEMY_ONLY user sees only GENERAL + own specialty + allowed specialties.
+3. Syria nursing user cannot view pharmacy/dentistry lectures.
+4. Admin can grant extra specialty access.
+5. Syria user with ALL access sees all academy lectures.
+6. Syria user can read news.
+7. Syria user can read articles.
+8. Syria user cannot write articles.
+9. Syria user cannot open chat/tasks/volunteer/board/admin routes.
+
+Academy management:
+
+1. MODERATOR can create lecture.
+2. ADMIN can create lecture.
+3. SUPER_ADMIN can create lecture.
+4. MEMBER cannot create lecture.
+5. Academy manager adds Google Drive link.
+6. Embed URL generated correctly.
+7. PDF attachment works.
+8. Publish/hide/archive works.
+
+Video:
+
+1. Lecture watch page shows iframe embed.
+2. Direct Drive link is not shown as a button.
+3. Watermark appears in corner with fullName/membership/email.
+4. Unauthorized user cannot view restricted lecture.
+
+Regression:
+
+1. /login works.
+2. /register works.
+3. /home works.
+4. /news works.
+5. /articles works.
+6. /chat works for FULL_APP users.
+7. /tasks works for existing task users.
+8. /volunteer-delegations works for FULL_APP users.
+9. /admin works for staff.
+10. /more works.
+11. Typecheck passes.
+12. Backend starts cleanly.
+13. Preview works.
+14. External link still has no removeChild translation error.
+
+==================================================
+V. REQUIRED REPORT
+==================
+
+After completion, provide:
+
+SGMA ACADEMY SYRIA MODULE REPORT
+
+1. What was implemented
+2. Files changed
+3. Database/table changes
+4. New user fields:
+
+   * accessScope
+   * academySpecialty
+   * academyAllowedSpecialties
+5. SY membership flow status
+6. Syria user access restrictions
+7. Full app user academy access status
+8. Lecture/announcement management status
+9. Google Drive embed behavior
+10. Watermark behavior
+11. PDF attachment behavior
+12. Admin user management updates
+13. Backend API endpoints
+14. OpenAPI/client generation status
+15. Permission/security test results
+16. Runtime test results
+17. Preview status
+18. Known issues, if any
+19. Confirmation:
+
+* FULL_APP users can view all academy lectures
+* SYRIA_ACADEMY_ONLY users are filtered by specialty
+* admins can grant extra specialties or all access
+* Syria users can read news/articles but cannot write articles
+* no videos stored in DB
+* no Firebase
+* no MySQL migration
+* no unrelated modules changed
+
+Do not report success until SY registration, specialty filtering, Google Drive embed, watermark, and academy admin management are verified.
