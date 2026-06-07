@@ -24,13 +24,16 @@ export function MobileNav() {
       ];
 
   return (
-    <nav className="fixed bottom-0 left-0 right-0 border-t border-border bg-card pb-safe z-50">
+    <nav className="fixed bottom-0 left-0 right-0 border-t border-border bg-card/95 backdrop-blur supports-[backdrop-filter]:bg-card/80 pb-safe z-50 shadow-[0_-2px_12px_-4px_hsl(var(--primary)/0.15)]">
       <div className="flex justify-around items-center h-16 px-2">
         {navItems.map((item) => {
           const isActive = location === item.href;
           return (
             <Link key={item.href} href={item.href} className="flex-1 h-full">
-              <div className={`flex flex-col items-center justify-center w-full h-full space-y-1 ${isActive ? "text-primary" : "text-muted-foreground"}`}>
+              <div className={`relative flex flex-col items-center justify-center w-full h-full space-y-1 transition-colors ${isActive ? "text-primary" : "text-muted-foreground"}`}>
+                {isActive && (
+                  <span className="absolute top-0 h-1 w-8 rounded-full bg-sgma-gradient" />
+                )}
                 <item.icon className="h-5 w-5" />
                 <span className="text-[10px] font-medium">{item.label}</span>
               </div>

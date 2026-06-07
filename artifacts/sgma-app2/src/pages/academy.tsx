@@ -44,19 +44,19 @@ export default function Academy() {
         <BackButton fallback={syria ? "/academy" : "/more"} />
       </div>
 
-      <div className="px-2">
+      <div className="bg-sgma-gradient rounded-2xl p-5 text-white shadow-md shadow-primary/20">
         <div className="flex items-center gap-3">
-          <div className="p-3 rounded-xl bg-primary/10 text-primary shrink-0">
+          <div className="p-3 rounded-xl bg-white/15 text-white shrink-0">
             <GraduationCap className="h-7 w-7" />
           </div>
           <div>
             <h1 className="text-2xl font-bold">أكاديمية سوريا الطبية</h1>
-            <p className="text-muted-foreground text-sm mt-0.5">SGMA Academy Syria</p>
+            <p className="text-white/80 text-sm mt-0.5">SGMA Academy Syria</p>
           </div>
         </div>
         {syria && user?.academySpecialty && (
-          <p className="text-sm text-muted-foreground mt-3 leading-relaxed">
-            اختصاصك: <span className="font-semibold text-foreground">{specialtyLabel(user.academySpecialty)}</span>
+          <p className="text-sm text-white/85 mt-3 leading-relaxed">
+            اختصاصك: <span className="font-semibold text-white">{specialtyLabel(user.academySpecialty)}</span>
           </p>
         )}
       </div>

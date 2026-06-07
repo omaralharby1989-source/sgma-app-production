@@ -58,9 +58,9 @@ export default function AdminDashboard() {
         <BackButton fallback="/home" />
       </div>
 
-      <div className="px-2">
+      <div className="bg-sgma-gradient rounded-2xl p-5 text-white shadow-md shadow-primary/20">
         <h1 className="text-2xl font-bold">لوحة الإدارة</h1>
-        <p className="text-muted-foreground text-sm mt-1">نظرة عامة وإدارة المحتوى والأعضاء</p>
+        <p className="text-white/85 text-sm mt-1">نظرة عامة وإدارة المحتوى والأعضاء</p>
       </div>
 
       {isError ? (

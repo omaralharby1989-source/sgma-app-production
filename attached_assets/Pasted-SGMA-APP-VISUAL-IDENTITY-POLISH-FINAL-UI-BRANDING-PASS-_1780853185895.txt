@@ -1,0 +1,477 @@
+SGMA APP VISUAL IDENTITY POLISH — FINAL UI BRANDING PASS
+
+Start this task now.
+
+Scope:
+Improve the visual identity and overall UI presentation of SGMA APP using the SGMA logo colors and a professional medical association style.
+
+This is a visual/UI polish task only.
+
+Do NOT add new features.
+Do NOT change app logic.
+Do NOT change database schema.
+Do NOT change backend APIs.
+Do NOT change permissions.
+Do NOT change routes.
+Do NOT change authentication.
+Do NOT touch business logic.
+
+Existing stable modules must remain working:
+
+* login
+* register
+* home/my account
+* news
+* articles
+* chat
+* broadcast
+* admin dashboard
+* board of directors
+* volunteer delegations
+* task management
+* ads management
+* academy
+* more page
+* developer-info
+* privacy-policy
+* terms
+* about-sgma
+* membership approval flow
+* logo/branding
+
+Current architecture:
+
+* PostgreSQL + Drizzle
+* JWT auth
+* Arabic RTL
+* Mobile-first
+* No Firebase
+* No MySQL migration
+
+==================================================
+A. VISUAL IDENTITY GOAL
+=======================
+
+Create a polished, consistent, professional SGMA visual identity across the app.
+
+Design direction:
+
+* Medical
+* Professional
+* Clean
+* Modern
+* Calm
+* Trustworthy
+* Mobile-first
+* Arabic RTL
+
+Use the SGMA logo color direction:
+
+* dark blue
+* medium blue
+* light blue
+* small green accent
+
+The app should feel like an official medical association platform, not a generic template.
+
+==================================================
+B. COLOR PALETTE
+================
+
+Use design tokens / CSS variables if possible.
+
+Suggested SGMA color palette:
+
+Primary Dark Blue:
+#0F2F6B
+
+Primary Blue:
+#1E63C6
+
+Light Blue:
+#49B5FF
+
+Soft Sky Background:
+#DDF3FF
+
+Medical Green Accent:
+#39C95A
+
+Light App Background:
+#F7FAFD
+
+Text Dark:
+#14213D
+
+Muted Text:
+#64748B
+
+Card Border:
+#D8E7F5
+
+Success Green:
+#22C55E
+
+Warning:
+#F59E0B
+
+Danger:
+#EF4444
+
+Important:
+
+* Do not overuse green.
+* Green should be an accent only.
+* Blue should dominate the identity.
+
+==================================================
+C. GLOBAL STYLE UPDATE
+======================
+
+Update global frontend styling carefully.
+
+Required:
+
+1. App background should be soft and professional.
+2. Cards should be cleaner and more consistent.
+3. Primary buttons should use SGMA blue gradient or solid primary blue.
+4. Secondary buttons should use light blue/soft blue style.
+5. Badges should use the SGMA palette.
+6. Inputs should have clean focus states with primary blue.
+7. Page headers should have a consistent style.
+8. Remove random orange/default template color if still visible.
+9. Make shadows softer and more professional.
+10. Keep accessibility and contrast readable.
+
+Do not make the whole app dark.
+Use light UI with blue medical identity.
+
+==================================================
+D. GRADIENT STYLE
+=================
+
+Use a consistent gradient style in important areas:
+
+Gradient:
+dark blue → primary blue → light blue
+
+Suggested:
+linear-gradient(135deg, #0F2F6B 0%, #1E63C6 55%, #49B5FF 100%)
+
+Use this for:
+
+* Login/Register header background or accent panel
+* Home welcome card
+* Academy header card
+* Board header card
+* Admin dashboard header
+* Main CTA buttons where appropriate
+
+Do NOT use gradient on every card.
+Keep it elegant.
+
+==================================================
+E. LOGIN / REGISTER POLISH
+==========================
+
+Improve /login and /register visually.
+
+Requirements:
+
+* Keep SGMA logo clean and visible.
+* Use the slogan:
+  منصة تربط الكفاءات الطبية السورية بين ألمانيا وسوريا، لأن سوريا تستحق
+
+Apply it under SGMA APP title or as a small subtitle if it fits cleanly.
+
+Login:
+
+* Logo centered
+* SGMA APP title
+* Arabic subtitle
+* Slogan in smaller text
+* Clean card with soft shadow
+* Blue gradient primary login button
+
+Register:
+
+* Keep form readable and not too long visually.
+* Use section cards or subtle dividers.
+* Keep SGMA logo smaller than login.
+* Improve membershipNumber helper text style.
+* Keep all validation and fields unchanged.
+
+Do not change signup logic.
+
+==================================================
+F. PAGE HEADER COMPONENT STYLE
+==============================
+
+If there is an existing BackButton/page header pattern, keep it.
+If there are repeated page headers, improve them consistently.
+
+Page header design:
+
+* Rounded card
+* Light blue/white background
+* Optional subtle gradient strip
+* Title dark blue
+* Subtitle muted
+* Small icon if existing
+
+Apply where safe:
+
+* Home
+* News
+* Articles
+* Chat
+* Board
+* Volunteer Delegations
+* Tasks
+* Academy
+* Admin pages
+* Static pages
+
+Do not rewrite pages deeply.
+Polish existing headers and cards.
+
+==================================================
+G. CARDS STYLE
+==============
+
+Unify card style across:
+
+* news cards
+* article cards
+* academy lecture cards
+* board member cards
+* task cards
+* volunteer request cards
+* admin cards
+* more page cards
+
+Card requirements:
+
+* white or soft white background
+* border in light blue-gray
+* border-radius consistent
+* subtle shadow
+* hover/active touch feedback if easy
+* no harsh black shadows
+* no crowded spacing
+
+Suggested:
+
+* rounded-2xl
+* border border-blue-100 or token equivalent
+* shadow-sm / shadow-md soft
+* padding consistent
+
+Mobile:
+
+* no horizontal overflow
+* spacing comfortable
+* bottom nav does not cover content
+
+==================================================
+H. BUTTON STYLE
+===============
+
+Unify button appearance.
+
+Primary button:
+
+* SGMA blue gradient or solid primary blue
+* white text
+* soft shadow
+* rounded-xl or rounded-2xl
+
+Secondary button:
+
+* soft blue background
+* primary blue text
+* border light blue
+
+Danger button:
+
+* keep red but softer, not aggressive unless destructive
+
+Success:
+
+* green accent, limited use
+
+Do not break existing button component variants.
+
+If the app uses shadcn Button variants, update styling centrally if safe.
+
+==================================================
+I. BOTTOM NAVIGATION POLISH
+===========================
+
+Improve mobile bottom navigation.
+
+Requirements:
+
+* white/very light background
+* active item dark blue
+* inactive item muted gray-blue
+* active item may have subtle blue glow or small top indicator
+* no orange color
+* safe-area bottom padding if supported
+* icons and labels readable
+
+Do not change nav logic or role-based visibility.
+
+==================================================
+J. ADMIN DASHBOARD POLISH
+=========================
+
+Make admin pages look more official.
+
+Apply:
+
+* blue header card
+* consistent stat cards
+* cleaner management links
+* badges with consistent colors
+* tables/cards mobile-friendly
+
+Do not change admin permissions or logic.
+
+==================================================
+K. ACADEMY VISUAL POLISH
+========================
+
+Academy should feel like an educational medical section.
+
+Apply:
+
+* blue gradient hero card
+* lecture cards with image thumbnails
+* specialty badges
+* clear lecture/recording labels
+* video detail page watermark unaffected
+* do not change Drive embed logic
+
+==================================================
+L. BOARD CARD BIO BULLETS
+=========================
+
+If the Board bio bullet format fix is not already done, include it here as a small UI polish:
+
+* Display board member bio as bullet list.
+* Split by line breaks.
+* Add helper text in edit form:
+  اكتب كل نقطة في سطر مستقل ليتم عرضها بشكل مرتب داخل البطاقة.
+
+If already done, do not redo.
+
+==================================================
+M. DO NOT CHANGE FUNCTIONALITY
+==============================
+
+Do not change:
+
+* APIs
+* database
+* schemas
+* auth
+* role permissions
+* accessScope
+* SY Academy logic
+* chat logic
+* tasks logic
+* article approval logic
+* member activation flow
+* uploads
+* exports
+* Google Drive embed
+* watermark logic
+
+This task is visual polish only.
+
+==================================================
+N. TESTING REQUIRED
+===================
+
+After visual changes, test in Preview:
+
+1. /login
+2. /register
+3. /home
+4. /more
+5. /news
+6. /news/:id
+7. /articles
+8. /articles/:id
+9. /chat
+10. /board
+11. /volunteer-delegations
+12. /tasks
+13. /academy
+14. /admin
+15. /admin/users
+16. /admin/academy
+17. /developer-info
+18. /privacy-policy
+19. /terms
+20. /about-sgma
+
+Check:
+
+* mobile layout
+* no horizontal scroll
+* bottom nav not broken
+* no broken icons/images
+* RTL still correct
+* colors consistent
+* no console errors
+* typecheck passes
+
+==================================================
+O. BEFORE/AFTER SAFETY
+======================
+
+Before changing:
+
+* create or rely on current checkpoint
+* do not touch backend
+
+After changing:
+
+* run frontend typecheck
+* if full workspace typecheck is fast, run it
+* verify Preview visually
+* do not report success without screenshots or clear preview verification
+
+==================================================
+P. REQUIRED REPORT
+==================
+
+After completion, provide:
+
+SGMA VISUAL IDENTITY POLISH REPORT
+
+1. What was changed
+2. Files changed
+3. Color palette applied
+4. Login/Register status
+5. Global card/button style status
+6. Bottom navigation status
+7. Admin UI polish status
+8. Academy polish status
+9. Board card bio bullet status if touched
+10. Preview/mobile test results
+11. Typecheck result
+12. Known issues, if any
+13. Confirmation:
+
+* no backend changed
+* no database changed
+* no auth/permissions changed
+* no route logic changed
+* no unrelated features added
+* existing modules still work
+
+Do not overdo the redesign.
+Keep the app stable, professional, and consistent with SGMA colors.

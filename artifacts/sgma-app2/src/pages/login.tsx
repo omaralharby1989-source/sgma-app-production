@@ -69,10 +69,15 @@ export default function Login() {
         <p className="mt-2 text-center text-sm text-muted-foreground">
           بوابة أعضاء الجمعية الطبية السورية الألمانية
         </p>
+        <p className="mt-2 text-center text-xs text-muted-foreground/90 leading-relaxed max-w-xs mx-auto">
+          منصة تربط الكفاءات الطبية السورية بين ألمانيا وسوريا، لأن سوريا تستحق
+        </p>
       </div>
 
       <div className="mt-8 sm:mx-auto sm:w-full sm:max-w-md">
-        <div className="bg-card py-8 px-4 shadow sm:rounded-lg sm:px-10 border border-border">
+        <div className="bg-card pt-1.5 pb-8 px-0 shadow-lg shadow-primary/5 rounded-2xl border border-card-border overflow-hidden">
+          <div className="h-1.5 w-full bg-sgma-gradient" />
+          <div className="px-4 sm:px-10 pt-7">
           <form className="space-y-6" onSubmit={form.handleSubmit(onSubmit)}>
             
             <div className="space-y-2">
@@ -133,6 +138,7 @@ export default function Login() {
             <Link href="/register" className="text-sm font-medium text-primary hover:underline">
               ليس لديك حساب؟ سجل الآن
             </Link>
+          </div>
           </div>
         </div>
       </div>

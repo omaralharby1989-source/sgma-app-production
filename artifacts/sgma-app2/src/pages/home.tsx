@@ -246,10 +246,10 @@ export default function Home() {
   return (
     <div className="p-4 space-y-6 max-w-lg mx-auto pb-28">
 
-      <Card className="overflow-hidden border-none shadow-md bg-gradient-to-br from-card to-muted">
+      <Card className="overflow-hidden border-none shadow-md shadow-primary/20 bg-sgma-gradient text-white">
         <CardContent className="p-6 flex flex-col items-center text-center">
           <div className="relative mb-4">
-            <Avatar className="h-24 w-24 border-4 border-background shadow-sm">
+            <Avatar className="h-24 w-24 border-4 border-white/80 shadow-sm">
               {profile.avatarUrl && <AvatarImage src={profile.avatarUrl} />}
               <AvatarFallback className="text-2xl">{profile.fullName.substring(0, 2)}</AvatarFallback>
             </Avatar>

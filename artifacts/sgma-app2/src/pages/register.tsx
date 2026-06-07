@@ -119,10 +119,15 @@ export default function Register() {
         <p className="mt-2 text-center text-sm text-muted-foreground">
           انضم إلى SGMA APP
         </p>
+        <p className="mt-2 text-center text-xs text-muted-foreground/90 leading-relaxed max-w-xs mx-auto">
+          منصة تربط الكفاءات الطبية السورية بين ألمانيا وسوريا، لأن سوريا تستحق
+        </p>
       </div>
 
       <div className="mt-8 sm:mx-auto sm:w-full sm:max-w-md mb-8">
-        <div className="bg-card py-8 px-4 shadow sm:rounded-lg sm:px-10 border border-border">
+        <div className="bg-card pb-8 px-0 shadow-lg shadow-primary/5 rounded-2xl border border-card-border overflow-hidden">
+          <div className="h-1.5 w-full bg-sgma-gradient" />
+          <div className="px-4 sm:px-10 pt-8">
           <form className="space-y-8" onSubmit={form.handleSubmit(onSubmit)} noValidate>
 
             <section className="space-y-5">
@@ -211,9 +216,9 @@ export default function Register() {
               <div className="space-y-2">
                 <Label htmlFor="membershipNumber">رقم العضوية</Label>
                 <Input id="membershipNumber" type="text" {...form.register("membershipNumber")} disabled={isPending} className="text-left" dir="ltr" placeholder="أدخل رقم عضويتك في SGMA" />
-                <p className="text-xs text-muted-foreground leading-relaxed">
+                <p className="rounded-lg bg-secondary/60 border border-secondary-border px-3 py-2 text-xs text-secondary-foreground leading-relaxed">
                   أعضاء SGMA: أدخل رقم عضويتك الرقمي. للتسجيل في أكاديمية سوريا فقط:
-                  اكتب <span className="font-semibold">SY</span> في هذا الحقل.
+                  اكتب <span className="font-bold">SY</span> في هذا الحقل.
                 </p>
                 {form.formState.errors.membershipNumber && (
                   <p className="text-xs text-destructive">{form.formState.errors.membershipNumber.message}</p>
@@ -298,6 +303,7 @@ export default function Register() {
             <Link href="/login" className="text-sm font-medium text-primary hover:underline">
               لديك حساب بالفعل؟ سجل دخولك
             </Link>
+          </div>
           </div>
         </div>
       </div>

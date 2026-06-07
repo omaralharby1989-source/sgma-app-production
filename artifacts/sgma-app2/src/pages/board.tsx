@@ -40,9 +40,9 @@ export default function Board() {
         <BackButton fallback="/more" />
       </div>
 
-      <div className="px-2">
+      <div className="bg-sgma-gradient rounded-2xl p-5 text-white shadow-md shadow-primary/20">
         <h1 className="text-2xl font-bold">مجلس الإدارة</h1>
-        <p className="text-muted-foreground text-sm mt-1 leading-relaxed">
+        <p className="text-white/85 text-sm mt-1 leading-relaxed">
           تعرف على مجلس إدارة الجمعية الطبية السورية الألمانية SGMA
         </p>
       </div>
