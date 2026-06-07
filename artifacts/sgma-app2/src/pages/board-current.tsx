@@ -40,6 +40,7 @@ import { BackButton } from "@/components/BackButton";
 import { useToast } from "@/hooks/use-toast";
 import { AlertCircle, Loader2, Plus, Phone, Mail, Pencil, EyeOff } from "lucide-react";
 import { getStoredUser, isAdminOrSuper } from "@/lib/auth";
+import { formatBoardBioToBullets } from "@/lib/board";
 
 const BOARD_TYPE = "CURRENT" as const;
 const MAX_IMAGE_BYTES = 2 * 1024 * 1024;
@@ -291,7 +292,27 @@ export default function BoardCurrent() {
                 </div>
               </div>
 
-              <p className="text-sm text-muted-foreground leading-relaxed break-words">{m.bio}</p>
+              {(() => {
+                const points = formatBoardBioToBullets(m.bio);
+                if (points.length === 0) {
+                  return (
+                    <p className="text-sm text-muted-foreground">لا توجد نبذة متاحة</p>
+                  );
+                }
+                return (
+                  <ul className="space-y-1.5">
+                    {points.map((point, i) => (
+                      <li
+                        key={i}
+                        className="flex items-start gap-2 text-sm text-muted-foreground leading-relaxed break-words"
+                      >
+                        <span className="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-primary" />
+                        <span className="min-w-0">{point}</span>
+                      </li>
+                    ))}
+                  </ul>
+                );
+              })()}
 
               <div className="flex flex-wrap gap-2">
                 {m.phone ? (
@@ -412,6 +433,9 @@ export default function BoardCurrent() {
                 onChange={(e) => setForm((f) => ({ ...f, bio: e.target.value }))}
                 rows={4}
               />
+              <p className="text-xs text-muted-foreground leading-relaxed">
+                اكتب كل نقطة في سطر مستقل ليتم عرضها بشكل مرتب داخل البطاقة.
+              </p>
             </div>
             <div className="space-y-1.5">
               <Label>رقم الهاتف</Label>

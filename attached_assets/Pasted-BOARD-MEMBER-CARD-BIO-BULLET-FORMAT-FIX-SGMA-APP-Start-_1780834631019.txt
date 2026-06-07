@@ -1,0 +1,194 @@
+BOARD MEMBER CARD BIO BULLET FORMAT FIX — SGMA APP
+
+Start this small UI fix now.
+
+Scope:
+Improve the Board of Directors member card bio display.
+
+Current problem:
+In /board/current, the board member bio appears as one long paragraph. It looks crowded and unprofessional on mobile, especially when the bio contains Arabic and German text.
+
+Required:
+Display each board member bio as a clean bullet list.
+
+Do not change database schema.
+Do not change backend unless absolutely necessary.
+Do not change board permissions.
+Do not change unrelated modules.
+
+Current architecture:
+
+* PostgreSQL + Drizzle
+* JWT auth
+* Arabic RTL
+* Mobile-first
+* No Firebase
+* No MySQL migration
+
+==================================================
+A. DISPLAY REQUIREMENT
+======================
+
+In the board member card, convert the bio text into bullet points.
+
+Example stored bio:
+
+أخصائي أمراض قلب من سوريا وألمانيا
+Oberarzt für Kardiologie im Klinikum Itzehoe
+عضو هيئة تأسيسية في SGMA
+عضو مجلس إدارة تأسيسي
+مدير الوفد الطبي الأول والثاني لعام 2024
+منسق فريق القلبية
+
+Should display as:
+
+• أخصائي أمراض قلب من سوريا وألمانيا
+• Oberarzt für Kardiologie im Klinikum Itzehoe
+• عضو هيئة تأسيسية في SGMA
+• عضو مجلس إدارة تأسيسي
+• مدير الوفد الطبي الأول والثاني لعام 2024
+• منسق فريق القلبية
+
+==================================================
+B. BIO PARSING RULES
+====================
+
+Create a small helper function on the frontend, for example:
+
+formatBoardBioToBullets(bio: string): string[]
+
+Rules:
+
+1. Split bio by new lines.
+2. Also support lines that already start with:
+
+   * "-"
+   * "•"
+   * "."
+3. Trim whitespace.
+4. Remove empty lines.
+5. Remove duplicated bullet characters from the beginning.
+6. Return clean bullet text items.
+
+If bio has no line breaks:
+
+* Still display it as one bullet point instead of a paragraph.
+
+Do not mutate stored database value.
+Only change display formatting.
+
+==================================================
+C. BOARD CARD UI
+================
+
+Update the board member card UI in:
+
+/board/current
+
+Bio display should be:
+
+<ul>
+  <li>...</li>
+</ul>
+
+Arabic RTL-friendly styling:
+
+* list-inside or custom bullet
+* comfortable spacing
+* text-sm or readable size
+* line-height relaxed
+* bullet should not break RTL layout
+* German text should still display correctly
+
+Suggested styling:
+
+* Use a vertical list.
+* Each item has a small colored dot/bullet.
+* Text color: muted foreground.
+* Spacing between points: 4–6px.
+* Do not use a dense paragraph.
+
+If the bio is empty:
+Show nothing or:
+لا توجد نبذة متاحة
+
+==================================================
+D. EDIT FORM HELPER TEXT
+========================
+
+In the board member add/edit form, under the bio textarea, add helper text:
+
+اكتب كل نقطة في سطر مستقل ليتم عرضها بشكل مرتب داخل البطاقة.
+
+This helps admins enter bios correctly.
+
+Do not force the user to add bullets manually.
+The app should add bullet formatting automatically in display.
+
+==================================================
+E. EXAMPLE
+==========
+
+When editing a board member, admin can write:
+
+أخصائي قلب من سوريا وألمانيا
+Oberarzt für Kardiologie
+عضو هيئة تأسيس سجما
+مدير الوفد الطبي الأول والثاني
+
+The card should display it as four bullets.
+
+==================================================
+F. DO NOT CHANGE
+================
+
+Do not change:
+
+* board_members table
+* board API
+* role permissions
+* image upload
+* delete/soft-delete behavior
+* /more
+* /admin
+* any unrelated module
+
+This is a frontend display and form-helper improvement only.
+
+==================================================
+G. TESTING REQUIRED
+===================
+
+Test before reporting:
+
+1. /board/current opens.
+2. Existing long bio now displays as bullet list.
+3. Multi-line Arabic/German bio displays correctly.
+4. Bio with lines starting with "-" or "•" does not show duplicate bullets.
+5. Empty bio does not break the card.
+6. Add/edit form shows helper text under bio textarea.
+7. Mobile layout remains clean.
+8. Typecheck passes.
+9. Preview works.
+
+==================================================
+H. REQUIRED REPORT
+==================
+
+After completion, provide:
+
+BOARD BIO BULLET FORMAT REPORT
+
+1. What was changed
+2. Files changed
+3. Bio parsing behavior
+4. Board card display status
+5. Add/edit helper text status
+6. Mobile preview status
+7. Known issues, if any
+8. Confirmation:
+
+   * no database change
+   * no backend change unless absolutely necessary
+   * no permission change
+   * no unrelated modules changed
