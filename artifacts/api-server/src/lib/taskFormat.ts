@@ -18,6 +18,7 @@ export interface AssigneeInfo {
   fullName: string | null;
   account: string | null;
   email: string | null;
+  userRole: string | null;
 }
 
 export interface ReportInfo {
@@ -36,13 +37,14 @@ export async function fetchActiveAssignees(taskIds: number[]): Promise<Map<numbe
       fullName: usersTable.fullName,
       account: usersTable.account,
       email: usersTable.email,
+      userRole: usersTable.role,
     })
     .from(taskAssigneesTable)
     .leftJoin(usersTable, eq(taskAssigneesTable.userId, usersTable.id))
     .where(and(inArray(taskAssigneesTable.taskId, taskIds), eq(taskAssigneesTable.isActive, true)));
   for (const r of rows) {
     const list = map.get(r.a.taskId) ?? [];
-    list.push({ row: r.a, fullName: r.fullName, account: r.account, email: r.email });
+    list.push({ row: r.a, fullName: r.fullName, account: r.account, email: r.email, userRole: r.userRole });
     map.set(r.a.taskId, list);
   }
   return map;
@@ -86,9 +88,11 @@ function formatAssignee(info: AssigneeInfo) {
     id: info.row.id,
     taskId: info.row.taskId,
     userId: info.row.userId,
+    participantRole: info.row.participantRole,
     userFullName: info.fullName ?? null,
     userAccount: info.account ?? null,
     userEmail: info.email ?? null,
+    userRole: info.userRole ?? null,
     isActive: info.row.isActive,
     assignedAt: info.row.assignedAt?.toISOString() ?? null,
   };

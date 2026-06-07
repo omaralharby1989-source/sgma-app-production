@@ -28,7 +28,36 @@ const VALID_STATUSES = [
   "CANCELLED",
 ];
 
-// Validates that all given user ids are ACTIVE MEMBER accounts; returns the found ids.
+type ParticipantRole = "SUPERVISOR" | "ASSIGNEE" | "SUPPORTER";
+
+interface Participant {
+  userId: number;
+  participantRole: ParticipantRole;
+}
+
+// Builds a deduplicated participant list from the three role inputs. A user may
+// appear in more than one role, but never twice within the same role list.
+function buildParticipants(input: {
+  supervisorUserId?: number | null;
+  assigneeUserIds?: number[];
+  supporterUserIds?: number[];
+}): Participant[] {
+  const seen = new Set<string>();
+  const out: Participant[] = [];
+  const add = (userId: number, role: ParticipantRole) => {
+    const key = `${userId}:${role}`;
+    if (seen.has(key)) return;
+    seen.add(key);
+    out.push({ userId, participantRole: role });
+  };
+  if (input.supervisorUserId != null) add(input.supervisorUserId, "SUPERVISOR");
+  for (const id of input.assigneeUserIds ?? []) add(id, "ASSIGNEE");
+  for (const id of input.supporterUserIds ?? []) add(id, "SUPPORTER");
+  return out;
+}
+
+// Validates that all given user ids are ACTIVE accounts (ANY role); returns the
+// set of found ids. Staff may be participants too, so role is NOT filtered.
 async function activeUserIds(ids: number[]): Promise<Set<number>> {
   if (ids.length === 0) return new Set();
   const rows = await db
@@ -37,7 +66,6 @@ async function activeUserIds(ids: number[]): Promise<Set<number>> {
     .where(
       and(
         inArray(usersTable.id, ids),
-        eq(usersTable.role, "MEMBER"),
         eq(usersTable.status, "ACTIVE"),
         eq(usersTable.isActive, true),
       ),
@@ -45,18 +73,26 @@ async function activeUserIds(ids: number[]): Promise<Set<number>> {
   return new Set(rows.map((r) => r.id));
 }
 
-// Replaces the active assignee set of a task with the provided user ids.
-async function reconcileAssignees(taskId: number, userIds: number[], actorId: number) {
+// Replaces the active participant set of a task with the provided list,
+// matching existing rows by (userId, participantRole).
+async function reconcileParticipants(
+  taskId: number,
+  participants: Participant[],
+  actorId: number,
+) {
   const existing = await db
     .select()
     .from(taskAssigneesTable)
     .where(eq(taskAssigneesTable.taskId, taskId));
-  const existingByUser = new Map(existing.map((e) => [e.userId, e]));
-  const wanted = new Set(userIds);
+  const existingByKey = new Map(
+    existing.map((e) => [`${e.userId}:${e.participantRole}`, e]),
+  );
+  const wanted = new Set(participants.map((p) => `${p.userId}:${p.participantRole}`));
 
   // Deactivate everyone no longer wanted.
   for (const e of existing) {
-    if (!wanted.has(e.userId) && e.isActive) {
+    const key = `${e.userId}:${e.participantRole}`;
+    if (!wanted.has(key) && e.isActive) {
       await db
         .update(taskAssigneesTable)
         .set({ isActive: false })
@@ -64,17 +100,20 @@ async function reconcileAssignees(taskId: number, userIds: number[], actorId: nu
     }
   }
   // Activate / insert the wanted set.
-  for (const uid of wanted) {
-    const ex = existingByUser.get(uid);
+  for (const p of participants) {
+    const ex = existingByKey.get(`${p.userId}:${p.participantRole}`);
     if (ex) {
       await db
         .update(taskAssigneesTable)
         .set({ isActive: true, assignedById: actorId })
         .where(eq(taskAssigneesTable.id, ex.id));
     } else {
-      await db
-        .insert(taskAssigneesTable)
-        .values({ taskId, userId: uid, assignedById: actorId });
+      await db.insert(taskAssigneesTable).values({
+        taskId,
+        userId: p.userId,
+        participantRole: p.participantRole,
+        assignedById: actorId,
+      });
     }
   }
 }
@@ -161,14 +200,16 @@ router.get("/admin/tasks/export", requireAuth, async (req, res): Promise<void> =
     const assignees = await fetchActiveAssignees(ids);
     const reports = await fetchReports(ids);
 
-    const assigneeLabel = (list: AssigneeInfo[]) =>
+    const labelFor = (list: AssigneeInfo[], role: ParticipantRole) =>
       list
+        .filter((a) => a.row.participantRole === role)
         .map((a) => a.fullName ?? a.account ?? String(a.row.userId))
         .filter(Boolean)
         .join(", ");
 
     res.json(
       rows.map((r) => {
+        const list = assignees.get(r.task.id) ?? [];
         const repList = reports.get(r.task.id) ?? [];
         const latest = repList[0];
         return {
@@ -177,7 +218,9 @@ router.get("/admin/tasks/export", requireAuth, async (req, res): Promise<void> =
           description: r.task.description,
           priority: r.task.priority,
           status: r.task.status,
-          assignees: assigneeLabel(assignees.get(r.task.id) ?? []),
+          supervisor: labelFor(list, "SUPERVISOR"),
+          assignees: labelFor(list, "ASSIGNEE"),
+          supporters: labelFor(list, "SUPPORTER"),
           startDate: r.task.startDate ?? null,
           dueDate: r.task.dueDate ?? null,
           createdByName: r.createdByName ?? null,
@@ -212,7 +255,6 @@ router.get("/admin/tasks/assignable-users", requireAuth, async (req, res): Promi
       .from(usersTable)
       .where(
         and(
-          eq(usersTable.role, "MEMBER"),
           eq(usersTable.status, "ACTIVE"),
           eq(usersTable.isActive, true),
         ),
@@ -226,7 +268,7 @@ router.get("/admin/tasks/assignable-users", requireAuth, async (req, res): Promi
   }
 });
 
-// POST /admin/tasks — staff only; create + assign
+// POST /admin/tasks — staff only; create + assign participants
 router.post("/admin/tasks", requireAuth, async (req, res): Promise<void> => {
   if (!isStaff(req.user!.role)) {
     res.status(403).json({ error: "ليس لديك صلاحية لإنشاء المهام" });
@@ -245,14 +287,20 @@ router.post("/admin/tasks", requireAuth, async (req, res): Promise<void> => {
     return;
   }
 
-  const assigneeIds = [...new Set(data.assigneeIds)];
-  if (assigneeIds.length === 0) {
-    res.status(400).json({ error: "يرجى اختيار عضو واحد على الأقل" });
+  const participants = buildParticipants({
+    supervisorUserId: data.supervisorUserId,
+    assigneeUserIds: data.assigneeUserIds,
+    supporterUserIds: data.supporterUserIds,
+  });
+  if (participants.length === 0) {
+    res.status(400).json({ error: "يرجى اختيار مشارك واحد على الأقل في المهمة" });
     return;
   }
-  const active = await activeUserIds(assigneeIds);
-  if (active.size !== assigneeIds.length) {
-    res.status(400).json({ error: "بعض الأعضاء المحددين غير موجودين أو غير مفعّلين" });
+
+  const distinctIds = [...new Set(participants.map((p) => p.userId))];
+  const active = await activeUserIds(distinctIds);
+  if (active.size !== distinctIds.length) {
+    res.status(400).json({ error: "بعض المستخدمين المحددين غير موجودين أو غير مفعّلين" });
     return;
   }
 
@@ -272,9 +320,10 @@ router.post("/admin/tasks", requireAuth, async (req, res): Promise<void> => {
       .returning();
 
     await db.insert(taskAssigneesTable).values(
-      assigneeIds.map((uid) => ({
+      participants.map((p) => ({
         taskId: task.id,
-        userId: uid,
+        userId: p.userId,
+        participantRole: p.participantRole,
         assignedById: req.user!.userId,
       })),
     );
@@ -335,19 +384,28 @@ router.patch("/admin/tasks/:id", requireAuth, async (req, res): Promise<void> =>
     if (data.dueDate !== undefined) updates.dueDate = data.dueDate?.trim() || null;
     if (data.adminNotes !== undefined) updates.adminNotes = data.adminNotes?.trim() || null;
 
-    // Validate + reconcile assignees if provided.
-    if (data.assigneeIds !== undefined) {
-      const ids = [...new Set(data.assigneeIds)];
-      if (ids.length === 0) {
-        res.status(400).json({ error: "يرجى اختيار عضو واحد على الأقل" });
+    // Validate + reconcile participants if any of the role lists were provided.
+    const participantsProvided =
+      data.supervisorUserId !== undefined ||
+      data.assigneeUserIds !== undefined ||
+      data.supporterUserIds !== undefined;
+    if (participantsProvided) {
+      const participants = buildParticipants({
+        supervisorUserId: data.supervisorUserId,
+        assigneeUserIds: data.assigneeUserIds,
+        supporterUserIds: data.supporterUserIds,
+      });
+      if (participants.length === 0) {
+        res.status(400).json({ error: "يرجى اختيار مشارك واحد على الأقل في المهمة" });
         return;
       }
-      const active = await activeUserIds(ids);
-      if (active.size !== ids.length) {
-        res.status(400).json({ error: "بعض الأعضاء المحددين غير موجودين أو غير مفعّلين" });
+      const distinctIds = [...new Set(participants.map((p) => p.userId))];
+      const active = await activeUserIds(distinctIds);
+      if (active.size !== distinctIds.length) {
+        res.status(400).json({ error: "بعض المستخدمين المحددين غير موجودين أو غير مفعّلين" });
         return;
       }
-      await reconcileAssignees(id, ids, req.user!.userId);
+      await reconcileParticipants(id, participants, req.user!.userId);
     }
 
     if (Object.keys(updates).length > 0) {

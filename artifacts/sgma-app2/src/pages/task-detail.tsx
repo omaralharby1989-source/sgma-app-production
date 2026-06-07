@@ -34,6 +34,7 @@ import {
   PRIORITY_LABELS,
   PRIORITY_CLASS,
   TASK_STATUS_OPTIONS,
+  ROLE_LABELS,
   formatTaskDate,
 } from "@/lib/taskLabels";
 import {
@@ -46,6 +47,8 @@ import {
   Download,
   ClipboardList,
   Users,
+  UserCog,
+  HeartHandshake,
   StickyNote,
 } from "lucide-react";
 
@@ -269,17 +272,35 @@ export default function TaskDetail() {
                 <span>تاريخ البدء: {formatTaskDate(task.startDate)}</span>
                 <span>الاستحقاق: {formatTaskDate(task.dueDate)}</span>
               </div>
-              <div className="flex items-start gap-2 text-muted-foreground">
-                <Users className="h-4 w-4 mt-0.5 shrink-0" />
-                <span>
-                  المكلّفون:{" "}
-                  {task.assignees.length
-                    ? task.assignees
-                        .map((a) => a.userFullName ?? a.userAccount ?? `#${a.userId}`)
-                        .join("، ")
-                    : "—"}
-                </span>
-              </div>
+              {(() => {
+                const group = (role: string) =>
+                  task.assignees
+                    .filter((a) => a.participantRole === role)
+                    .map((a) => {
+                      const name = a.userFullName ?? a.userAccount ?? `#${a.userId}`;
+                      const r = a.userRole ? ROLE_LABELS[a.userRole] ?? a.userRole : null;
+                      return r ? `${name} (${r})` : name;
+                    });
+                const supervisor = group("SUPERVISOR");
+                const assignees = group("ASSIGNEE");
+                const supporters = group("SUPPORTER");
+                const Row = ({ icon, label, names }: { icon: React.ReactNode; label: string; names: string[] }) => (
+                  <div className="flex items-start gap-2 text-muted-foreground">
+                    <span className="mt-0.5 shrink-0">{icon}</span>
+                    <span>
+                      <span className="font-medium text-foreground">{label}: </span>
+                      {names.length ? names.join("، ") : "—"}
+                    </span>
+                  </div>
+                );
+                return (
+                  <div className="space-y-2">
+                    <Row icon={<UserCog className="h-4 w-4" />} label="مشرف المهمة" names={supervisor} />
+                    <Row icon={<Users className="h-4 w-4" />} label="المكلّفون" names={assignees} />
+                    <Row icon={<HeartHandshake className="h-4 w-4" />} label="المساعدون / الداعمون" names={supporters} />
+                  </div>
+                );
+              })()}
               {staff && task.adminNotes && (
                 <p className="rounded-md bg-muted/50 p-2">
                   <span className="font-medium">ملاحظات إدارية: </span>

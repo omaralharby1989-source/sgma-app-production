@@ -22,6 +22,7 @@ export const taskAssigneesTable = pgTable("task_assignees", {
   id: serial("id").primaryKey(),
   taskId: integer("task_id").notNull(),
   userId: integer("user_id").notNull(),
+  participantRole: text("participant_role").notNull().default("ASSIGNEE"),
   assignedById: integer("assigned_by_id").notNull(),
   assignedAt: timestamp("assigned_at", { withTimezone: true }).notNull().defaultNow(),
   isActive: boolean("is_active").notNull().default(true),

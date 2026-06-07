@@ -599,9 +599,11 @@ export const GetMyTasksResponseItem = zod.object({
   "id": zod.number(),
   "taskId": zod.number(),
   "userId": zod.number(),
+  "participantRole": zod.enum(['SUPERVISOR', 'ASSIGNEE', 'SUPPORTER']),
   "userFullName": zod.string().nullish(),
   "userAccount": zod.string().nullish(),
   "userEmail": zod.string().nullish(),
+  "userRole": zod.string().nullish(),
   "isActive": zod.boolean(),
   "assignedAt": zod.coerce.date().nullish()
 }))
@@ -649,9 +651,11 @@ export const GetTaskResponse = zod.object({
   "id": zod.number(),
   "taskId": zod.number(),
   "userId": zod.number(),
+  "participantRole": zod.enum(['SUPERVISOR', 'ASSIGNEE', 'SUPPORTER']),
   "userFullName": zod.string().nullish(),
   "userAccount": zod.string().nullish(),
   "userEmail": zod.string().nullish(),
+  "userRole": zod.string().nullish(),
   "isActive": zod.boolean(),
   "assignedAt": zod.coerce.date().nullish()
 })),
@@ -730,9 +734,11 @@ export const GetAdminTasksResponseItem = zod.object({
   "id": zod.number(),
   "taskId": zod.number(),
   "userId": zod.number(),
+  "participantRole": zod.enum(['SUPERVISOR', 'ASSIGNEE', 'SUPPORTER']),
   "userFullName": zod.string().nullish(),
   "userAccount": zod.string().nullish(),
   "userEmail": zod.string().nullish(),
+  "userRole": zod.string().nullish(),
   "isActive": zod.boolean(),
   "assignedAt": zod.coerce.date().nullish()
 }))
@@ -747,11 +753,12 @@ export const GetAdminTasksResponse = zod.array(GetAdminTasksResponseItem)
 
 
 
-
 export const CreateAdminTaskBody = zod.object({
   "title": zod.string().min(1),
   "description": zod.string().min(1),
-  "assigneeIds": zod.array(zod.number()).min(1),
+  "supervisorUserId": zod.number().nullish(),
+  "assigneeUserIds": zod.array(zod.number()).optional(),
+  "supporterUserIds": zod.array(zod.number()).optional(),
   "priority": zod.enum(['LOW', 'MEDIUM', 'HIGH', 'URGENT']),
   "status": zod.enum(['NEW', 'IN_PROGRESS', 'WAITING_REVIEW', 'COMPLETED', 'POSTPONED', 'CANCELLED']).optional(),
   "startDate": zod.string().nullish(),
@@ -769,7 +776,9 @@ export const GetTasksExportResponseItem = zod.object({
   "description": zod.string().optional(),
   "priority": zod.string(),
   "status": zod.string(),
+  "supervisor": zod.string().optional(),
   "assignees": zod.string().optional(),
+  "supporters": zod.string().optional(),
   "startDate": zod.string().nullish(),
   "dueDate": zod.string().nullish(),
   "createdByName": zod.string().nullish(),
@@ -805,11 +814,12 @@ export const UpdateAdminTaskParams = zod.object({
 
 
 
-
 export const UpdateAdminTaskBody = zod.object({
   "title": zod.string().min(1).optional(),
   "description": zod.string().min(1).optional(),
-  "assigneeIds": zod.array(zod.number()).min(1).optional(),
+  "supervisorUserId": zod.number().nullish(),
+  "assigneeUserIds": zod.array(zod.number()).optional(),
+  "supporterUserIds": zod.array(zod.number()).optional(),
   "priority": zod.enum(['LOW', 'MEDIUM', 'HIGH', 'URGENT']).optional(),
   "status": zod.enum(['NEW', 'IN_PROGRESS', 'WAITING_REVIEW', 'COMPLETED', 'POSTPONED', 'CANCELLED']).optional(),
   "startDate": zod.string().nullish(),
@@ -834,9 +844,11 @@ export const UpdateAdminTaskResponse = zod.object({
   "id": zod.number(),
   "taskId": zod.number(),
   "userId": zod.number(),
+  "participantRole": zod.enum(['SUPERVISOR', 'ASSIGNEE', 'SUPPORTER']),
   "userFullName": zod.string().nullish(),
   "userAccount": zod.string().nullish(),
   "userEmail": zod.string().nullish(),
+  "userRole": zod.string().nullish(),
   "isActive": zod.boolean(),
   "assignedAt": zod.coerce.date().nullish()
 })),

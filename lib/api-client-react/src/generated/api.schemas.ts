@@ -725,16 +725,28 @@ export const TaskReportType = {
   ADMIN_NOTE: 'ADMIN_NOTE',
 } as const;
 
+export type TaskParticipantRole = typeof TaskParticipantRole[keyof typeof TaskParticipantRole];
+
+
+export const TaskParticipantRole = {
+  SUPERVISOR: 'SUPERVISOR',
+  ASSIGNEE: 'ASSIGNEE',
+  SUPPORTER: 'SUPPORTER',
+} as const;
+
 export interface TaskAssignee {
   id: number;
   taskId: number;
   userId: number;
+  participantRole: TaskParticipantRole;
   /** @nullable */
   userFullName?: string | null;
   /** @nullable */
   userAccount?: string | null;
   /** @nullable */
   userEmail?: string | null;
+  /** @nullable */
+  userRole?: string | null;
   isActive: boolean;
   /** @nullable */
   assignedAt?: string | null;
@@ -842,8 +854,10 @@ export interface CreateTaskInput {
   title: string;
   /** @minLength 1 */
   description: string;
-  /** @minItems 1 */
-  assigneeIds: number[];
+  /** @nullable */
+  supervisorUserId?: number | null;
+  assigneeUserIds?: number[];
+  supporterUserIds?: number[];
   priority: TaskPriority;
   status?: TaskStatus;
   /** @nullable */
@@ -859,8 +873,10 @@ export interface UpdateTaskInput {
   title?: string;
   /** @minLength 1 */
   description?: string;
-  /** @minItems 1 */
-  assigneeIds?: number[];
+  /** @nullable */
+  supervisorUserId?: number | null;
+  assigneeUserIds?: number[];
+  supporterUserIds?: number[];
   priority?: TaskPriority;
   status?: TaskStatus;
   /** @nullable */
@@ -886,7 +902,9 @@ export interface TaskExportRow {
   description?: string;
   priority: string;
   status: string;
+  supervisor?: string;
   assignees?: string;
+  supporters?: string;
   /** @nullable */
   startDate?: string | null;
   /** @nullable */

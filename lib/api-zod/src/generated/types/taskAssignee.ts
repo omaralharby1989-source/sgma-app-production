@@ -5,17 +5,21 @@
  * SGMA APP2 API specification
  * OpenAPI spec version: 0.1.0
  */
+import type { TaskParticipantRole } from './taskParticipantRole';
 
 export interface TaskAssignee {
   id: number;
   taskId: number;
   userId: number;
+  participantRole: TaskParticipantRole;
   /** @nullable */
   userFullName?: string | null;
   /** @nullable */
   userAccount?: string | null;
   /** @nullable */
   userEmail?: string | null;
+  /** @nullable */
+  userRole?: string | null;
   isActive: boolean;
   /** @nullable */
   assignedAt?: Date | null;

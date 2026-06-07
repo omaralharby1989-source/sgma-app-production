@@ -64,7 +64,9 @@ export default function AdminTasks() {
         "الوصف",
         "الأولوية",
         "الحالة",
+        "مشرف المهمة",
         "المكلّفون",
+        "المساعدون / الداعمون",
         "تاريخ البدء",
         "الاستحقاق",
         "أنشئت بواسطة",
@@ -86,7 +88,9 @@ export default function AdminTasks() {
             r.description ?? "",
             PRIORITY_LABELS[r.priority] ?? r.priority,
             STATUS_LABELS[r.status] ?? r.status,
+            r.supervisor ?? "",
             r.assignees ?? "",
+            r.supporters ?? "",
             r.startDate ?? "",
             r.dueDate ?? "",
             r.createdByName ?? "",
@@ -133,7 +137,9 @@ export default function AdminTasks() {
 <td>${esc(r.title)}</td>
 <td>${esc(STATUS_LABELS[r.status] ?? r.status)}</td>
 <td>${esc(PRIORITY_LABELS[r.priority] ?? r.priority)}</td>
-<td>${esc(r.assignees ?? "—")}</td>
+<td>${esc(r.supervisor || "—")}</td>
+<td>${esc(r.assignees || "—")}</td>
+<td>${esc(r.supporters || "—")}</td>
 <td>${esc(r.dueDate ?? "—")}</td>
 <td>${esc(typeof r.latestProgress === "number" ? r.latestProgress + "%" : "—")}</td>
 </tr>`,
@@ -153,7 +159,7 @@ export default function AdminTasks() {
 <h1>تقرير المهام</h1>
 <div class="date">تاريخ التقرير: ${esc(today)} — العدد: ${rows.length}</div>
 <table><thead><tr>
-<th>المعرّف</th><th>العنوان</th><th>الحالة</th><th>الأولوية</th><th>المكلّفون</th><th>الاستحقاق</th><th>الإنجاز</th>
+<th>المعرّف</th><th>العنوان</th><th>الحالة</th><th>الأولوية</th><th>مشرف المهمة</th><th>المكلّفون</th><th>المساعدون</th><th>الاستحقاق</th><th>الإنجاز</th>
 </tr></thead><tbody>${body}</tbody></table>
 <script>window.onload = function(){ window.print(); };</script>
 </body></html>`;
@@ -269,14 +275,22 @@ export default function AdminTasks() {
                     </span>
                   )}
                 </div>
-                <p className="text-xs text-muted-foreground">
-                  المكلّفون:{" "}
-                  {t.assignees.length
-                    ? t.assignees
-                        .map((a) => a.userFullName ?? a.userAccount ?? `#${a.userId}`)
-                        .join("، ")
-                    : "—"}
-                </p>
+                {(() => {
+                  const sup = t.assignees.find((a) => a.participantRole === "SUPERVISOR");
+                  const assigneeCount = t.assignees.filter((a) => a.participantRole === "ASSIGNEE").length;
+                  const supporterCount = t.assignees.filter((a) => a.participantRole === "SUPPORTER").length;
+                  return (
+                    <div className="text-xs text-muted-foreground space-y-0.5">
+                      <p>
+                        مشرف المهمة:{" "}
+                        {sup ? sup.userFullName ?? sup.userAccount ?? `#${sup.userId}` : "—"}
+                      </p>
+                      <p>
+                        المكلّفون: {assigneeCount} — المساعدون: {supporterCount}
+                      </p>
+                    </div>
+                  );
+                })()}
               </Card>
             </Link>
           ))}

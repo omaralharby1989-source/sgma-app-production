@@ -12,7 +12,6 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
-import { Checkbox } from "@/components/ui/checkbox";
 import {
   Select,
   SelectContent,
@@ -21,9 +20,10 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { BackButton } from "@/components/BackButton";
+import { UserPicker } from "@/components/UserPicker";
 import { useToast } from "@/hooks/use-toast";
 import { TASK_PRIORITY_OPTIONS, PRIORITY_LABELS } from "@/lib/taskLabels";
-import { ClipboardList, Loader2, Send, Users } from "lucide-react";
+import { ClipboardList, Loader2, Send, UserCog, Users, HeartHandshake } from "lucide-react";
 
 export default function AdminTaskNew() {
   const { toast } = useToast();
@@ -36,7 +36,10 @@ export default function AdminTaskNew() {
   const [startDate, setStartDate] = useState("");
   const [dueDate, setDueDate] = useState("");
   const [adminNotes, setAdminNotes] = useState("");
+
+  const [supervisorIds, setSupervisorIds] = useState<number[]>([]);
   const [assigneeIds, setAssigneeIds] = useState<number[]>([]);
+  const [supporterIds, setSupporterIds] = useState<number[]>([]);
 
   const [users, setUsers] = useState<AssignableUser[]>([]);
   const [usersLoading, setUsersLoading] = useState(true);
@@ -64,11 +67,8 @@ export default function AdminTaskNew() {
 
   const createTask = useCreateAdminTask();
 
-  const toggleAssignee = (id: number) => {
-    setAssigneeIds((prev) =>
-      prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id],
-    );
-  };
+  const participantCount =
+    supervisorIds.length + assigneeIds.length + supporterIds.length;
 
   const submit = () => {
     if (!title.trim()) {
@@ -79,8 +79,12 @@ export default function AdminTaskNew() {
       toast({ variant: "destructive", title: "بيانات ناقصة", description: "يرجى إدخال وصف المهمة." });
       return;
     }
-    if (assigneeIds.length === 0) {
-      toast({ variant: "destructive", title: "بيانات ناقصة", description: "يرجى اختيار عضو واحد على الأقل." });
+    if (participantCount === 0) {
+      toast({
+        variant: "destructive",
+        title: "بيانات ناقصة",
+        description: "يرجى اختيار مشارك واحد على الأقل (مشرف أو مكلّف أو مساعد).",
+      });
       return;
     }
     if (startDate && dueDate && startDate > dueDate) {
@@ -96,8 +100,10 @@ export default function AdminTaskNew() {
         data: {
           title: title.trim(),
           description: description.trim(),
-          assigneeIds,
           priority: priority as TaskPriority,
+          ...(supervisorIds.length ? { supervisorUserId: supervisorIds[0] } : {}),
+          ...(assigneeIds.length ? { assigneeUserIds: assigneeIds } : {}),
+          ...(supporterIds.length ? { supporterUserIds: supporterIds } : {}),
           ...(startDate ? { startDate } : {}),
           ...(dueDate ? { dueDate } : {}),
           ...(adminNotes.trim() ? { adminNotes: adminNotes.trim() } : {}),
@@ -197,44 +203,47 @@ export default function AdminTaskNew() {
               </div>
             </div>
 
-            <div className="space-y-2">
-              <Label className="flex items-center gap-2">
-                <Users className="h-4 w-4 text-primary" />
-                المكلّفون
-              </Label>
-              {usersError ? (
-                <p className="text-sm text-destructive">تعذر تحميل قائمة الأعضاء</p>
-              ) : usersLoading ? (
-                <p className="text-sm text-muted-foreground">جارِ التحميل...</p>
-              ) : users.length === 0 ? (
-                <p className="text-sm text-muted-foreground">لا يوجد أعضاء متاحون</p>
-              ) : (
-                <div className="max-h-60 overflow-y-auto rounded-md border divide-y">
-                  {users.map((u) => (
-                    <label
-                      key={u.id}
-                      className="flex items-center gap-3 p-3 cursor-pointer hover:bg-muted/40"
-                    >
-                      <Checkbox
-                        checked={assigneeIds.includes(u.id)}
-                        onCheckedChange={() => toggleAssignee(u.id)}
-                      />
-                      <span className="min-w-0">
-                        <span className="block text-sm font-medium truncate">{u.fullName}</span>
-                        <span className="block text-xs text-muted-foreground truncate">
-                          {u.account} — {u.role}
-                        </span>
-                      </span>
-                    </label>
-                  ))}
-                </div>
-              )}
-              {assigneeIds.length > 0 && (
-                <p className="text-xs text-muted-foreground">
-                  تم اختيار {assigneeIds.length} عضو
-                </p>
-              )}
-            </div>
+            {usersError ? (
+              <p className="text-sm text-destructive">تعذر تحميل قائمة المستخدمين</p>
+            ) : usersLoading ? (
+              <p className="text-sm text-muted-foreground">جارِ تحميل المستخدمين...</p>
+            ) : (
+              <div className="space-y-5 rounded-lg border p-3 bg-background">
+                <UserPicker
+                  label="مشرف المهمة"
+                  placeholder="ابحث بالاسم أو البريد الإلكتروني أو اسم المستخدم"
+                  helper="مستخدم واحد فقط — المسؤول الرئيسي عن المهمة"
+                  users={users}
+                  selectedIds={supervisorIds}
+                  onChange={setSupervisorIds}
+                  multiple={false}
+                  icon={<UserCog className="h-4 w-4 text-primary" />}
+                />
+                <UserPicker
+                  label="المكلّفون"
+                  placeholder="اختر شخصاً أو أكثر لتنفيذ المهمة"
+                  users={users}
+                  selectedIds={assigneeIds}
+                  onChange={setAssigneeIds}
+                  multiple
+                  icon={<Users className="h-4 w-4 text-primary" />}
+                />
+                <UserPicker
+                  label="المساعدون / الداعمون"
+                  placeholder="اختر أشخاصاً داعمين للمهمة"
+                  users={users}
+                  selectedIds={supporterIds}
+                  onChange={setSupporterIds}
+                  multiple
+                  icon={<HeartHandshake className="h-4 w-4 text-primary" />}
+                />
+                {participantCount > 0 && (
+                  <p className="text-xs text-muted-foreground">
+                    إجمالي المشاركين المحددين: {participantCount}
+                  </p>
+                )}
+              </div>
+            )}
 
             <div className="space-y-1.5">
               <Label htmlFor="task-notes">ملاحظات إدارية (اختياري)</Label>

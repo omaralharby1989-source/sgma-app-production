@@ -234,7 +234,21 @@ Additive module for registering volunteer medical delegations (تسجيل للو
 
 ## Task Management Module Status — COMPLETE
 
-Internal Trello-like task module (no drag/drop). Staff (MODERATOR/ADMIN/SUPER_ADMIN) create/assign tasks to MEMBERs, track progress, add admin notes, change status, download attachments, export CSV+PDF. Members see ONLY assigned tasks and submit reports with device-uploaded attachments. Backend is the source of truth for ALL permissions; UI gating is convenience only.
+Internal Trello-like task module (no drag/drop). Staff (MODERATOR/ADMIN/SUPER_ADMIN) create tasks and assign PARTICIPANTS in three roles, track progress, add admin notes, change status, download attachments, export CSV+PDF. Any participant sees the task and submits reports with device-uploaded attachments. Backend is the source of truth for ALL permissions; UI gating is convenience only.
+
+### Participant Roles (extension)
+- Tasks now support 3 participant roles on the single `task_assignees` table via a `participant_role` text column (default `ASSIGNEE`): `SUPERVISOR` (مشرف المهمة, single), `ASSIGNEE` (المكلّفون, multi), `SUPPORTER` (المساعدون/الداعمون, multi).
+- ALL active users (MEMBER/MODERATOR/ADMIN/SUPER_ADMIN) can be participants — `activeUserIds()` + `assignable-users` filter ONLY on ACTIVE+isActive (the old role=MEMBER restriction was REMOVED). Staff can now be participants too.
+- A user MAY appear in more than one role on the same task, but never twice in the same role. `buildParticipants()` dedups by composite key `userId:participantRole`.
+- Create/PATCH accept `supervisorUserId` (nullable int), `assigneeUserIds[]`, `supporterUserIds[]` (NOT the old `assigneeIds`). Required fields are now just title/description/priority; backend requires ≥1 participant across the 3 lists and validates all are ACTIVE.
+- PATCH uses `reconcileParticipants()`: matches existing rows by `userId:participantRole`, deactivates removed, reactivates/inserts wanted. Visibility flips with it (member loses access when their participant row is deactivated).
+- Visibility unchanged in shape but now covers all roles: `isAssignedTo()` / `/tasks/my` key off active `task_assignees` rows regardless of `participantRole` — non-staff see a task ONLY if they are a participant in ANY role; staff see all.
+- Report type is still ACTOR-forced (staff→ADMIN_NOTE, any participant→MEMBER_REPORT); only MEMBER_REPORT on NEW/IN_PROGRESS auto→WAITING_REVIEW.
+- Export (`/admin/tasks/export`) + admin CSV/PDF now emit separate `supervisor` / `assignees` / `supporters` columns (role-filtered names).
+- Frontend: `task-new.tsx` uses 3 searchable `UserPicker` components (search by fullName/email/account/role, removable chips) replacing the old MEMBER Checkbox list. `task-detail.tsx` shows grouped SUPERVISOR/ASSIGNEE/SUPPORTER rows with each participant's userRole. `taskLabels.ts` adds `PARTICIPANT_ROLE_LABELS` + `ROLE_LABELS`.
+- OpenAPI: `TaskParticipantRole` enum; `participantRole`+`userRole` on `TaskAssignee`; generated zod bodies `CreateAdminTaskBody`/`UpdateAdminTaskBody` expose the 3 role fields.
+
+### Original module (still applies)
 - DB (`lib/db/src/schema/tasks.ts`): `tasks`, `task_assignees`, `task_reports`, `task_report_attachments`. Statuses NEW/IN_PROGRESS/WAITING_REVIEW/COMPLETED/POSTPONED/CANCELLED; priorities LOW/MEDIUM/HIGH/URGENT; report types MEMBER_REPORT/ADMIN_NOTE.
 - Member/shared routes (`routes/tasks.ts`, JWT): `GET /tasks/my` (assigned only), `GET /tasks/:id` (assignee or staff only), `POST /tasks/:id/reports`, `GET /tasks/reports/attachments/:attachmentId`. Static `reports/attachments` path registered BEFORE `:id`.
 - Admin routes (`routes/admin/tasks.ts`, staff only): `GET /admin/tasks?status=&priority=`, `GET /admin/tasks/export` (CSV rows), `GET /admin/tasks/assignable-users`, `POST /admin/tasks`, `PATCH /admin/tasks/:id`. Static `export`/`assignable-users` registered BEFORE `:id`.

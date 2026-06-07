@@ -94,6 +94,7 @@ export * from './taskDetail';
 export * from './taskExportResponse';
 export * from './taskExportRow';
 export * from './taskItem';
+export * from './taskParticipantRole';
 export * from './taskPriority';
 export * from './taskReport';
 export * from './taskReportAttachment';

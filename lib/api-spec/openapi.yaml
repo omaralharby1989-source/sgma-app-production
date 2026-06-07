@@ -3681,9 +3681,13 @@ components:
       type: string
       enum: [MEMBER_REPORT, ADMIN_NOTE]
 
+    TaskParticipantRole:
+      type: string
+      enum: [SUPERVISOR, ASSIGNEE, SUPPORTER]
+
     TaskAssignee:
       type: object
-      required: [id, taskId, userId, isActive]
+      required: [id, taskId, userId, participantRole, isActive]
       properties:
         id:
           type: integer
@@ -3691,11 +3695,15 @@ components:
           type: integer
         userId:
           type: integer
+        participantRole:
+          $ref: "#/components/schemas/TaskParticipantRole"
         userFullName:
           type: ["string", "null"]
         userAccount:
           type: ["string", "null"]
         userEmail:
+          type: ["string", "null"]
+        userRole:
           type: ["string", "null"]
         isActive:
           type: boolean
@@ -3867,7 +3875,7 @@ components:
 
     CreateTaskInput:
       type: object
-      required: [title, description, assigneeIds, priority]
+      required: [title, description, priority]
       properties:
         title:
           type: string
@@ -3875,9 +3883,14 @@ components:
         description:
           type: string
           minLength: 1
-        assigneeIds:
+        supervisorUserId:
+          type: ["integer", "null"]
+        assigneeUserIds:
           type: array
-          minItems: 1
+          items:
+            type: integer
+        supporterUserIds:
+          type: array
           items:
             type: integer
         priority:
@@ -3900,9 +3913,14 @@ components:
         description:
           type: string
           minLength: 1
-        assigneeIds:
+        supervisorUserId:
+          type: ["integer", "null"]
+        assigneeUserIds:
           type: array
-          minItems: 1
+          items:
+            type: integer
+        supporterUserIds:
+          type: array
           items:
             type: integer
         priority:
@@ -3946,7 +3964,11 @@ components:
           type: string
         status:
           type: string
+        supervisor:
+          type: string
         assignees:
+          type: string
+        supporters:
           type: string
         startDate:
           type: ["string", "null"]

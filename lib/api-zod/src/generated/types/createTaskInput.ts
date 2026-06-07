@@ -13,8 +13,10 @@ export interface CreateTaskInput {
   title: string;
   /** @minLength 1 */
   description: string;
-  /** @minItems 1 */
-  assigneeIds: number[];
+  /** @nullable */
+  supervisorUserId?: number | null;
+  assigneeUserIds?: number[];
+  supporterUserIds?: number[];
   priority: TaskPriority;
   status?: TaskStatus;
   /** @nullable */

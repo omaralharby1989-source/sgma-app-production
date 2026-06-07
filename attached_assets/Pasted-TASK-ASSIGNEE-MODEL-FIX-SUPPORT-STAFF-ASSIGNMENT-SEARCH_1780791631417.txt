@@ -1,0 +1,487 @@
+TASK ASSIGNEE MODEL FIX — SUPPORT STAFF ASSIGNMENT + SEARCH + TASK ROLES
+
+Start this fix now.
+
+Scope:
+Fix the Task Management module assignment logic.
+
+Current problem:
+The task creation page only allows assigning MEMBER users. This is wrong. Sometimes the assigned person can be a manager, moderator, admin, or super admin.
+
+Required:
+Task assignment must support all ACTIVE users, not only MEMBER.
+
+Do not rebuild the task module from scratch.
+Do not change unrelated modules.
+Do not break existing task reports, attachments, export, or permissions.
+
+Existing modules must remain working:
+
+* login
+* register
+* home
+* news
+* articles
+* chat
+* broadcast
+* admin dashboard
+* board
+* volunteer delegations
+* ads management
+* more
+* developer-info
+* static pages
+
+Current architecture:
+
+* PostgreSQL + Drizzle
+* JWT auth
+* Arabic RTL
+* Mobile-first
+* No Firebase
+* No MySQL migration
+
+==================================================
+A. REQUIRED BEHAVIOR CHANGE
+===========================
+
+Task creators must be able to select any ACTIVE user as part of a task:
+
+Allowed task participants:
+
+* MEMBER
+* MODERATOR
+* ADMIN
+* SUPER_ADMIN
+
+Do NOT restrict task assignees to MEMBER only.
+
+Why:
+Sometimes a manager, admin, moderator, or super admin may be responsible for a task or supporting it.
+
+==================================================
+B. TASK PARTICIPANT ROLES
+=========================
+
+Add role distinction inside each task.
+
+Each task should support:
+
+1. مشرف المهمة
+   field:
+   supervisorUserId
+
+Rules:
+
+* One user only.
+* Can be MEMBER / MODERATOR / ADMIN / SUPER_ADMIN, as long as active.
+* This person is the main responsible supervisor for the task.
+
+2. المكلفون
+   field/table relation:
+   assignees
+
+Rules:
+
+* Multiple users allowed.
+* Any ACTIVE user role allowed.
+* These are the main people assigned to complete the task.
+
+3. المساعدون / الداعمون
+   field/table relation:
+   supporters
+
+Rules:
+
+* Multiple users allowed.
+* Any ACTIVE user role allowed.
+* These are support/helper people.
+
+Important:
+A user can be in one or more roles if needed, but avoid duplicates in the same role list.
+If a user is selected multiple times, store each role cleanly or deduplicate safely.
+
+Recommended DB design:
+Either extend task_assignees with participantRole:
+
+* ASSIGNEE
+* SUPERVISOR
+* SUPPORTER
+
+OR create separate fields/tables if cleaner.
+
+Preferred:
+Use task_assignees with participantRole because it is flexible.
+
+==================================================
+C. ACCESS RULES
+===============
+
+A user can see a task if:
+
+1. User is MODERATOR / ADMIN / SUPER_ADMIN
+   OR
+2. User is included in the task participants as:
+
+   * SUPERVISOR
+   * ASSIGNEE
+   * SUPPORTER
+
+A normal MEMBER who is not part of the task cannot view it.
+
+A staff user who is not listed can still view all tasks because staff have full task management permissions.
+
+Backend enforcement is mandatory.
+
+==================================================
+D. REPORTING RULES
+==================
+
+Any participant of a task can submit a task report:
+
+* supervisor
+* assignee
+* supporter
+
+Staff users can submit administrative notes/reports on any task.
+
+Report type logic:
+
+* If user is staff and is adding an administrative note from staff UI: ADMIN_NOTE
+* If user is a participant adding a normal progress report from task detail: MEMBER_REPORT or PARTICIPANT_REPORT if you add that enum
+
+Avoid the previous mistake:
+Do not let the frontend decide report type in a way that can be spoofed.
+Backend must determine report type based on route/context/user role.
+
+Simple acceptable behavior:
+
+* Reports submitted from /tasks/:id by a participant are MEMBER_REPORT.
+* Reports submitted from admin/staff controls are ADMIN_NOTE.
+
+==================================================
+E. TASK CREATE PAGE UI — /admin/tasks/new
+=========================================
+
+Fix the current “المكلفون” section.
+
+Required UI:
+
+1. مشرف المهمة
+
+* Searchable select/list
+* Single selection
+* Label:
+  مشرف المهمة
+* Placeholder:
+  ابحث بالاسم أو البريد الإلكتروني أو اسم المستخدم
+
+2. المكلفون
+
+* Searchable multi-select/list
+* Multiple users
+* Label:
+  المكلفون
+* Placeholder:
+  اختر شخصاً أو أكثر لتنفيذ المهمة
+
+3. المساعدون / الداعمون
+
+* Searchable multi-select/list
+* Multiple users
+* Label:
+  المساعدون / الداعمون
+* Placeholder:
+  اختر أشخاصاً داعمين للمهمة
+
+Search should include:
+
+* fullName
+* email
+* account
+* role
+
+Display each option as:
+الاسم الكامل
+email/account — role
+
+The screenshot currently shows only a small fixed list. Replace or improve it with a searchable selector.
+
+Mobile-friendly requirements:
+
+* Search input must be easy to use on phone.
+* Selected users should appear as small cards/chips with remove button.
+* No horizontal overflow.
+* Long names/emails must wrap or truncate cleanly.
+
+==================================================
+F. BACKEND USER PICKER
+======================
+
+Update assignable users endpoint.
+
+Current issue:
+It returns only MEMBER users.
+
+Required:
+Return all ACTIVE users:
+
+* MEMBER
+* MODERATOR
+* ADMIN
+* SUPER_ADMIN
+
+Endpoint likely:
+GET /api/admin/tasks/assignable-users
+
+Return fields:
+
+* id
+* fullName
+* account
+* email
+* role
+* professionGroup if useful
+
+Rules:
+
+* Only staff can call it:
+  MODERATOR / ADMIN / SUPER_ADMIN
+* Do not include inactive/pending/suspended users.
+* Do not include passwords or sensitive fields.
+
+==================================================
+G. BACKEND CREATE TASK
+======================
+
+Update create task input.
+
+Suggested structure:
+
+{
+title,
+description,
+priority,
+status,
+startDate,
+dueDate,
+adminNotes,
+supervisorUserId,
+assigneeUserIds: [],
+supporterUserIds: []
+}
+
+Validation:
+
+* title required
+* description required
+* priority valid
+* status valid
+* at least one participant is required:
+  supervisorUserId OR assigneeUserIds.length > 0 OR supporterUserIds.length > 0
+
+User IDs validation:
+
+* every provided user must exist
+* every provided user must be ACTIVE / isActive true
+* roles can be MEMBER / MODERATOR / ADMIN / SUPER_ADMIN
+* reject pending/inactive/suspended users
+* remove duplicates safely
+* do not require all to be MEMBER
+
+Create participant rows with role:
+
+* SUPERVISOR
+* ASSIGNEE
+* SUPPORTER
+
+==================================================
+H. BACKEND UPDATE TASK
+======================
+
+If admin/staff task edit exists:
+Allow updating:
+
+* supervisorUserId
+* assigneeUserIds
+* supporterUserIds
+
+Same validation as create.
+
+If full edit UI does not exist yet:
+At minimum backend should be ready, but do not overbuild unless current module already supports editing assignees.
+
+==================================================
+I. TASK DETAIL DISPLAY
+======================
+
+Update /tasks/:id and /admin/tasks detail/card display.
+
+Show participants grouped:
+
+1. مشرف المهمة
+
+* Name + role
+
+2. المكلفون
+
+* list of names + roles
+
+3. المساعدون / الداعمون
+
+* list of names + roles
+
+In cards:
+
+* show supervisor
+* show number of assignees/supporters if too many
+
+==================================================
+J. /MORE LINK VISIBILITY
+========================
+
+For normal users:
+
+Show “مهامي” if they are included in any task as:
+
+* supervisor
+* assignee
+* supporter
+
+Not only if they are ASSIGNEE.
+
+For staff:
+Show “إدارة المهام” as before.
+
+==================================================
+K. EXPORT UPDATE
+================
+
+Update CSV/PDF export to include:
+
+* مشرف المهمة
+* المكلفون
+* المساعدون / الداعمون
+
+Do not remove existing columns.
+
+==================================================
+L. OPENAPI / GENERATED CLIENT
+=============================
+
+Update OpenAPI if request/response schemas change.
+
+Likely schemas to update:
+
+* CreateTaskInput
+* UpdateTaskInput
+* TaskAssignee or TaskParticipant
+* TaskDetail
+* TaskItem
+* AssignableUser
+
+Add participantRole enum if needed:
+
+* SUPERVISOR
+* ASSIGNEE
+* SUPPORTER
+
+Then:
+
+* Regenerate client
+* Do not manually edit generated files
+* Run typecheck
+
+==================================================
+M. TESTING REQUIRED
+===================
+
+Do not report completion until tested.
+
+Required tests:
+
+Backend:
+
+1. assignable-users returns ACTIVE users from all roles, not only MEMBER.
+2. create task with MEMBER as assignee works.
+3. create task with MODERATOR as assignee works.
+4. create task with ADMIN as supervisor works.
+5. create task with SUPER_ADMIN as supporter works.
+6. create task with multiple participants works.
+7. create task with no participant is rejected.
+8. inactive/pending user cannot be assigned.
+9. member participant can open /tasks/:id.
+10. non-participant member cannot open /tasks/:id.
+11. participant can submit report with attachment.
+12. staff can see all tasks.
+13. export includes supervisor/assignees/supporters.
+
+Frontend:
+
+1. /admin/tasks/new shows:
+
+   * مشرف المهمة
+   * المكلفون
+   * المساعدون / الداعمون
+2. User search works by name/email/account.
+3. Multiple users can be selected.
+4. Selected users can be removed before submit.
+5. Task creation works from UI.
+6. /tasks shows task for participant user.
+7. /tasks does not show unrelated tasks for non-participant member.
+8. Task detail groups participants correctly.
+9. /more shows مهامي for any participant, not only assignee.
+
+Regression:
+
+1. Existing task reports still work.
+2. Attachments still work.
+3. Export still works.
+4. /login works.
+5. /register works.
+6. /home works.
+7. /news works.
+8. /articles works.
+9. /chat works.
+10. /admin works.
+11. /more works.
+12. Typecheck passes.
+13. Backend starts cleanly.
+14. Preview works.
+
+==================================================
+N. REQUIRED REPORT
+==================
+
+After completion, provide:
+
+TASK PARTICIPANT ASSIGNMENT FIX REPORT
+
+1. What was wrong before
+2. What was changed
+3. Database changes if any
+4. Participant roles implemented:
+
+   * supervisor
+   * assignees
+   * supporters
+5. Assignable users endpoint status
+6. Task create UI status
+7. Task detail display status
+8. Access rules status
+9. Report/attachment behavior status
+10. Export update status
+11. OpenAPI/client generation status
+12. Permission/security test results
+13. Runtime test results
+14. Preview status
+15. Confirmation:
+
+* staff can be assigned to tasks
+* all active roles can be selected
+* non-participant members cannot see tasks
+* no Firebase
+* no MySQL migration
+* no unrelated modules changed
+
+Do not report success until staff assignment, multi-participant selection, and grouped task roles work in Preview and backend tests.

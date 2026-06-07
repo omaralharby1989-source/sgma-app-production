@@ -41,6 +41,19 @@ export const PRIORITY_CLASS: Record<string, string> = {
   URGENT: "bg-red-500/10 text-red-700 dark:text-red-400 border-red-500/20",
 };
 
+export const PARTICIPANT_ROLE_LABELS: Record<string, string> = {
+  SUPERVISOR: "مشرف المهمة",
+  ASSIGNEE: "المكلّفون",
+  SUPPORTER: "المساعدون / الداعمون",
+};
+
+export const ROLE_LABELS: Record<string, string> = {
+  MEMBER: "عضو",
+  MODERATOR: "مشرف",
+  ADMIN: "مدير",
+  SUPER_ADMIN: "مدير عام",
+};
+
 export function formatTaskDate(value: string | null | undefined): string {
   if (!value) return "—";
   const d = new Date(value);

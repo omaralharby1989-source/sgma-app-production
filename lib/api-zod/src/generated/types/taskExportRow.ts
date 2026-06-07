@@ -12,7 +12,9 @@ export interface TaskExportRow {
   description?: string;
   priority: string;
   status: string;
+  supervisor?: string;
   assignees?: string;
+  supporters?: string;
   /** @nullable */
   startDate?: string | null;
   /** @nullable */
