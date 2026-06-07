@@ -26,6 +26,10 @@ import DeveloperInfo from "./pages/developer-info";
 import StaticPage from "./pages/static-page";
 import VolunteerDelegations from "./pages/volunteer-delegations";
 import AdminVolunteerDelegations from "./pages/admin/volunteer-delegations";
+import Tasks from "./pages/tasks";
+import TaskDetail from "./pages/task-detail";
+import AdminTasks from "./pages/admin/tasks";
+import AdminTaskNew from "./pages/admin/task-new";
 import Board from "./pages/board";
 import BoardCurrent from "./pages/board-current";
 import BoardPrevious from "./pages/board-previous";
@@ -155,6 +159,12 @@ function Router() {
       <Route path="/volunteer-delegations">
         <ProtectedRoute component={VolunteerDelegations} />
       </Route>
+      <Route path="/tasks">
+        <ProtectedRoute component={Tasks} />
+      </Route>
+      <Route path="/tasks/:id">
+        <ProtectedRoute component={TaskDetail} />
+      </Route>
       <Route path="/board">
         <ProtectedRoute component={Board} />
       </Route>
@@ -189,6 +199,12 @@ function Router() {
       </Route>
       <Route path="/admin/volunteer-delegations">
         <ProtectedRoute component={AdminVolunteerDelegations} staffOnly />
+      </Route>
+      <Route path="/admin/tasks/new">
+        <ProtectedRoute component={AdminTaskNew} staffOnly />
+      </Route>
+      <Route path="/admin/tasks">
+        <ProtectedRoute component={AdminTasks} staffOnly />
       </Route>
       <Route path="/admin/ads">
         <ProtectedRoute component={AdminAds} allowedRoles={["SUPER_ADMIN"]} />

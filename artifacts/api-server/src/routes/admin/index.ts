@@ -6,6 +6,7 @@ import newsRouter from "./news";
 import broadcastsRouter from "./broadcasts";
 import volunteerDelegationsRouter from "./volunteer-delegations";
 import adsRouter from "./ads";
+import tasksRouter from "./tasks";
 
 const router: IRouter = Router();
 
@@ -16,5 +17,6 @@ router.use(newsRouter);
 router.use(broadcastsRouter);
 router.use(volunteerDelegationsRouter);
 router.use(adsRouter);
+router.use(tasksRouter);
 
 export default router;

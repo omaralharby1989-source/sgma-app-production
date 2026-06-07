@@ -577,6 +577,292 @@ export const GetAdminVolunteerDelegationFileResponse = zod.object({
 
 
 /**
+ * @summary List tasks assigned to the current user
+ */
+export const GetMyTasksResponseItem = zod.object({
+  "id": zod.number(),
+  "title": zod.string(),
+  "description": zod.string(),
+  "priority": zod.enum(['LOW', 'MEDIUM', 'HIGH', 'URGENT']),
+  "status": zod.enum(['NEW', 'IN_PROGRESS', 'WAITING_REVIEW', 'COMPLETED', 'POSTPONED', 'CANCELLED']),
+  "startDate": zod.string().nullish(),
+  "dueDate": zod.string().nullish(),
+  "createdById": zod.number(),
+  "createdByName": zod.string().nullish(),
+  "adminNotes": zod.string().nullish(),
+  "createdAt": zod.coerce.date().nullish(),
+  "updatedAt": zod.coerce.date().nullish(),
+  "latestReportAt": zod.coerce.date().nullish(),
+  "latestReportExcerpt": zod.string().nullish(),
+  "latestProgress": zod.number().nullish(),
+  "assignees": zod.array(zod.object({
+  "id": zod.number(),
+  "taskId": zod.number(),
+  "userId": zod.number(),
+  "userFullName": zod.string().nullish(),
+  "userAccount": zod.string().nullish(),
+  "userEmail": zod.string().nullish(),
+  "isActive": zod.boolean(),
+  "assignedAt": zod.coerce.date().nullish()
+}))
+})
+export const GetMyTasksResponse = zod.array(GetMyTasksResponseItem)
+
+
+/**
+ * @summary Download a report attachment (assigned member or staff)
+ */
+export const GetTaskReportAttachmentParams = zod.object({
+  "attachmentId": zod.coerce.number()
+})
+
+export const GetTaskReportAttachmentResponse = zod.object({
+  "id": zod.number(),
+  "fileName": zod.string(),
+  "mimeType": zod.string(),
+  "fileSize": zod.number().optional(),
+  "fileData": zod.string()
+})
+
+
+/**
+ * @summary Get a task's details (assigned member or staff)
+ */
+export const GetTaskParams = zod.object({
+  "id": zod.coerce.number()
+})
+
+export const GetTaskResponse = zod.object({
+  "id": zod.number(),
+  "title": zod.string(),
+  "description": zod.string(),
+  "priority": zod.enum(['LOW', 'MEDIUM', 'HIGH', 'URGENT']),
+  "status": zod.enum(['NEW', 'IN_PROGRESS', 'WAITING_REVIEW', 'COMPLETED', 'POSTPONED', 'CANCELLED']),
+  "startDate": zod.string().nullish(),
+  "dueDate": zod.string().nullish(),
+  "createdById": zod.number(),
+  "createdByName": zod.string().nullish(),
+  "adminNotes": zod.string().nullish(),
+  "createdAt": zod.coerce.date().nullish(),
+  "updatedAt": zod.coerce.date().nullish(),
+  "assignees": zod.array(zod.object({
+  "id": zod.number(),
+  "taskId": zod.number(),
+  "userId": zod.number(),
+  "userFullName": zod.string().nullish(),
+  "userAccount": zod.string().nullish(),
+  "userEmail": zod.string().nullish(),
+  "isActive": zod.boolean(),
+  "assignedAt": zod.coerce.date().nullish()
+})),
+  "reports": zod.array(zod.object({
+  "id": zod.number(),
+  "taskId": zod.number(),
+  "authorId": zod.number(),
+  "authorName": zod.string().nullish(),
+  "reportText": zod.string(),
+  "progressPercent": zod.number().nullish(),
+  "reportType": zod.enum(['MEMBER_REPORT', 'ADMIN_NOTE']),
+  "createdAt": zod.coerce.date().nullish(),
+  "updatedAt": zod.coerce.date().nullish(),
+  "attachments": zod.array(zod.object({
+  "id": zod.number(),
+  "reportId": zod.number(),
+  "fileName": zod.string(),
+  "mimeType": zod.string(),
+  "fileSize": zod.number(),
+  "createdAt": zod.coerce.date().nullish()
+}))
+}))
+})
+
+
+/**
+ * @summary Add a report or admin note to a task
+ */
+export const CreateTaskReportParams = zod.object({
+  "id": zod.coerce.number()
+})
+
+
+
+
+
+
+
+export const CreateTaskReportBody = zod.object({
+  "reportText": zod.string().min(1),
+  "progressPercent": zod.number().nullish(),
+  "reportType": zod.enum(['MEMBER_REPORT', 'ADMIN_NOTE']).optional(),
+  "attachments": zod.array(zod.object({
+  "fileName": zod.string().min(1),
+  "mimeType": zod.string().min(1),
+  "fileData": zod.string().min(1)
+})).optional()
+})
+
+
+/**
+ * @summary List all tasks with filters (MODERATOR/ADMIN/SUPER_ADMIN)
+ */
+export const GetAdminTasksQueryParams = zod.object({
+  "status": zod.enum(['NEW', 'IN_PROGRESS', 'WAITING_REVIEW', 'COMPLETED', 'POSTPONED', 'CANCELLED']).optional(),
+  "priority": zod.enum(['LOW', 'MEDIUM', 'HIGH', 'URGENT']).optional()
+})
+
+export const GetAdminTasksResponseItem = zod.object({
+  "id": zod.number(),
+  "title": zod.string(),
+  "description": zod.string(),
+  "priority": zod.enum(['LOW', 'MEDIUM', 'HIGH', 'URGENT']),
+  "status": zod.enum(['NEW', 'IN_PROGRESS', 'WAITING_REVIEW', 'COMPLETED', 'POSTPONED', 'CANCELLED']),
+  "startDate": zod.string().nullish(),
+  "dueDate": zod.string().nullish(),
+  "createdById": zod.number(),
+  "createdByName": zod.string().nullish(),
+  "adminNotes": zod.string().nullish(),
+  "createdAt": zod.coerce.date().nullish(),
+  "updatedAt": zod.coerce.date().nullish(),
+  "latestReportAt": zod.coerce.date().nullish(),
+  "latestReportExcerpt": zod.string().nullish(),
+  "latestProgress": zod.number().nullish(),
+  "assignees": zod.array(zod.object({
+  "id": zod.number(),
+  "taskId": zod.number(),
+  "userId": zod.number(),
+  "userFullName": zod.string().nullish(),
+  "userAccount": zod.string().nullish(),
+  "userEmail": zod.string().nullish(),
+  "isActive": zod.boolean(),
+  "assignedAt": zod.coerce.date().nullish()
+}))
+})
+export const GetAdminTasksResponse = zod.array(GetAdminTasksResponseItem)
+
+
+/**
+ * @summary Create a task and assign members (MODERATOR/ADMIN/SUPER_ADMIN)
+ */
+
+
+
+
+
+export const CreateAdminTaskBody = zod.object({
+  "title": zod.string().min(1),
+  "description": zod.string().min(1),
+  "assigneeIds": zod.array(zod.number()).min(1),
+  "priority": zod.enum(['LOW', 'MEDIUM', 'HIGH', 'URGENT']),
+  "status": zod.enum(['NEW', 'IN_PROGRESS', 'WAITING_REVIEW', 'COMPLETED', 'POSTPONED', 'CANCELLED']).optional(),
+  "startDate": zod.string().nullish(),
+  "dueDate": zod.string().nullish(),
+  "adminNotes": zod.string().nullish()
+})
+
+
+/**
+ * @summary Export task data for CSV/PDF (MODERATOR/ADMIN/SUPER_ADMIN)
+ */
+export const GetTasksExportResponseItem = zod.object({
+  "id": zod.number(),
+  "title": zod.string(),
+  "description": zod.string().optional(),
+  "priority": zod.string(),
+  "status": zod.string(),
+  "assignees": zod.string().optional(),
+  "startDate": zod.string().nullish(),
+  "dueDate": zod.string().nullish(),
+  "createdByName": zod.string().nullish(),
+  "createdAt": zod.string().nullish(),
+  "latestReportText": zod.string().nullish(),
+  "latestProgress": zod.number().nullish(),
+  "adminNotes": zod.string().nullish()
+})
+export const GetTasksExportResponse = zod.array(GetTasksExportResponseItem)
+
+
+/**
+ * @summary List active users that can be assigned to tasks (staff only)
+ */
+export const GetAssignableUsersResponseItem = zod.object({
+  "id": zod.number(),
+  "fullName": zod.string(),
+  "account": zod.string(),
+  "email": zod.string().nullish(),
+  "role": zod.string()
+})
+export const GetAssignableUsersResponse = zod.array(GetAssignableUsersResponseItem)
+
+
+/**
+ * @summary Update a task (MODERATOR/ADMIN/SUPER_ADMIN)
+ */
+export const UpdateAdminTaskParams = zod.object({
+  "id": zod.coerce.number()
+})
+
+
+
+
+
+
+export const UpdateAdminTaskBody = zod.object({
+  "title": zod.string().min(1).optional(),
+  "description": zod.string().min(1).optional(),
+  "assigneeIds": zod.array(zod.number()).min(1).optional(),
+  "priority": zod.enum(['LOW', 'MEDIUM', 'HIGH', 'URGENT']).optional(),
+  "status": zod.enum(['NEW', 'IN_PROGRESS', 'WAITING_REVIEW', 'COMPLETED', 'POSTPONED', 'CANCELLED']).optional(),
+  "startDate": zod.string().nullish(),
+  "dueDate": zod.string().nullish(),
+  "adminNotes": zod.string().nullish()
+})
+
+export const UpdateAdminTaskResponse = zod.object({
+  "id": zod.number(),
+  "title": zod.string(),
+  "description": zod.string(),
+  "priority": zod.enum(['LOW', 'MEDIUM', 'HIGH', 'URGENT']),
+  "status": zod.enum(['NEW', 'IN_PROGRESS', 'WAITING_REVIEW', 'COMPLETED', 'POSTPONED', 'CANCELLED']),
+  "startDate": zod.string().nullish(),
+  "dueDate": zod.string().nullish(),
+  "createdById": zod.number(),
+  "createdByName": zod.string().nullish(),
+  "adminNotes": zod.string().nullish(),
+  "createdAt": zod.coerce.date().nullish(),
+  "updatedAt": zod.coerce.date().nullish(),
+  "assignees": zod.array(zod.object({
+  "id": zod.number(),
+  "taskId": zod.number(),
+  "userId": zod.number(),
+  "userFullName": zod.string().nullish(),
+  "userAccount": zod.string().nullish(),
+  "userEmail": zod.string().nullish(),
+  "isActive": zod.boolean(),
+  "assignedAt": zod.coerce.date().nullish()
+})),
+  "reports": zod.array(zod.object({
+  "id": zod.number(),
+  "taskId": zod.number(),
+  "authorId": zod.number(),
+  "authorName": zod.string().nullish(),
+  "reportText": zod.string(),
+  "progressPercent": zod.number().nullish(),
+  "reportType": zod.enum(['MEMBER_REPORT', 'ADMIN_NOTE']),
+  "createdAt": zod.coerce.date().nullish(),
+  "updatedAt": zod.coerce.date().nullish(),
+  "attachments": zod.array(zod.object({
+  "id": zod.number(),
+  "reportId": zod.number(),
+  "fileName": zod.string(),
+  "mimeType": zod.string(),
+  "fileSize": zod.number(),
+  "createdAt": zod.coerce.date().nullish()
+}))
+}))
+})
+
+
+/**
  * @summary Get a static page by slug
  */
 export const GetStaticPageParams = zod.object({

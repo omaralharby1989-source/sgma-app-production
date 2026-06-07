@@ -1,0 +1,908 @@
+TASK MANAGEMENT MODULE — SGMA APP
+
+Start this task now.
+
+Scope:
+Build a complete internal Task Management module for SGMA APP.
+
+Purpose:
+Admins, moderators, and super admins can create and assign tasks to specific members.
+Assigned members can access only their own tasks and submit detailed reports with attachments from their phone/device.
+Admins/moderators/super admins can view all tasks, all reports, all attachments, and export task information to Excel or PDF for archiving.
+
+Do not add unrelated features.
+Do not break existing stable modules:
+
+* login
+* register
+* home/my account
+* news
+* articles
+* chat
+* broadcast
+* admin dashboard
+* board
+* volunteer delegations
+* ads management
+* more page
+* developer-info
+* static pages
+* membership approval flow
+* logo/branding
+
+Current architecture:
+
+* PostgreSQL + Drizzle
+* JWT auth
+* Arabic RTL
+* Mobile-first
+* No Firebase
+* No MySQL migration
+* No old SGMA APP1 routes
+
+==================================================
+A. MAIN IDEA
+============
+
+Create a Trello-like task system, but without complex drag/drop for now.
+
+Use clean task cards, filters, details page, reports, attachments, and export buttons.
+
+Roles:
+
+1. SUPER_ADMIN
+   Full task control:
+
+* create tasks
+* assign tasks to one or multiple members
+* view all tasks
+* view all reports
+* add admin reports/comments
+* change status
+* export Excel/PDF
+* download attachments
+
+2. ADMIN
+   Same full task control:
+
+* create tasks
+* assign tasks
+* view all
+* reports
+* status changes
+* export Excel/PDF
+* download attachments
+
+3. MODERATOR
+   Same full task control:
+
+* create tasks
+* assign tasks
+* view all
+* reports
+* status changes
+* export Excel/PDF
+* download attachments
+
+4. MEMBER
+   Limited:
+
+* can access task module ONLY if assigned to at least one task
+* can see only own assigned tasks
+* can submit detailed reports
+* can upload attachments from phone/device inside reports
+* cannot see other members’ tasks
+* cannot create tasks
+* cannot export all tasks
+* cannot access admin task list
+
+Important:
+A normal MEMBER with no assigned tasks must NOT see task links and must NOT access task pages.
+
+Backend enforcement is mandatory.
+
+==================================================
+B. REQUIRED ROUTES
+==================
+
+Member routes:
+
+1. /tasks
+   For assigned members:
+
+* shows “مهامي”
+* only tasks assigned to current user
+* if member has no tasks, show:
+  لا توجد مهام مكلّف بها حالياً
+
+For MODERATOR / ADMIN / SUPER_ADMIN:
+
+* can redirect to /admin/tasks or show shortcut cards.
+
+2. /tasks/:id
+   Task detail page.
+   Member can open only if assigned to this task.
+   Staff can open any task.
+
+Admin/staff routes:
+
+3. /admin/tasks
+   Task management dashboard.
+   Access:
+
+* MODERATOR
+* ADMIN
+* SUPER_ADMIN
+
+4. /admin/tasks/new
+   Create task page.
+   Access:
+
+* MODERATOR
+* ADMIN
+* SUPER_ADMIN
+
+Optional if cleaner:
+5. /admin/tasks/:id
+Admin task detail page.
+Can use same /tasks/:id with role-aware UI if better.
+
+6. /admin/tasks/export
+   Not necessarily a page; can be buttons on /admin/tasks.
+
+==================================================
+C. UPDATE /MORE PAGE
+====================
+
+In /more:
+
+For assigned MEMBER:
+Show item:
+مهامي
+Route:
+/tasks
+
+Only show this item if current user has assigned tasks.
+If checking this dynamically is too complex for /more, show it for authenticated users but /tasks must correctly show “لا توجد مهام مكلّف بها حالياً” for unassigned users.
+
+For MODERATOR / ADMIN / SUPER_ADMIN:
+Show under admin/management section:
+إدارة المهام
+Route:
+/admin/tasks
+
+Do not show إدارة المهام to MEMBER.
+
+==================================================
+D. DATABASE MODELS
+==================
+
+Create tables:
+
+1. tasks
+
+Fields:
+
+* id
+* title
+* description
+* priority
+* status
+* startDate nullable
+* dueDate nullable
+* createdById
+* updatedById nullable
+* adminNotes nullable
+* createdAt
+* updatedAt
+
+Priority values:
+
+* LOW
+* MEDIUM
+* HIGH
+* URGENT
+
+Status values:
+
+* NEW
+* IN_PROGRESS
+* WAITING_REVIEW
+* COMPLETED
+* POSTPONED
+* CANCELLED
+
+Default:
+status = NEW
+priority = MEDIUM
+
+2. task_assignees
+
+Fields:
+
+* id
+* taskId
+* userId
+* assignedById
+* assignedAt
+* isActive boolean default true
+
+Rules:
+
+* A task can have one or multiple assigned members.
+* A member can have many tasks.
+* Use this table for visibility control.
+
+3. task_reports
+
+Fields:
+
+* id
+* taskId
+* authorId
+* reportText
+* progressPercent nullable integer
+* reportType
+* createdAt
+* updatedAt
+
+reportType values:
+
+* MEMBER_REPORT
+* ADMIN_NOTE
+
+Rules:
+
+* Assigned member can create MEMBER_REPORT for own task.
+* MODERATOR / ADMIN / SUPER_ADMIN can create ADMIN_NOTE on any task.
+* Staff can also add a report if needed.
+
+4. task_report_attachments
+
+Fields:
+
+* id
+* reportId
+* fileName
+* mimeType
+* fileSize
+* fileData
+* createdAt
+
+Storage strategy:
+For now, store attachments as base64 data URLs or base64 text in DB.
+
+Allowed attachment types:
+
+* PDF
+* JPG/JPEG
+* PNG
+* WEBP
+* DOC/DOCX if easy and safe
+* XLS/XLSX if easy and safe
+
+Recommended minimum:
+
+* PDF + images only
+
+Max files:
+
+* 5 files per report
+
+Max file size:
+
+* 5 MB per file
+
+Do not add:
+
+* Firebase Storage
+* S3
+* external file service
+
+==================================================
+E. TASK CREATION — ADMIN/STAFF
+==============================
+
+Create task form.
+
+Fields:
+
+* title required
+  Label: عنوان المهمة
+
+* description required
+  Label: وصف المهمة
+
+* assignees required
+  Label: الأعضاء المكلّفون
+  Select one or multiple active users.
+  Search by name/email/account if possible.
+
+* priority required
+  Label: الأولوية
+  Options:
+  LOW: منخفضة
+  MEDIUM: متوسطة
+  HIGH: عالية
+  URGENT: عاجلة
+
+* status optional
+  Default NEW
+
+* startDate optional
+  Label: تاريخ البداية
+
+* dueDate optional
+  Label: تاريخ التسليم
+
+* adminNotes optional
+  Label: ملاحظات إدارية
+
+Submit:
+إنشاء المهمة
+
+Success:
+تم إنشاء المهمة وتكليف الأعضاء بنجاح
+
+==================================================
+F. MEMBER TASK VIEW
+===================
+
+Page /tasks:
+
+Title:
+مهامي
+
+Show task cards assigned to current user.
+
+Each card:
+
+* title
+* description excerpt
+* priority badge
+* status badge
+* dueDate if exists
+* last report date if exists
+* button:
+  عرض التفاصيل
+
+Member sees only assigned tasks.
+
+If no tasks:
+لا توجد مهام مكلّف بها حالياً
+
+==================================================
+G. TASK DETAIL PAGE
+===================
+
+Page /tasks/:id:
+
+Show:
+
+* title
+* description
+* assigned members if staff
+* priority
+* status
+* startDate
+* dueDate
+* adminNotes if allowed
+* reports timeline
+* attachments list
+
+Member view:
+
+* sees own task details
+* sees reports related to this task
+* can submit new report
+* can attach files from phone/device
+* cannot modify task title/status directly unless allowed below
+
+Staff view:
+
+* sees all details
+* sees all reports
+* can add admin note/report
+* can update task status
+* can download attachments
+* can export this task to PDF if implemented
+
+==================================================
+H. MEMBER REPORT SUBMISSION
+===========================
+
+In task detail, assigned member can add report.
+
+Fields:
+
+* reportText required
+  Label:
+  تقرير المهمة
+
+Placeholder:
+اكتب ماذا تم إنجازه، الصعوبات، الخطوات القادمة، وأي ملاحظات مهمة...
+
+* progressPercent optional
+  Label:
+  نسبة الإنجاز
+
+Range:
+0–100
+
+* attachments optional
+  Label:
+  إرفاق ملفات من الجوال
+
+File input:
+accept:
+.pdf,.jpg,.jpeg,.png,.webp,.doc,.docx,.xls,.xlsx
+
+Recommended first implementation:
+pdf, jpg, jpeg, png, webp only.
+
+Rules:
+
+* max 5 files
+* max 5MB each
+* show selected file names
+* allow removing before submit
+
+Button:
+إرسال التقرير
+
+Success:
+تم إرسال تقرير المهمة بنجاح
+
+Important:
+Attachments must be uploaded from device/phone, not only via URL.
+Do not ask for links.
+
+==================================================
+I. STAFF REPORT / COMMENT
+=========================
+
+MODERATOR / ADMIN / SUPER_ADMIN can add an administrative report/note.
+
+Fields:
+
+* reportText required
+  Label:
+  ملاحظة أو تقرير إداري
+
+* progressPercent optional
+
+* attachments optional
+
+Button:
+إضافة ملاحظة إدارية
+
+Success:
+تمت إضافة الملاحظة الإدارية بنجاح
+
+==================================================
+J. TASK STATUS UPDATE
+=====================
+
+Staff can update task status.
+
+Allowed statuses:
+
+* NEW
+* IN_PROGRESS
+* WAITING_REVIEW
+* COMPLETED
+* POSTPONED
+* CANCELLED
+
+Arabic labels:
+
+* NEW: جديدة
+* IN_PROGRESS: قيد التنفيذ
+* WAITING_REVIEW: بانتظار مراجعة الإدارة
+* COMPLETED: مكتملة
+* POSTPONED: مؤجلة
+* CANCELLED: ملغاة
+
+Optional member behavior:
+When member submits a report, task can automatically become WAITING_REVIEW if current status is NEW or IN_PROGRESS.
+Only staff should mark COMPLETED.
+
+==================================================
+K. ADMIN TASK DASHBOARD — /admin/tasks
+======================================
+
+Access:
+
+* MODERATOR
+* ADMIN
+* SUPER_ADMIN
+
+Design:
+
+* Arabic RTL
+* Mobile-first
+* Cards, not dense tables
+
+Show filters:
+
+* All
+* NEW
+* IN_PROGRESS
+* WAITING_REVIEW
+* COMPLETED
+* POSTPONED
+* CANCELLED
+* priority filter if easy
+* assignee search if easy
+
+Each admin task card:
+
+* title
+* status
+* priority
+* assignees
+* dueDate
+* createdBy
+* createdAt
+* latest report excerpt
+* buttons:
+
+  * عرض
+  * تعديل الحالة
+  * تصدير PDF if per-task export implemented
+
+Top buttons:
+
+* إنشاء مهمة
+* تصدير Excel
+* تصدير PDF
+
+==================================================
+L. EXPORT REQUIREMENTS
+======================
+
+Admin/staff must have buttons:
+
+1. تصدير Excel
+2. تصدير PDF
+
+On /admin/tasks.
+
+Export should include:
+
+* task id
+* title
+* description
+* priority
+* status
+* assignees names/emails
+* startDate
+* dueDate
+* createdBy
+* createdAt
+* latest report text
+* latest progress
+* adminNotes
+
+Excel:
+
+* Generate .xlsx or .csv if xlsx is too heavy.
+* Preferred: .xlsx if library already available; otherwise CSV acceptable but label should be CSV if CSV.
+* Arabic columns.
+
+PDF:
+
+* Generate printable Arabic RTL PDF or a clean print page.
+* If direct PDF generation is unstable, generate printable HTML and open print dialog.
+* Must include title:
+  تقرير المهام
+
+Important:
+Export is for staff only.
+MEMBER cannot export all tasks.
+
+==================================================
+M. BACKEND API REQUIREMENTS
+===========================
+
+Create APIs:
+
+Member/staff read own/admin tasks:
+
+GET /api/tasks/my
+
+* Authenticated active user
+* Returns tasks assigned to current user
+* Staff may also use admin endpoint for all tasks
+
+GET /api/tasks/:id
+
+* Member can access only if assigned
+* Staff can access any task
+
+Create member report:
+POST /api/tasks/:id/reports
+
+* Member assigned to task can submit MEMBER_REPORT
+* Staff can submit ADMIN_NOTE or staff report
+* Attachments supported
+
+Download attachment:
+GET /api/tasks/reports/attachments/:attachmentId
+
+* Member can download only if attachment belongs to a task assigned to them
+* Staff can download any task attachment
+
+Admin/staff endpoints:
+
+GET /api/admin/tasks
+
+* MODERATOR / ADMIN / SUPER_ADMIN only
+* list all tasks with filters
+
+POST /api/admin/tasks
+
+* MODERATOR / ADMIN / SUPER_ADMIN only
+* create task and assignees
+
+PATCH /api/admin/tasks/:id
+
+* MODERATOR / ADMIN / SUPER_ADMIN only
+* update task fields/status/assignees/adminNotes as needed
+
+GET /api/admin/tasks/export
+
+* MODERATOR / ADMIN / SUPER_ADMIN only
+* returns data for export or generates CSV/PDF depending design
+
+Optional:
+GET /api/admin/tasks/:id
+
+* staff detail if separate from /api/tasks/:id
+
+Security:
+
+* userId comes from JWT
+* assignedById/createdById from JWT
+* members cannot access unassigned tasks
+* members cannot create tasks
+* members cannot update task status directly
+* staff can see all
+
+==================================================
+N. ATTACHMENT VALIDATION
+========================
+
+Frontend validation:
+
+* allowed file types
+* max 5 files
+* max 5MB each
+* Arabic errors
+
+Backend validation:
+Must repeat validation.
+
+Allowed MIME types:
+
+* application/pdf
+* image/jpeg
+* image/png
+* image/webp
+
+Optional if implemented:
+
+* application/msword
+* application/vnd.openxmlformats-officedocument.wordprocessingml.document
+* application/vnd.ms-excel
+* application/vnd.openxmlformats-officedocument.spreadsheetml.sheet
+
+If unsupported:
+يسمح برفع ملفات PDF أو صور فقط
+
+If too large:
+حجم الملف كبير جداً، الحد الأقصى 5MB
+
+If too many:
+لا يمكن رفع أكثر من 5 ملفات
+
+==================================================
+O. OPENAPI / GENERATED CLIENT
+=============================
+
+Update OpenAPI.
+
+Schemas:
+
+* TaskItem
+* TaskDetail
+* TaskAssignee
+* TaskReport
+* TaskReportAttachment
+* CreateTaskInput
+* UpdateTaskInput
+* CreateTaskReportInput
+* TasksResponse
+* TaskStatus
+* TaskPriority
+
+Endpoints:
+
+* GET /api/tasks/my
+* GET /api/tasks/{id}
+* POST /api/tasks/{id}/reports
+* GET /api/tasks/reports/attachments/{attachmentId}
+* GET /api/admin/tasks
+* POST /api/admin/tasks
+* PATCH /api/admin/tasks/{id}
+* GET /api/admin/tasks/export
+
+Then:
+
+* Regenerate client
+* Do not manually edit generated files
+* Run typecheck
+
+==================================================
+P. UI QUALITY REQUIREMENTS
+==========================
+
+All pages:
+
+* Arabic RTL
+* Mobile-first
+* Clean cards
+* BackButton
+* No horizontal scroll
+* Bottom navigation must not cover buttons
+* File names must not overflow
+* Progress/status badges clear
+* Export buttons visible only to staff
+* Member pages simple and focused
+
+==================================================
+Q. PERMISSION RULES
+===================
+
+MEMBER:
+
+* can access /tasks only if assigned to at least one task
+* can view own assigned tasks
+* can submit reports on own tasks
+* can upload attachments on own reports
+* can download own task attachments
+* cannot create tasks
+* cannot view other tasks
+* cannot export all tasks
+* cannot access /admin/tasks
+
+MODERATOR:
+
+* full task management
+* create/assign tasks
+* view all tasks/reports
+* add notes/reports
+* update status
+* export Excel/PDF
+* download all attachments
+
+ADMIN:
+
+* same as MODERATOR
+
+SUPER_ADMIN:
+
+* same as ADMIN, full control
+
+Backend enforcement mandatory.
+
+==================================================
+R. TESTING REQUIRED
+===================
+
+Do not report completion until tested in Preview.
+
+Member tests:
+
+1. Assigned member sees /tasks.
+2. Unassigned member cannot see other tasks.
+3. Assigned member sees only own tasks.
+4. Assigned member opens task detail.
+5. Assigned member submits detailed report.
+6. Assigned member uploads attachment from device.
+7. Attachment downloads.
+8. Member cannot access /admin/tasks.
+9. Member cannot create task via API.
+10. Member cannot access another member’s task.
+
+Staff tests:
+
+1. MODERATOR opens /admin/tasks.
+2. ADMIN opens /admin/tasks.
+3. SUPER_ADMIN opens /admin/tasks.
+4. Staff creates task and assigns member.
+5. Staff views all tasks.
+6. Staff updates status.
+7. Staff adds admin report/note with attachment.
+8. Staff downloads attachments.
+9. Staff exports Excel or CSV.
+10. Staff exports PDF or printable report.
+
+Navigation:
+
+1. /more shows إدارة المهام for MODERATOR/ADMIN/SUPER_ADMIN.
+2. /more shows مهامي for assigned member or /tasks works with no-task message.
+3. No management links for normal member.
+
+Validation:
+
+1. Empty title/description rejected.
+2. Missing assignees rejected.
+3. Invalid status rejected.
+4. Invalid priority rejected.
+5. Unsupported attachment rejected.
+6. File >5MB rejected.
+7. More than 5 files rejected.
+
+Regression:
+
+1. /login works.
+2. /register works.
+3. /home works.
+4. /news works.
+5. /articles works.
+6. /chat works.
+7. /broadcast works.
+8. /admin works.
+9. /board works.
+10. /volunteer-delegations works.
+11. /ads management works for super admin.
+12. /more works.
+13. /developer-info works.
+14. /privacy-policy works.
+15. /terms works.
+16. /about-sgma works.
+17. Typecheck passes.
+18. Backend starts cleanly.
+19. Preview works.
+20. External link still has no removeChild translation error.
+
+==================================================
+S. REQUIRED REPORT
+==================
+
+After completion, provide:
+
+TASK MANAGEMENT MODULE REPORT
+
+1. What was implemented
+2. Files changed
+3. Database/table changes
+4. Routes added
+5. /more update status
+6. Task creation/assignment status
+7. Member task view status
+8. Task report + attachments status
+9. Staff admin task dashboard status
+10. Export Excel/PDF status
+11. Backend API endpoints
+12. OpenAPI/client generation status
+13. Permission test results:
+
+* MEMBER assigned
+* MEMBER unassigned
+* MODERATOR
+* ADMIN
+* SUPER_ADMIN
+
+14. Runtime test results
+15. Preview status
+16. Known issues, if any
+17. Confirmation:
+
+* No Firebase
+* No MySQL migration
+* No unrelated features added
+* Existing modules still work
+
+Do not report success until task assignment, member report attachments, admin/staff full visibility, and export buttons are verified.

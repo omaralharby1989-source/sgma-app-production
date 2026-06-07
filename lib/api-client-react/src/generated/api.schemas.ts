@@ -695,6 +695,227 @@ export interface UpdateVolunteerDelegationStatusInput {
   adminNotes?: string | null;
 }
 
+export type TaskStatus = typeof TaskStatus[keyof typeof TaskStatus];
+
+
+export const TaskStatus = {
+  NEW: 'NEW',
+  IN_PROGRESS: 'IN_PROGRESS',
+  WAITING_REVIEW: 'WAITING_REVIEW',
+  COMPLETED: 'COMPLETED',
+  POSTPONED: 'POSTPONED',
+  CANCELLED: 'CANCELLED',
+} as const;
+
+export type TaskPriority = typeof TaskPriority[keyof typeof TaskPriority];
+
+
+export const TaskPriority = {
+  LOW: 'LOW',
+  MEDIUM: 'MEDIUM',
+  HIGH: 'HIGH',
+  URGENT: 'URGENT',
+} as const;
+
+export type TaskReportType = typeof TaskReportType[keyof typeof TaskReportType];
+
+
+export const TaskReportType = {
+  MEMBER_REPORT: 'MEMBER_REPORT',
+  ADMIN_NOTE: 'ADMIN_NOTE',
+} as const;
+
+export interface TaskAssignee {
+  id: number;
+  taskId: number;
+  userId: number;
+  /** @nullable */
+  userFullName?: string | null;
+  /** @nullable */
+  userAccount?: string | null;
+  /** @nullable */
+  userEmail?: string | null;
+  isActive: boolean;
+  /** @nullable */
+  assignedAt?: string | null;
+}
+
+export interface TaskReportAttachment {
+  id: number;
+  reportId: number;
+  fileName: string;
+  mimeType: string;
+  fileSize: number;
+  /** @nullable */
+  createdAt?: string | null;
+}
+
+export interface TaskReportAttachmentData {
+  id: number;
+  fileName: string;
+  mimeType: string;
+  fileSize?: number;
+  fileData: string;
+}
+
+export interface CreateTaskReportFileInput {
+  /** @minLength 1 */
+  fileName: string;
+  /** @minLength 1 */
+  mimeType: string;
+  /** @minLength 1 */
+  fileData: string;
+}
+
+export interface TaskReport {
+  id: number;
+  taskId: number;
+  authorId: number;
+  /** @nullable */
+  authorName?: string | null;
+  reportText: string;
+  /** @nullable */
+  progressPercent?: number | null;
+  reportType: TaskReportType;
+  /** @nullable */
+  createdAt?: string | null;
+  /** @nullable */
+  updatedAt?: string | null;
+  attachments: TaskReportAttachment[];
+}
+
+export interface TaskItem {
+  id: number;
+  title: string;
+  description: string;
+  priority: TaskPriority;
+  status: TaskStatus;
+  /** @nullable */
+  startDate?: string | null;
+  /** @nullable */
+  dueDate?: string | null;
+  createdById: number;
+  /** @nullable */
+  createdByName?: string | null;
+  /** @nullable */
+  adminNotes?: string | null;
+  /** @nullable */
+  createdAt?: string | null;
+  /** @nullable */
+  updatedAt?: string | null;
+  /** @nullable */
+  latestReportAt?: string | null;
+  /** @nullable */
+  latestReportExcerpt?: string | null;
+  /** @nullable */
+  latestProgress?: number | null;
+  assignees: TaskAssignee[];
+}
+
+export interface TaskDetail {
+  id: number;
+  title: string;
+  description: string;
+  priority: TaskPriority;
+  status: TaskStatus;
+  /** @nullable */
+  startDate?: string | null;
+  /** @nullable */
+  dueDate?: string | null;
+  createdById: number;
+  /** @nullable */
+  createdByName?: string | null;
+  /** @nullable */
+  adminNotes?: string | null;
+  /** @nullable */
+  createdAt?: string | null;
+  /** @nullable */
+  updatedAt?: string | null;
+  assignees: TaskAssignee[];
+  reports: TaskReport[];
+}
+
+export type TasksResponse = TaskItem[];
+
+export interface CreateTaskInput {
+  /** @minLength 1 */
+  title: string;
+  /** @minLength 1 */
+  description: string;
+  /** @minItems 1 */
+  assigneeIds: number[];
+  priority: TaskPriority;
+  status?: TaskStatus;
+  /** @nullable */
+  startDate?: string | null;
+  /** @nullable */
+  dueDate?: string | null;
+  /** @nullable */
+  adminNotes?: string | null;
+}
+
+export interface UpdateTaskInput {
+  /** @minLength 1 */
+  title?: string;
+  /** @minLength 1 */
+  description?: string;
+  /** @minItems 1 */
+  assigneeIds?: number[];
+  priority?: TaskPriority;
+  status?: TaskStatus;
+  /** @nullable */
+  startDate?: string | null;
+  /** @nullable */
+  dueDate?: string | null;
+  /** @nullable */
+  adminNotes?: string | null;
+}
+
+export interface CreateTaskReportInput {
+  /** @minLength 1 */
+  reportText: string;
+  /** @nullable */
+  progressPercent?: number | null;
+  reportType?: TaskReportType;
+  attachments?: CreateTaskReportFileInput[];
+}
+
+export interface TaskExportRow {
+  id: number;
+  title: string;
+  description?: string;
+  priority: string;
+  status: string;
+  assignees?: string;
+  /** @nullable */
+  startDate?: string | null;
+  /** @nullable */
+  dueDate?: string | null;
+  /** @nullable */
+  createdByName?: string | null;
+  /** @nullable */
+  createdAt?: string | null;
+  /** @nullable */
+  latestReportText?: string | null;
+  /** @nullable */
+  latestProgress?: number | null;
+  /** @nullable */
+  adminNotes?: string | null;
+}
+
+export type TaskExportResponse = TaskExportRow[];
+
+export interface AssignableUser {
+  id: number;
+  fullName: string;
+  account: string;
+  /** @nullable */
+  email?: string | null;
+  role: string;
+}
+
+export type AssignableUsersResponse = AssignableUser[];
+
 export interface StaticPage {
   id: number;
   slug: string;
@@ -1031,6 +1252,11 @@ boardType?: BoardType;
 
 export type GetAdminVolunteerDelegationsParams = {
 status?: VolunteerDelegationStatus;
+};
+
+export type GetAdminTasksParams = {
+status?: TaskStatus;
+priority?: TaskPriority;
 };
 
 export type GetAdminChatMessagesParams = {

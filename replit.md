@@ -232,6 +232,20 @@ Additive module for registering volunteer medical delegations (تسجيل للو
 - PDF attachments stored as base64 data URIs; file endpoints return JSON `{id,fileName,mimeType,fileSize,fileData}`, client builds a Blob/anchor download. `app.ts` json+urlencoded limit raised 8mb→40mb to fit up to 5×5MB base64 PDFs.
 - Frontend: `/volunteer-delegations` (member 14-field RTL form + conditional equipment details + PDF upload with client type/size/count checks + "حفظ كـ PDF / طباعة" via window.open print, NOT submit + "طلباتي" list); `/admin/volunteer-delegations` (staffOnly: cards, status filter, badges, PDF download, update dialog). Success msg: "تم تسجيل طلب عملك التطوعي، سيتم التواصل معك لترتيب الإجراءات. شكراً جزيلاً." `/more` links: member "تسجيل للوفود التطوعية", staff "طلبات الوفود التطوعية".
 
+## Task Management Module Status — COMPLETE
+
+Internal Trello-like task module (no drag/drop). Staff (MODERATOR/ADMIN/SUPER_ADMIN) create/assign tasks to MEMBERs, track progress, add admin notes, change status, download attachments, export CSV+PDF. Members see ONLY assigned tasks and submit reports with device-uploaded attachments. Backend is the source of truth for ALL permissions; UI gating is convenience only.
+- DB (`lib/db/src/schema/tasks.ts`): `tasks`, `task_assignees`, `task_reports`, `task_report_attachments`. Statuses NEW/IN_PROGRESS/WAITING_REVIEW/COMPLETED/POSTPONED/CANCELLED; priorities LOW/MEDIUM/HIGH/URGENT; report types MEMBER_REPORT/ADMIN_NOTE.
+- Member/shared routes (`routes/tasks.ts`, JWT): `GET /tasks/my` (assigned only), `GET /tasks/:id` (assignee or staff only), `POST /tasks/:id/reports`, `GET /tasks/reports/attachments/:attachmentId`. Static `reports/attachments` path registered BEFORE `:id`.
+- Admin routes (`routes/admin/tasks.ts`, staff only): `GET /admin/tasks?status=&priority=`, `GET /admin/tasks/export` (CSV rows), `GET /admin/tasks/assignable-users`, `POST /admin/tasks`, `PATCH /admin/tasks/:id`. Static `export`/`assignable-users` registered BEFORE `:id`.
+- SECURITY (server-enforced, never trust client):
+  - Assignees MUST be `role=MEMBER` AND ACTIVE AND isActive — both `activeUserIds()` (create/reassign) and `assignable-users` filter on role=MEMBER; assigning a non-member → 400. Staff cannot assign tasks to staff.
+  - Report type is forced by ACTOR ROLE, client `reportType` is ignored: staff → ALWAYS ADMIN_NOTE, member → ALWAYS MEMBER_REPORT. Only a MEMBER_REPORT on a NEW/IN_PROGRESS task auto-transitions it to WAITING_REVIEW — staff cannot spoof that transition.
+  - Attachment download (`/tasks/reports/attachments/:id`): members get ONLY their own (`row.authorId !== req.user.userId` → 403); staff bypass allowed. There is NO separate admin attachment route — staff use this shared endpoint (frontend `getTaskReportAttachment` for both).
+  - `authorId`/`assignedById`/`reviewedById` always from `req.user`, never client.
+- Attachment validation (`lib/taskAttachmentValidation.ts`): pdf + jpeg/png/webp only, ≤5 files, ≤5MB decoded each; base64 data URIs.
+- Frontend: `/tasks` (مهامي list, empty="لا توجد مهام مكلّف بها حالياً"), `/tasks/:id` (role-aware: member report+progress+upload / staff admin-note + status change), `/admin/tasks` (filters, cards, CSV w/ UTF-8 BOM + print PDF title "تقرير المهام"), `/admin/tasks/new` (Checkbox multi-select assignees). `src/lib/taskLabels.ts` holds status/priority labels+variants+formatTaskDate. `/more` shows مهامي ONLY when `!isStaff && hasTasks`, إدارة المهام for staff. Routes: `/admin/tasks/new` BEFORE `/admin/tasks`.
+
 ## Test Accounts
 
 | account | email | password | role |

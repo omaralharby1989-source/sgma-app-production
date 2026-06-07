@@ -2,6 +2,7 @@
 - [News module visibility](news-module.md) — news visibility is driven by status enum (PUBLISHED only on reads); is_published is a synced legacy column.
 - [JWT signing secret](jwt-secret.md) — api-server signs JWTs with JWT_SECRET ?? SESSION_SECRET and fails fast; never reintroduce a hardcoded fallback.
 - [Signup role security](signup-role-security.md) — role/isDeveloper/isActive/status are server-controlled; never accept them from client update/signup bodies.
+- [Actor-derived fields](actor-derived-fields.md) — fields keyed off the caller (report type, assignee role, authorId) must be forced from req.user; ignore client input even if the schema allows it.
 - [SGMA APP2 auth system](sgma-app2-auth.md) — JWT auth setup, bcryptjs requirement, role validation at login.
 - [SGMA APP2 frontend import rules](sgma-app2-frontend-imports.md) — frontend must not import from @workspace/api-zod (server-side only).
 - [Drizzle push has no TTY](drizzle-push-no-tty.md) — ambiguous column changes prompt interactively and stall; drop empty tables via SQL first, then push.

@@ -32,6 +32,7 @@ import type {
   AdminVolunteerDelegationsResponse,
   ArticleDetail,
   ArticleListResponse,
+  AssignableUsersResponse,
   AuthResponse,
   AvatarResponse,
   AvatarUpload,
@@ -45,6 +46,8 @@ import type {
   CreateBroadcastInput,
   CreateCustomAdInput,
   CreateNewsInput,
+  CreateTaskInput,
+  CreateTaskReportInput,
   CreateVolunteerDelegationRequestInput,
   CustomAd,
   CustomAdListResponse,
@@ -54,6 +57,7 @@ import type {
   GetAdminArticlesParams,
   GetAdminChatMessagesParams,
   GetAdminNewsParams,
+  GetAdminTasksParams,
   GetAdminUsersParams,
   GetAdminVolunteerDelegationsParams,
   GetBoardMembersParams,
@@ -74,6 +78,10 @@ import type {
   SignupInput,
   SignupResponse,
   StaticPage,
+  TaskDetail,
+  TaskExportResponse,
+  TaskReportAttachmentData,
+  TasksResponse,
   UpdateAdSettingsInput,
   UpdateArticleInput,
   UpdateBoardMemberInput,
@@ -82,6 +90,7 @@ import type {
   UpdateDeveloperInfoInput,
   UpdateNewsInput,
   UpdateStaticPageInput,
+  UpdateTaskInput,
   UpdateVolunteerDelegationStatusInput,
   VolunteerDelegationFileData,
   VolunteerDelegationRequest
@@ -1594,6 +1603,690 @@ export function useGetAdminVolunteerDelegationFile<TData = Awaited<ReturnType<ty
 
 
 
+
+export const getGetMyTasksUrl = () => {
+
+
+
+
+  return `/api/tasks/my`
+}
+
+/**
+ * @summary List tasks assigned to the current user
+ */
+export const getMyTasks = async ( options?: RequestInit): Promise<TasksResponse> => {
+
+  return customFetch<TasksResponse>(getGetMyTasksUrl(),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getGetMyTasksQueryKey = () => {
+    return [
+    `/api/tasks/my`
+    ] as const;
+    }
+
+
+export const getGetMyTasksQueryOptions = <TData = Awaited<ReturnType<typeof getMyTasks>>, TError = ErrorType<ErrorResponse>>( options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getMyTasks>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetMyTasksQueryKey();
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getMyTasks>>> = ({ signal }) => getMyTasks({ signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getMyTasks>>, TError, TData> & { queryKey: QueryKey }
+}
+
+export type GetMyTasksQueryResult = NonNullable<Awaited<ReturnType<typeof getMyTasks>>>
+export type GetMyTasksQueryError = ErrorType<ErrorResponse>
+
+
+/**
+ * @summary List tasks assigned to the current user
+ */
+
+export function useGetMyTasks<TData = Awaited<ReturnType<typeof getMyTasks>>, TError = ErrorType<ErrorResponse>>(
+  options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getMyTasks>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+
+ ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+
+  const queryOptions = getGetMyTasksQueryOptions(options)
+
+  const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
+
+  return { ...query, queryKey: queryOptions.queryKey };
+}
+
+
+
+
+
+
+
+export const getGetTaskReportAttachmentUrl = (attachmentId: number,) => {
+
+
+
+
+  return `/api/tasks/reports/attachments/${attachmentId}`
+}
+
+/**
+ * @summary Download a report attachment (assigned member or staff)
+ */
+export const getTaskReportAttachment = async (attachmentId: number, options?: RequestInit): Promise<TaskReportAttachmentData> => {
+
+  return customFetch<TaskReportAttachmentData>(getGetTaskReportAttachmentUrl(attachmentId),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getGetTaskReportAttachmentQueryKey = (attachmentId: number,) => {
+    return [
+    `/api/tasks/reports/attachments/${attachmentId}`
+    ] as const;
+    }
+
+
+export const getGetTaskReportAttachmentQueryOptions = <TData = Awaited<ReturnType<typeof getTaskReportAttachment>>, TError = ErrorType<ErrorResponse>>(attachmentId: number, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getTaskReportAttachment>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetTaskReportAttachmentQueryKey(attachmentId);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getTaskReportAttachment>>> = ({ signal }) => getTaskReportAttachment(attachmentId, { signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, enabled: !!(attachmentId), ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getTaskReportAttachment>>, TError, TData> & { queryKey: QueryKey }
+}
+
+export type GetTaskReportAttachmentQueryResult = NonNullable<Awaited<ReturnType<typeof getTaskReportAttachment>>>
+export type GetTaskReportAttachmentQueryError = ErrorType<ErrorResponse>
+
+
+/**
+ * @summary Download a report attachment (assigned member or staff)
+ */
+
+export function useGetTaskReportAttachment<TData = Awaited<ReturnType<typeof getTaskReportAttachment>>, TError = ErrorType<ErrorResponse>>(
+ attachmentId: number, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getTaskReportAttachment>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+
+ ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+
+  const queryOptions = getGetTaskReportAttachmentQueryOptions(attachmentId,options)
+
+  const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
+
+  return { ...query, queryKey: queryOptions.queryKey };
+}
+
+
+
+
+
+
+
+export const getGetTaskUrl = (id: number,) => {
+
+
+
+
+  return `/api/tasks/${id}`
+}
+
+/**
+ * @summary Get a task's details (assigned member or staff)
+ */
+export const getTask = async (id: number, options?: RequestInit): Promise<TaskDetail> => {
+
+  return customFetch<TaskDetail>(getGetTaskUrl(id),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getGetTaskQueryKey = (id: number,) => {
+    return [
+    `/api/tasks/${id}`
+    ] as const;
+    }
+
+
+export const getGetTaskQueryOptions = <TData = Awaited<ReturnType<typeof getTask>>, TError = ErrorType<ErrorResponse>>(id: number, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getTask>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetTaskQueryKey(id);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getTask>>> = ({ signal }) => getTask(id, { signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, enabled: !!(id), ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getTask>>, TError, TData> & { queryKey: QueryKey }
+}
+
+export type GetTaskQueryResult = NonNullable<Awaited<ReturnType<typeof getTask>>>
+export type GetTaskQueryError = ErrorType<ErrorResponse>
+
+
+/**
+ * @summary Get a task's details (assigned member or staff)
+ */
+
+export function useGetTask<TData = Awaited<ReturnType<typeof getTask>>, TError = ErrorType<ErrorResponse>>(
+ id: number, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getTask>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+
+ ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+
+  const queryOptions = getGetTaskQueryOptions(id,options)
+
+  const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
+
+  return { ...query, queryKey: queryOptions.queryKey };
+}
+
+
+
+
+
+
+
+export const getCreateTaskReportUrl = (id: number,) => {
+
+
+
+
+  return `/api/tasks/${id}/reports`
+}
+
+/**
+ * @summary Add a report or admin note to a task
+ */
+export const createTaskReport = async (id: number,
+    createTaskReportInput: CreateTaskReportInput, options?: RequestInit): Promise<TaskDetail> => {
+
+  return customFetch<TaskDetail>(getCreateTaskReportUrl(id),
+  {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(
+      createTaskReportInput,)
+  }
+);}
+
+
+
+
+export const getCreateTaskReportMutationOptions = <TError = ErrorType<ErrorResponse>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof createTaskReport>>, TError,{id: number;data: BodyType<CreateTaskReportInput>}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof createTaskReport>>, TError,{id: number;data: BodyType<CreateTaskReportInput>}, TContext> => {
+
+const mutationKey = ['createTaskReport'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof createTaskReport>>, {id: number;data: BodyType<CreateTaskReportInput>}> = (props) => {
+          const {id,data} = props ?? {};
+
+          return  createTaskReport(id,data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type CreateTaskReportMutationResult = NonNullable<Awaited<ReturnType<typeof createTaskReport>>>
+    export type CreateTaskReportMutationBody = BodyType<CreateTaskReportInput>
+    export type CreateTaskReportMutationError = ErrorType<ErrorResponse>
+
+    /**
+ * @summary Add a report or admin note to a task
+ */
+export const useCreateTaskReport = <TError = ErrorType<ErrorResponse>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof createTaskReport>>, TError,{id: number;data: BodyType<CreateTaskReportInput>}, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof createTaskReport>>,
+        TError,
+        {id: number;data: BodyType<CreateTaskReportInput>},
+        TContext
+      > => {
+      return useMutation(getCreateTaskReportMutationOptions(options));
+    }
+
+export const getGetAdminTasksUrl = (params?: GetAdminTasksParams,) => {
+  const normalizedParams = new URLSearchParams();
+
+  Object.entries(params || {}).forEach(([key, value]) => {
+
+    if (value !== undefined) {
+      normalizedParams.append(key, value === null ? 'null' : value.toString())
+    }
+  });
+
+  const stringifiedParams = normalizedParams.toString();
+
+  return stringifiedParams.length > 0 ? `/api/admin/tasks?${stringifiedParams}` : `/api/admin/tasks`
+}
+
+/**
+ * @summary List all tasks with filters (MODERATOR/ADMIN/SUPER_ADMIN)
+ */
+export const getAdminTasks = async (params?: GetAdminTasksParams, options?: RequestInit): Promise<TasksResponse> => {
+
+  return customFetch<TasksResponse>(getGetAdminTasksUrl(params),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getGetAdminTasksQueryKey = (params?: GetAdminTasksParams,) => {
+    return [
+    `/api/admin/tasks`, ...(params ? [params] : [])
+    ] as const;
+    }
+
+
+export const getGetAdminTasksQueryOptions = <TData = Awaited<ReturnType<typeof getAdminTasks>>, TError = ErrorType<ErrorResponse>>(params?: GetAdminTasksParams, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getAdminTasks>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetAdminTasksQueryKey(params);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getAdminTasks>>> = ({ signal }) => getAdminTasks(params, { signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getAdminTasks>>, TError, TData> & { queryKey: QueryKey }
+}
+
+export type GetAdminTasksQueryResult = NonNullable<Awaited<ReturnType<typeof getAdminTasks>>>
+export type GetAdminTasksQueryError = ErrorType<ErrorResponse>
+
+
+/**
+ * @summary List all tasks with filters (MODERATOR/ADMIN/SUPER_ADMIN)
+ */
+
+export function useGetAdminTasks<TData = Awaited<ReturnType<typeof getAdminTasks>>, TError = ErrorType<ErrorResponse>>(
+ params?: GetAdminTasksParams, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getAdminTasks>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+
+ ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+
+  const queryOptions = getGetAdminTasksQueryOptions(params,options)
+
+  const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
+
+  return { ...query, queryKey: queryOptions.queryKey };
+}
+
+
+
+
+
+
+
+export const getCreateAdminTaskUrl = () => {
+
+
+
+
+  return `/api/admin/tasks`
+}
+
+/**
+ * @summary Create a task and assign members (MODERATOR/ADMIN/SUPER_ADMIN)
+ */
+export const createAdminTask = async (createTaskInput: CreateTaskInput, options?: RequestInit): Promise<TaskDetail> => {
+
+  return customFetch<TaskDetail>(getCreateAdminTaskUrl(),
+  {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(
+      createTaskInput,)
+  }
+);}
+
+
+
+
+export const getCreateAdminTaskMutationOptions = <TError = ErrorType<ErrorResponse>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof createAdminTask>>, TError,{data: BodyType<CreateTaskInput>}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof createAdminTask>>, TError,{data: BodyType<CreateTaskInput>}, TContext> => {
+
+const mutationKey = ['createAdminTask'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof createAdminTask>>, {data: BodyType<CreateTaskInput>}> = (props) => {
+          const {data} = props ?? {};
+
+          return  createAdminTask(data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type CreateAdminTaskMutationResult = NonNullable<Awaited<ReturnType<typeof createAdminTask>>>
+    export type CreateAdminTaskMutationBody = BodyType<CreateTaskInput>
+    export type CreateAdminTaskMutationError = ErrorType<ErrorResponse>
+
+    /**
+ * @summary Create a task and assign members (MODERATOR/ADMIN/SUPER_ADMIN)
+ */
+export const useCreateAdminTask = <TError = ErrorType<ErrorResponse>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof createAdminTask>>, TError,{data: BodyType<CreateTaskInput>}, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof createAdminTask>>,
+        TError,
+        {data: BodyType<CreateTaskInput>},
+        TContext
+      > => {
+      return useMutation(getCreateAdminTaskMutationOptions(options));
+    }
+
+export const getGetTasksExportUrl = () => {
+
+
+
+
+  return `/api/admin/tasks/export`
+}
+
+/**
+ * @summary Export task data for CSV/PDF (MODERATOR/ADMIN/SUPER_ADMIN)
+ */
+export const getTasksExport = async ( options?: RequestInit): Promise<TaskExportResponse> => {
+
+  return customFetch<TaskExportResponse>(getGetTasksExportUrl(),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getGetTasksExportQueryKey = () => {
+    return [
+    `/api/admin/tasks/export`
+    ] as const;
+    }
+
+
+export const getGetTasksExportQueryOptions = <TData = Awaited<ReturnType<typeof getTasksExport>>, TError = ErrorType<ErrorResponse>>( options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getTasksExport>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetTasksExportQueryKey();
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getTasksExport>>> = ({ signal }) => getTasksExport({ signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getTasksExport>>, TError, TData> & { queryKey: QueryKey }
+}
+
+export type GetTasksExportQueryResult = NonNullable<Awaited<ReturnType<typeof getTasksExport>>>
+export type GetTasksExportQueryError = ErrorType<ErrorResponse>
+
+
+/**
+ * @summary Export task data for CSV/PDF (MODERATOR/ADMIN/SUPER_ADMIN)
+ */
+
+export function useGetTasksExport<TData = Awaited<ReturnType<typeof getTasksExport>>, TError = ErrorType<ErrorResponse>>(
+  options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getTasksExport>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+
+ ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+
+  const queryOptions = getGetTasksExportQueryOptions(options)
+
+  const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
+
+  return { ...query, queryKey: queryOptions.queryKey };
+}
+
+
+
+
+
+
+
+export const getGetAssignableUsersUrl = () => {
+
+
+
+
+  return `/api/admin/tasks/assignable-users`
+}
+
+/**
+ * @summary List active users that can be assigned to tasks (staff only)
+ */
+export const getAssignableUsers = async ( options?: RequestInit): Promise<AssignableUsersResponse> => {
+
+  return customFetch<AssignableUsersResponse>(getGetAssignableUsersUrl(),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getGetAssignableUsersQueryKey = () => {
+    return [
+    `/api/admin/tasks/assignable-users`
+    ] as const;
+    }
+
+
+export const getGetAssignableUsersQueryOptions = <TData = Awaited<ReturnType<typeof getAssignableUsers>>, TError = ErrorType<ErrorResponse>>( options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getAssignableUsers>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetAssignableUsersQueryKey();
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getAssignableUsers>>> = ({ signal }) => getAssignableUsers({ signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getAssignableUsers>>, TError, TData> & { queryKey: QueryKey }
+}
+
+export type GetAssignableUsersQueryResult = NonNullable<Awaited<ReturnType<typeof getAssignableUsers>>>
+export type GetAssignableUsersQueryError = ErrorType<ErrorResponse>
+
+
+/**
+ * @summary List active users that can be assigned to tasks (staff only)
+ */
+
+export function useGetAssignableUsers<TData = Awaited<ReturnType<typeof getAssignableUsers>>, TError = ErrorType<ErrorResponse>>(
+  options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getAssignableUsers>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+
+ ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+
+  const queryOptions = getGetAssignableUsersQueryOptions(options)
+
+  const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
+
+  return { ...query, queryKey: queryOptions.queryKey };
+}
+
+
+
+
+
+
+
+export const getUpdateAdminTaskUrl = (id: number,) => {
+
+
+
+
+  return `/api/admin/tasks/${id}`
+}
+
+/**
+ * @summary Update a task (MODERATOR/ADMIN/SUPER_ADMIN)
+ */
+export const updateAdminTask = async (id: number,
+    updateTaskInput: UpdateTaskInput, options?: RequestInit): Promise<TaskDetail> => {
+
+  return customFetch<TaskDetail>(getUpdateAdminTaskUrl(id),
+  {
+    ...options,
+    method: 'PATCH',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(
+      updateTaskInput,)
+  }
+);}
+
+
+
+
+export const getUpdateAdminTaskMutationOptions = <TError = ErrorType<ErrorResponse>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof updateAdminTask>>, TError,{id: number;data: BodyType<UpdateTaskInput>}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof updateAdminTask>>, TError,{id: number;data: BodyType<UpdateTaskInput>}, TContext> => {
+
+const mutationKey = ['updateAdminTask'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof updateAdminTask>>, {id: number;data: BodyType<UpdateTaskInput>}> = (props) => {
+          const {id,data} = props ?? {};
+
+          return  updateAdminTask(id,data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type UpdateAdminTaskMutationResult = NonNullable<Awaited<ReturnType<typeof updateAdminTask>>>
+    export type UpdateAdminTaskMutationBody = BodyType<UpdateTaskInput>
+    export type UpdateAdminTaskMutationError = ErrorType<ErrorResponse>
+
+    /**
+ * @summary Update a task (MODERATOR/ADMIN/SUPER_ADMIN)
+ */
+export const useUpdateAdminTask = <TError = ErrorType<ErrorResponse>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof updateAdminTask>>, TError,{id: number;data: BodyType<UpdateTaskInput>}, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof updateAdminTask>>,
+        TError,
+        {id: number;data: BodyType<UpdateTaskInput>},
+        TContext
+      > => {
+      return useMutation(getUpdateAdminTaskMutationOptions(options));
+    }
 
 export const getGetStaticPageUrl = (slug: string,) => {
 
