@@ -1,0 +1,198 @@
+UPDATE SGMA APP LOGO TO NEW 3D LOGO — LOGIN / REGISTER / APP ICON
+
+Start this small branding update now.
+
+Scope:
+Replace the current SGMA APP logo assets with the new 3D SGMA logo image provided by the user.
+
+Use the new 3D logo image as the main app branding image.
+
+Do not change app logic.
+Do not change backend.
+Do not change database.
+Do not change authentication.
+Do not change routes.
+Do not change permissions.
+Do not change any unrelated module.
+
+Current architecture:
+
+* React frontend
+* Arabic RTL
+* Mobile-first
+* SGMA visual identity already applied
+* No Firebase changes
+* No MySQL migration
+
+==================================================
+A. SOURCE IMAGE
+===============
+
+Use the newly provided/generated 3D SGMA logo image.
+
+If the image is available as an uploaded file in the workspace, import/process that image.
+
+If it is not already inside the project, ask me to upload it into the project assets folder, then continue.
+
+Do not recreate the logo.
+Do not redesign the logo.
+Use the exact new 3D logo image.
+
+==================================================
+B. REQUIRED ASSETS
+==================
+
+Create/update these assets:
+
+1. Main logo for React pages:
+   src/assets/sgma-logo-3d.png
+
+2. App icon:
+   public/sgma-app-icon.png
+
+3. Favicon:
+   public/favicon.png
+
+4. OpenGraph/social preview image if currently used:
+   public/opengraph.jpg or public/opengraph.png
+
+If needed, create optimized/resized versions from the same 3D logo:
+
+* main page logo: keep original proportions
+* app icon: square 512x512, centered, no distortion
+* favicon: 64x64 or 128x128
+* opengraph: appropriate preview size, centered logo, clean background
+
+Important:
+
+* Do not stretch the logo.
+* Do not crop important parts.
+* Preserve the SGMA text and emblem.
+* Keep clean professional appearance.
+
+==================================================
+C. LOGIN PAGE UPDATE
+====================
+
+Update /login.
+
+Replace the current logo with:
+
+src/assets/sgma-logo-3d.png
+
+Display rules:
+
+* centered
+* width around 190px to 230px on mobile
+* max-width 75vw
+* height auto
+* object-contain
+* no black background wrapper
+* no distortion
+* keep current SGMA APP title
+* keep current slogan:
+  منصة تربط الكفاءات الطبية السورية بين ألمانيا وسوريا، لأن سوريا تستحق
+
+==================================================
+D. REGISTER PAGE UPDATE
+=======================
+
+Update /register.
+
+Replace the current logo with the same:
+
+src/assets/sgma-logo-3d.png
+
+Display rules:
+
+* centered
+* smaller than login
+* width around 130px to 170px
+* max-width 60vw
+* height auto
+* object-contain
+* no distortion
+* keep existing register form and logic unchanged
+
+==================================================
+E. APP ICON / FAVICON / META UPDATE
+===================================
+
+Update index.html if needed:
+
+* favicon should point to public/favicon.png
+* apple-touch-icon should point to public/sgma-app-icon.png
+* OpenGraph/Twitter image should point to the updated opengraph image if used
+
+Title stays:
+SGMA APP
+
+Do not change app name.
+
+==================================================
+F. DO NOT CHANGE
+================
+
+Do not change:
+
+* login behavior
+* register behavior
+* signup API
+* membership approval
+* SY academy registration
+* visual identity tokens unless absolutely necessary
+* backend
+* database
+* routes
+* permissions
+* any module logic
+
+This is only replacing branding image assets.
+
+==================================================
+G. TESTING REQUIRED
+===================
+
+Test before reporting:
+
+1. /login opens.
+2. New 3D logo appears clearly.
+3. Logo is not stretched.
+4. Logo is not cropped.
+5. /register opens.
+6. New 3D logo appears correctly, smaller than login.
+7. Browser favicon updates.
+8. App icon asset exists.
+9. OpenGraph image updated if used.
+10. Mobile layout remains clean.
+11. No broken image paths.
+12. Typecheck passes.
+13. Preview works.
+
+==================================================
+H. REQUIRED REPORT
+==================
+
+After completion, provide:
+
+SGMA 3D LOGO BRANDING UPDATE REPORT
+
+1. Source image used
+2. Files created
+3. Files changed
+4. Login logo status
+5. Register logo status
+6. Favicon/app icon status
+7. OpenGraph/social image status
+8. Mobile preview status
+9. Typecheck result
+10. Known issues, if any
+11. Confirmation:
+
+* no backend changed
+* no database changed
+* no auth logic changed
+* no route logic changed
+* no unrelated modules changed
+
+Do not report success until /login and /register show the new 3D SGMA logo correctly.
