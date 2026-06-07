@@ -1,0 +1,80 @@
+UPDATE ALL SGMA APP LOGOS TO TRANSPARENT 3D LOGO — FULL BRANDING REPLACEMENT
+
+Start this branding update now.
+
+Scope:
+Replace all current SGMA logo assets with the new transparent 3D SGMA logo.
+
+Goal:
+The app should use the new 3D SGMA logo without the light square/background behind it. Only the 3D emblem and the SGMA text should appear.
+
+Do not change app logic.
+Do not change backend.
+Do not change database.
+Do not change authentication.
+Do not change routes.
+Do not change permissions.
+Do not change any unrelated module.
+
+Current architecture:
+
+* React frontend
+* Arabic RTL
+* Mobile-first
+* SGMA visual identity already applied
+* No Firebase changes
+* No MySQL migration
+
+==================================================
+A. SOURCE IMAGE
+===============
+
+Use the latest transparent 3D SGMA logo image provided by the user.
+
+The correct logo is:
+
+* 3D blue SGMA emblem
+* 3D SGMA text
+* transparent background
+* no light blue square background
+* no black background
+* no extra small text
+
+If the image is available in attached_assets or workspace, use it.
+If the transparent logo file is not already in the project, ask me to upload it or move it into the project assets.
+
+Important:
+Use the transparent 3D logo, not the previous 3D logo with the light square background.
+
+Do not recreate or redesign the logo.
+Do not change the SGMA wordmark.
+Do not distort the image.
+
+==================================================
+B. REQUIRED ASSETS TO CREATE / REPLACE
+======================================
+
+Create or replace these assets:
+
+1. Main React logo:
+   artifacts/sgma-app2/src/assets/sgma-logo-3d-transparent.png
+
+2. Login/Register logo should import:
+   @/assets/sgma-logo-3d-transparent.png
+
+3. App icon:
+   artifacts/sgma-app2/public/sgma-app-icon.png
+
+4. Favicon:
+   artifacts/sgma-app2/public/favicon.png
+
+5. OpenGraph/social preview:
+   artifacts/sgma-app2/public/opengraph.jpg
+   or the currently used OpenGraph file
+
+6. If these old files exist, leave them if needed but do not use them:
+
+* sgma-logo.png
+* sgma-logo-3d.png
+* sgma-logo-clean-transparent.png
+* old favicon

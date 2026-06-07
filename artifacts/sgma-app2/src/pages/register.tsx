@@ -11,7 +11,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
 import { Loader2 } from "lucide-react";
-import sgmaLogo from "@/assets/sgma-logo-3d.png";
+import sgmaLogo from "@/assets/sgma-logo-3d-transparent.png";
 import { PROFESSION_GROUPS } from "@/lib/constants";
 
 const registerSchema = z
