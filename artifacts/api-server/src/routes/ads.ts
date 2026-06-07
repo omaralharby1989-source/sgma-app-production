@@ -1,7 +1,7 @@
 import { Router } from "express";
 import { db, adSettingsTable, customAdsTable } from "@workspace/db";
 import { and, or, eq, isNull, lte, gte, inArray, sql } from "drizzle-orm";
-import { requireAuth } from "../middlewares/auth";
+import { requireAuth, requireFullApp } from "../middlewares/auth";
 
 const router = Router();
 
@@ -47,7 +47,7 @@ export function formatSettings(row: SettingsRow) {
 }
 
 // Ad settings + active custom ads for a placement. Any authenticated user.
-router.get("/ads/active", requireAuth, async (req, res): Promise<void> => {
+router.get("/ads/active", requireAuth, requireFullApp, async (req, res): Promise<void> => {
   try {
     const settings = await ensureSettingsRow();
 

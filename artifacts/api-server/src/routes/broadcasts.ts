@@ -23,7 +23,7 @@ function formatBroadcast(row: BroadcastRow) {
 }
 
 // List active, non-expired broadcasts (newest first) — any authenticated user
-router.get("/broadcasts/active", requireAuth, async (req, res): Promise<void> => {
+router.get("/broadcasts/active", requireAuth, requireFullApp, async (req, res): Promise<void> => {
   try {
     const now = new Date();
     const rows = await db

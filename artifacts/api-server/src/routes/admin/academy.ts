@@ -109,6 +109,13 @@ router.post("/admin/academy/lectures", requireAuth, requireFullApp, async (req, 
     return;
   }
 
+  const isGeneral = d.isGeneral ?? false;
+  const allowedSpecialties = Array.isArray(d.allowedSpecialties) ? d.allowedSpecialties : [];
+  if (!isGeneral && allowedSpecialties.length === 0) {
+    res.status(400).json({ error: "يرجى اختيار اختصاص واحد على الأقل أو تحديد المحاضرة كعامة" });
+    return;
+  }
+
   const recordingDriveUrl = d.recordingDriveUrl?.trim() || null;
   let recordingEmbedUrl: string | null = null;
   if (recordingDriveUrl) {
@@ -220,6 +227,18 @@ router.patch("/admin/academy/lectures/:id", requireAuth, requireFullApp, async (
       updates.allowedSpecialties = serializeSpecialties(d.allowedSpecialties);
     }
     if (d.isGeneral !== undefined) updates.isGeneral = d.isGeneral;
+    const effectiveGeneral =
+      d.isGeneral !== undefined ? d.isGeneral : target.isGeneral;
+    const effectiveSpecialties =
+      d.allowedSpecialties !== undefined
+        ? d.allowedSpecialties
+        : parseSpecialties(target.allowedSpecialties);
+    if (!effectiveGeneral && effectiveSpecialties.length === 0) {
+      res.status(400).json({
+        error: "يرجى اختيار اختصاص واحد على الأقل أو تحديد المحاضرة كعامة",
+      });
+      return;
+    }
     if (d.status !== undefined) {
       if (!VALID_STATUSES.includes(d.status)) {
         res.status(400).json({ error: "حالة المحاضرة غير صالحة" });
