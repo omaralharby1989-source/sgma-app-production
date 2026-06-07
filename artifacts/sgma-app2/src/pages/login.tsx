@@ -9,7 +9,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
-import { Loader2 } from "lucide-react";
+import { Loader2, ExternalLink } from "lucide-react";
 import sgmaLogo from "@/assets/sgma-logo-clean-transparent.png";
 
 const loginSchema = z.object({
@@ -138,6 +138,22 @@ export default function Login() {
             <Link href="/register" className="text-sm font-medium text-primary hover:underline">
               ليس لديك حساب؟ سجل الآن
             </Link>
+          </div>
+
+          <div className="mt-6 rounded-xl border border-primary/30 bg-primary/5 p-4 text-center">
+            <p className="text-sm font-medium text-foreground">لست عضواً في SGMA بعد؟</p>
+            <a
+              href="https://www.sgma-med.org/de/join-us"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="mt-3 inline-flex w-full items-center justify-center gap-2 rounded-lg border border-primary bg-background px-4 py-2.5 text-sm font-semibold text-primary transition-colors hover:bg-primary/10"
+            >
+              الحصول على رقم عضوية في سجما
+              <ExternalLink className="h-4 w-4" />
+            </a>
+            <p className="mt-2 text-xs text-muted-foreground">
+              سيتم فتح موقع الجمعية الرسمي في نافذة جديدة.
+            </p>
           </div>
           </div>
         </div>

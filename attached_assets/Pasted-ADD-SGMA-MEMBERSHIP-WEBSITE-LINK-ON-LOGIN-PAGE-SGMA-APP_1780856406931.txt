@@ -1,0 +1,122 @@
+ADD SGMA MEMBERSHIP WEBSITE LINK ON LOGIN PAGE — SGMA APP
+
+Start this small UI fix now.
+
+Scope:
+Add a clear external link to the official SGMA membership registration page on the login page.
+
+Do not change authentication logic.
+Do not change registration logic.
+Do not change database.
+Do not change permissions.
+Do not change routes.
+Do not change unrelated modules.
+
+==================================================
+A. REQUIRED LOCATION
+====================
+
+Update the login page:
+
+/login
+
+Under the existing internal app registration link/button "تسجيل الآن", add a clear visible external link/button for users who are not yet SGMA members.
+
+Text above the button:
+لست عضواً في SGMA بعد؟
+
+External button text:
+الحصول على رقم عضوية في سجما
+
+External URL:
+https://www.sgma-med.org/de/join-us
+
+==================================================
+B. LINK BEHAVIOR
+================
+
+The external link must:
+
+* Open in a new tab/window.
+* Use target="_blank".
+* Use rel="noopener noreferrer".
+* Be visually clear but not confused with the app's internal account registration.
+
+Important distinction:
+
+* Internal "تسجيل الآن" creates an app account inside SGMA APP.
+* External "الحصول على رقم عضوية في سجما" takes the user to the official SGMA website to request/get a membership number.
+
+==================================================
+C. UI REQUIREMENTS
+==================
+
+Design:
+
+* Mobile-friendly.
+* Clear and professional.
+* Use SGMA blue identity colors.
+* Can be a bordered secondary button or a small info card.
+* Should appear directly below the internal register button/link.
+* Should not crowd the login form.
+
+Suggested helper text:
+سيتم فتح موقع الجمعية الرسمي في نافذة جديدة.
+
+==================================================
+D. DO NOT CHANGE
+================
+
+Do not change:
+
+* login form behavior
+* register route
+* signup API
+* membership approval logic
+* SY academy registration logic
+* visual identity tokens
+* backend
+* database
+* any unrelated page
+
+This is only adding an external membership link on /login.
+
+==================================================
+E. TESTING REQUIRED
+===================
+
+Test before reporting:
+
+1. /login opens.
+2. Internal "تسجيل الآن" still goes to /register.
+3. New external membership button is visible under it.
+4. Button text is exactly:
+   الحصول على رقم عضوية في سجما
+5. External link opens:
+   https://www.sgma-med.org/de/join-us
+6. Link opens in a new tab.
+7. Mobile layout remains clean.
+8. Typecheck passes.
+9. Preview works.
+
+==================================================
+F. REQUIRED REPORT
+==================
+
+After completion, provide:
+
+SGMA MEMBERSHIP LINK REPORT
+
+1. What was changed
+2. Files changed
+3. Button text
+4. Link location
+5. Link target
+6. Internal register link status
+7. Mobile preview status
+8. Confirmation:
+
+   * no backend changed
+   * no database changed
+   * no auth logic changed
+   * no unrelated modules changed
