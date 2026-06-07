@@ -12,7 +12,7 @@ export function ArticleCard({ item }: { item: ArticleItem }) {
   return (
     <Link href={`/articles/${item.id}`} className="block">
       <Card className="overflow-hidden border-border/50 border-r-4 border-r-primary/60 shadow-sm transition-colors hover:bg-muted/30 active:bg-muted/50">
-        <ArticleImage src={item.imageUrl} alt={item.title} className="aspect-[16/9] w-full" />
+        <ArticleImage src={item.imageUrl} alt={item.title} className="w-full" />
         <div className="space-y-2 p-4">
           <div className="flex flex-wrap items-center gap-2">
             {item.category && (

@@ -61,7 +61,7 @@ export default function NewsDetail() {
 
       {!isLoading && !notFound && item && (
         <article className="pb-24">
-          <NewsImage src={item.imageUrl} alt={item.title} className="aspect-[16/9] w-full" />
+          <NewsImage src={item.imageUrl} alt={item.title} className="w-full" maxHeightClass="max-h-[70vh]" />
           <div className="space-y-4 p-4">
             <div className="flex flex-wrap items-center gap-2">
               {item.category && <Badge variant="secondary">{item.category}</Badge>}

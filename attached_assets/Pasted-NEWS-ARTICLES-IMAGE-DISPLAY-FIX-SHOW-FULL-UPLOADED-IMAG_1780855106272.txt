@@ -1,0 +1,184 @@
+NEWS + ARTICLES IMAGE DISPLAY FIX — SHOW FULL UPLOADED IMAGE
+
+Start this small UI fix now.
+
+Scope:
+Fix image display in News and Articles cards/details.
+
+Current problem:
+Uploaded images in news and articles are being cropped. The image does not appear fully after upload, especially if the image is vertical or has a different aspect ratio.
+
+Required:
+Images must display fully without cropping.
+
+Do not change upload logic.
+Do not change database schema.
+Do not change backend validation.
+Do not change article/news permissions.
+Do not change unrelated modules.
+
+Current architecture:
+
+* PostgreSQL + Drizzle
+* JWT auth
+* Arabic RTL
+* Mobile-first
+* No Firebase
+* No MySQL migration
+
+==================================================
+A. IMAGE DISPLAY REQUIREMENT
+============================
+
+For News and Articles images:
+
+1. Do not crop uploaded images.
+2. Do not use object-cover where it hides parts of the image.
+3. Use object-contain or adaptive image height.
+4. The card/image container should adapt to the uploaded image ratio as much as possible.
+5. The full image must be visible.
+6. No broken layout on mobile.
+7. No horizontal overflow.
+
+Affected areas:
+
+* /news list cards
+* /news/:id detail image
+* /articles list cards
+* /articles/:id detail image
+* any admin preview cards if present
+
+==================================================
+B. CARD IMAGE BEHAVIOR
+======================
+
+On list cards:
+
+Preferred behavior:
+
+* Show the full image inside a clean container.
+* Use:
+  object-contain
+  width: 100%
+  height: auto
+  max-height reasonable for mobile
+
+Suggested:
+
+* image wrapper background: soft blue/white or muted background
+* border radius consistent with card
+* image class:
+  w-full h-auto object-contain
+* if a fixed wrapper is needed:
+  use max-h-[280px] or similar and object-contain, not object-cover
+
+Important:
+Do not force all images into the same cropped 16:9 box if it cuts important content.
+
+If the uploaded image is vertical:
+
+* card should show the full vertical image
+* it may be taller, but still clean
+
+If the uploaded image is horizontal:
+
+* show full horizontal image
+
+==================================================
+C. DETAIL PAGE IMAGE BEHAVIOR
+=============================
+
+On news/article detail pages:
+
+* Display the image full width.
+* Preserve aspect ratio.
+* No cropping.
+* Use:
+  w-full h-auto object-contain
+* Optional max-height:
+  max-h-[70vh]
+  so very tall images do not dominate the whole screen.
+* Use a soft background behind transparent/contained images if needed.
+
+==================================================
+D. FALLBACK BEHAVIOR
+====================
+
+If image is missing:
+
+* keep existing fallback icon/card.
+
+If image fails loading:
+
+* keep existing fallback behavior.
+* do not show broken image icon.
+
+==================================================
+E. SPECIFIC FILES TO CHECK
+==========================
+
+Inspect and update these or equivalent files:
+
+* NewsCard component
+* NewsImage component if exists
+* news detail page
+* ArticleCard component
+* ArticleImage component if exists
+* article detail page
+
+Search for:
+
+* object-cover
+* aspect-video
+* fixed h-48 / h-56 / h-64 image containers
+* background-image cropping
+
+Replace only where it affects news/articles image cropping.
+
+Do not change academy lecture thumbnails unless they have the same issue and share the same component safely.
+
+==================================================
+F. TESTING REQUIRED
+===================
+
+Test before reporting:
+
+1. Upload/use a vertical image in a news item.
+2. /news card shows the full image without cropping.
+3. /news/:id shows the full image without cropping.
+4. Upload/use a horizontal image in a news item.
+5. Image displays cleanly.
+6. Repeat for articles:
+
+   * /articles card
+   * /articles/:id detail
+7. No broken image icon.
+8. Mobile layout remains clean.
+9. No horizontal scrolling.
+10. Typecheck passes.
+11. Preview works.
+
+==================================================
+G. REQUIRED REPORT
+==================
+
+After completion, provide:
+
+NEWS / ARTICLES FULL IMAGE DISPLAY REPORT
+
+1. What was changed
+2. Files changed
+3. object-cover/fixed crop removal status
+4. News card/detail image status
+5. Article card/detail image status
+6. Vertical image test result
+7. Horizontal image test result
+8. Mobile preview status
+9. Known issues, if any
+10. Confirmation:
+
+* no backend changed
+* no database changed
+* no upload logic changed
+* no permissions changed
+* no unrelated modules changed
