@@ -24,6 +24,7 @@ import {
   ACADEMY_SPECIALTY_LABELS,
   ACADEMY_SPECIALTY_OPTIONS,
   specialtyLabel,
+  SPECIAL_ALL,
 } from "@/lib/academyLabels";
 import {
   Select,
@@ -146,12 +147,18 @@ export default function AdminUsers() {
 
   function toggleAllowedSpecialty(s: string) {
     setAllowedTouched(true);
-    setForm((f) => ({
-      ...f,
-      academyAllowedSpecialties: f.academyAllowedSpecialties.includes(s)
+    setForm((f) => {
+      const has = f.academyAllowedSpecialties.includes(s);
+      if (s === SPECIAL_ALL) {
+        // Toggling ALL grants/clears full access and clears specific picks.
+        return { ...f, academyAllowedSpecialties: has ? [] : [SPECIAL_ALL] };
+      }
+      // Selecting a specific specialty implicitly drops the ALL grant.
+      const next = has
         ? f.academyAllowedSpecialties.filter((x) => x !== s)
-        : [...f.academyAllowedSpecialties, s],
-    }));
+        : [...f.academyAllowedSpecialties.filter((x) => x !== SPECIAL_ALL), s];
+      return { ...f, academyAllowedSpecialties: next };
+    });
   }
 
   // ADMIN cannot act on SUPER_ADMIN users at all
@@ -421,19 +428,36 @@ export default function AdminUsers() {
 
                   <div className="space-y-2">
                     <Label>اختصاصات إضافية مسموح بها</Label>
-                    <div className="grid grid-cols-2 gap-2 rounded-lg border border-border p-3 max-h-44 overflow-y-auto">
-                      {ACADEMY_SPECIALTY_OPTIONS.filter((s) => s !== "GENERAL").map((s) => (
-                        <label key={s} className="flex items-center gap-2 text-sm cursor-pointer">
-                          <Checkbox
-                            checked={form.academyAllowedSpecialties.includes(s)}
-                            onCheckedChange={() => toggleAllowedSpecialty(s)}
-                          />
-                          <span>{ACADEMY_SPECIALTY_LABELS[s]}</span>
-                        </label>
-                      ))}
+                    <div className="rounded-lg border border-border p-3 max-h-52 overflow-y-auto space-y-2">
+                      <label className="flex items-center gap-2 text-sm cursor-pointer font-medium border-b border-border pb-2">
+                        <Checkbox
+                          checked={form.academyAllowedSpecialties.includes(SPECIAL_ALL)}
+                          onCheckedChange={() => toggleAllowedSpecialty(SPECIAL_ALL)}
+                        />
+                        <span>كل الاختصاصات (وصول كامل للمحاضرات)</span>
+                      </label>
+                      <div className="grid grid-cols-2 gap-2">
+                        {ACADEMY_SPECIALTY_OPTIONS.filter((s) => s !== "GENERAL").map((s) => (
+                          <label
+                            key={s}
+                            className={`flex items-center gap-2 text-sm cursor-pointer ${
+                              form.academyAllowedSpecialties.includes(SPECIAL_ALL)
+                                ? "opacity-40 pointer-events-none"
+                                : ""
+                            }`}
+                          >
+                            <Checkbox
+                              checked={form.academyAllowedSpecialties.includes(s)}
+                              disabled={form.academyAllowedSpecialties.includes(SPECIAL_ALL)}
+                              onCheckedChange={() => toggleAllowedSpecialty(s)}
+                            />
+                            <span>{ACADEMY_SPECIALTY_LABELS[s]}</span>
+                          </label>
+                        ))}
+                      </div>
                     </div>
                     <p className="text-xs text-muted-foreground leading-relaxed">
-                      اتركها فارغة للاكتفاء باختصاص العضو الأساسي. عند عدم التعديل لن تتغير القيمة الحالية.
+                      اختر "كل الاختصاصات" لمنح العضو وصولاً لكل المحاضرات، أو حدد اختصاصات معينة. اتركها فارغة للاكتفاء باختصاص العضو الأساسي. عند عدم التعديل لن تتغير القيمة الحالية.
                     </p>
                   </div>
                 </>

@@ -8,6 +8,7 @@ import { BackButton } from "@/components/BackButton";
 import { useToast } from "@/hooks/use-toast";
 import { Calendar, User, Clock, FileText, Download, Video, ExternalLink } from "lucide-react";
 import { specialtyLabel, formatAcademyDate } from "@/lib/academyLabels";
+import { getStoredUser } from "@/lib/auth";
 
 const WATERMARK_TEXT = "هذه التسجيلات مخصصة للأعضاء المصرح لهم فقط — أكاديمية سوريا الطبية";
 
@@ -15,6 +16,13 @@ export default function AcademyLectureDetail() {
   const params = useParams();
   const id = Number(params.id);
   const { toast } = useToast();
+
+  // Per-user identity watermark (fullName | membershipNumber | email) — deters
+  // re-sharing by stamping the viewer's identity over the playback area.
+  const viewer = getStoredUser();
+  const watermarkIdentity = [viewer?.fullName, viewer?.membershipNumber, viewer?.email]
+    .filter(Boolean)
+    .join(" | ");
 
   const { data: lecture, isLoading, isError } = useGetAcademyLecture(id, {
     query: { queryKey: [`/api/academy/lectures/${id}`], enabled: Number.isInteger(id) },
@@ -103,10 +111,20 @@ export default function AcademyLectureDetail() {
                   allowFullScreen
                 />
                 {/* Watermark overlay — pointer-events-none so it never blocks the player controls */}
-                <div className="pointer-events-none absolute inset-0 flex items-start justify-end p-2">
-                  <span className="rounded bg-black/40 px-2 py-1 text-[10px] font-medium text-white/80 max-w-[70%] text-left leading-tight">
+                <div className="pointer-events-none absolute inset-0 flex flex-col items-end justify-between p-2">
+                  {watermarkIdentity && (
+                    <span className="rounded bg-black/40 px-2 py-1 text-[10px] font-semibold text-white/85 max-w-[80%] text-left leading-tight ltr:text-left" dir="ltr">
+                      {watermarkIdentity}
+                    </span>
+                  )}
+                  <span className="self-center rounded bg-black/30 px-2 py-1 text-[10px] font-medium text-white/70 max-w-[90%] text-center leading-tight">
                     {WATERMARK_TEXT}
                   </span>
+                  {watermarkIdentity && (
+                    <span className="self-start rounded bg-black/40 px-2 py-1 text-[10px] font-semibold text-white/85 max-w-[80%] text-left leading-tight" dir="ltr">
+                      {watermarkIdentity}
+                    </span>
+                  )}
                 </div>
               </div>
             </div>

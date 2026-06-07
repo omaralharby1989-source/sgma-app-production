@@ -47,7 +47,7 @@ router.get("/admin/academy/lectures", requireAuth, requireFullApp, async (req, r
         )
       : rows;
 
-    res.json(filtered.map(formatLecture));
+    res.json(filtered.map((row) => formatLecture(row, { includeRaw: true })));
   } catch (err) {
     req.log.error({ err }, "admin academy list failed");
     res.status(500).json({ error: "تعذر تحميل المحاضرات" });
@@ -171,7 +171,7 @@ router.post("/admin/academy/lectures", requireAuth, requireFullApp, async (req, 
       .select()
       .from(academyFilesTable)
       .where(eq(academyFilesTable.lectureId, created.id));
-    res.status(201).json({ ...formatLecture(created), attachments: files.map(formatFileMeta) });
+    res.status(201).json({ ...formatLecture(created, { includeRaw: true }), attachments: files.map(formatFileMeta) });
   } catch (err) {
     req.log.error({ err }, "admin academy create failed");
     res.status(500).json({ error: "تعذر إنشاء المحاضرة" });
@@ -290,7 +290,7 @@ router.patch("/admin/academy/lectures/:id", requireAuth, requireFullApp, async (
       .select()
       .from(academyFilesTable)
       .where(eq(academyFilesTable.lectureId, id));
-    res.json({ ...formatLecture(updated), attachments: files.map(formatFileMeta) });
+    res.json({ ...formatLecture(updated, { includeRaw: true }), attachments: files.map(formatFileMeta) });
   } catch (err) {
     req.log.error({ err }, "admin academy update failed");
     res.status(500).json({ error: "تعذر تحديث المحاضرة" });

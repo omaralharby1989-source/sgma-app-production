@@ -209,35 +209,35 @@ function Router() {
       </Route>
 
       <Route path="/broadcast">
-        <ProtectedRoute component={Broadcast} allowedRoles={["ADMIN", "SUPER_ADMIN"]} />
+        <ProtectedRoute component={Broadcast} allowedRoles={["ADMIN", "SUPER_ADMIN"]} fullAppOnly />
       </Route>
 
       <Route path="/admin">
-        <ProtectedRoute component={AdminDashboard} staffOnly />
+        <ProtectedRoute component={AdminDashboard} staffOnly fullAppOnly />
       </Route>
       <Route path="/admin/users">
-        <ProtectedRoute component={AdminUsers} allowedRoles={["ADMIN", "SUPER_ADMIN"]} />
+        <ProtectedRoute component={AdminUsers} allowedRoles={["ADMIN", "SUPER_ADMIN"]} fullAppOnly />
       </Route>
       <Route path="/admin/articles">
-        <ProtectedRoute component={AdminArticles} staffOnly />
+        <ProtectedRoute component={AdminArticles} staffOnly fullAppOnly />
       </Route>
       <Route path="/admin/news">
-        <ProtectedRoute component={AdminNews} staffOnly />
+        <ProtectedRoute component={AdminNews} staffOnly fullAppOnly />
       </Route>
       <Route path="/admin/broadcasts">
-        <ProtectedRoute component={AdminBroadcasts} allowedRoles={["ADMIN", "SUPER_ADMIN"]} />
+        <ProtectedRoute component={AdminBroadcasts} allowedRoles={["ADMIN", "SUPER_ADMIN"]} fullAppOnly />
       </Route>
       <Route path="/admin/volunteer-delegations">
-        <ProtectedRoute component={AdminVolunteerDelegations} staffOnly />
+        <ProtectedRoute component={AdminVolunteerDelegations} staffOnly fullAppOnly />
       </Route>
       <Route path="/admin/tasks/new">
-        <ProtectedRoute component={AdminTaskNew} staffOnly />
+        <ProtectedRoute component={AdminTaskNew} staffOnly fullAppOnly />
       </Route>
       <Route path="/admin/tasks">
-        <ProtectedRoute component={AdminTasks} staffOnly />
+        <ProtectedRoute component={AdminTasks} staffOnly fullAppOnly />
       </Route>
       <Route path="/admin/ads">
-        <ProtectedRoute component={AdminAds} allowedRoles={["SUPER_ADMIN"]} />
+        <ProtectedRoute component={AdminAds} allowedRoles={["SUPER_ADMIN"]} fullAppOnly />
       </Route>
 
       <Route component={NotFound} />

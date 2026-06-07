@@ -65,10 +65,18 @@ function formatUserDetail(row: UserRow) {
 
 const VALID_ACCESS_SCOPES = ["FULL_APP", "SYRIA_ACADEMY_ONLY"];
 
+// A tx handle or the base db — both expose the same query builder.
+type Executor = Parameters<Parameters<typeof db.transaction>[0]>[0];
+
+// Advisory-lock key shared by all SY-number issuance so concurrent activations
+// serialize and never collide on SY{n}.
+const SY_NUMBER_LOCK_KEY = 918273645;
+
 // Generates the next SY membership number (SY1, SY2, …) by scanning existing
-// SY-prefixed numbers and taking max+1.
-async function generateNextSyNumber(): Promise<string> {
-  const rows = await db
+// SY-prefixed numbers and taking max+1. MUST be called inside a transaction
+// that already holds the advisory lock so the read+increment is atomic.
+async function generateNextSyNumber(tx: Executor): Promise<string> {
+  const rows = await tx
     .select({ m: usersTable.membershipNumber })
     .from(usersTable)
     .where(ilike(usersTable.membershipNumber, "SY%"));
@@ -303,33 +311,39 @@ router.patch("/admin/users/:id", requireAuth, async (req, res): Promise<void> =>
       if (wantsActive) updates.isActive = d.isActive!;
     }
 
-    // Auto-generate an SY membership number when activating a Syria-academy
-    // applicant that doesn't have a number yet (and admin didn't set one).
+    // Decide whether activating this user requires auto-issuing an SY number.
     const finalAccessScope = updates.accessScope ?? target.accessScope ?? "FULL_APP";
     const finalStatus = updates.status ?? target.status;
     const finalIsActive = updates.isActive ?? target.isActive;
     const becomingActive = finalStatus === "ACTIVE" && finalIsActive === true;
     const currentMembership = updates.membershipNumber ?? target.membershipNumber;
     const hasNumericMembership = !!currentMembership && /^\d+$/.test(currentMembership);
-    if (
+    const needsSyNumber =
       finalAccessScope === "SYRIA_ACADEMY_ONLY" &&
       becomingActive &&
       !currentMembership &&
-      !hasNumericMembership
-    ) {
-      updates.membershipNumber = await generateNextSyNumber();
-    }
+      !hasNumericMembership;
 
-    if (Object.keys(updates).length === 0) {
+    if (Object.keys(updates).length === 0 && !needsSyNumber) {
       res.status(400).json({ error: "لا توجد بيانات للتعديل" });
       return;
     }
 
-    const [updated] = await db
-      .update(usersTable)
-      .set(updates)
-      .where(eq(usersTable.id, id))
-      .returning();
+    // Run the SY-number generation and the update in ONE transaction guarded by
+    // a transaction-scoped advisory lock, so concurrent activations serialize
+    // and the SY{n} read+increment can never produce a duplicate.
+    const updated = await db.transaction(async (tx) => {
+      if (needsSyNumber) {
+        await tx.execute(sql`SELECT pg_advisory_xact_lock(${SY_NUMBER_LOCK_KEY})`);
+        updates.membershipNumber = await generateNextSyNumber(tx);
+      }
+      const [row] = await tx
+        .update(usersTable)
+        .set(updates)
+        .where(eq(usersTable.id, id))
+        .returning();
+      return row;
+    });
 
     res.json(formatUserDetail(updated));
   } catch (err) {

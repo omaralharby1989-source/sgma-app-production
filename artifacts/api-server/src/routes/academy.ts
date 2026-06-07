@@ -18,7 +18,10 @@ const router = Router();
 type LectureRow = typeof academyLecturesTable.$inferSelect;
 type FileRow = typeof academyFilesTable.$inferSelect;
 
-function formatLecture(row: LectureRow) {
+// `includeRaw` exposes the raw Google Drive share URL — ONLY for staff/admin
+// responses. Member-facing responses must never leak the raw Drive link
+// (members consume the /preview embed URL only).
+function formatLecture(row: LectureRow, opts: { includeRaw?: boolean } = {}) {
   return {
     id: row.id,
     title: row.title,
@@ -28,7 +31,7 @@ function formatLecture(row: LectureRow) {
     lectureTime: row.lectureTime ?? null,
     isUpcoming: row.isUpcoming,
     liveMeetingUrl: row.liveMeetingUrl ?? null,
-    recordingDriveUrl: row.recordingDriveUrl ?? null,
+    recordingDriveUrl: opts.includeRaw ? (row.recordingDriveUrl ?? null) : null,
     recordingEmbedUrl: row.recordingEmbedUrl ?? null,
     thumbnailUrl: row.thumbnailUrl ?? null,
     allowedSpecialties: parseSpecialties(row.allowedSpecialties),
@@ -96,7 +99,7 @@ router.get("/academy/lectures", requireAuth, async (req, res): Promise<void> => 
         )
       : visible;
 
-    res.json(filtered.map(formatLecture));
+    res.json(filtered.map((row) => formatLecture(row)));
   } catch (err) {
     req.log.error({ err }, "academy lectures list failed");
     res.status(500).json({ error: "تعذر تحميل المحاضرات" });
@@ -121,7 +124,7 @@ router.get("/academy/announcements", requireAuth, async (req, res): Promise<void
     const visible = rows.filter((r) =>
       lectureVisibleToSyriaUser(r.isGeneral, r.allowedSpecialties, viewable),
     );
-    res.json(visible.map(formatLecture));
+    res.json(visible.map((row) => formatLecture(row)));
   } catch (err) {
     req.log.error({ err }, "academy announcements failed");
     res.status(500).json({ error: "تعذر تحميل الإعلانات" });
