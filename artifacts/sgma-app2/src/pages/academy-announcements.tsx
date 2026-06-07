@@ -53,9 +53,11 @@ export default function AcademyAnnouncements() {
         <div className="space-y-3">
           {items.map((item) => (
             <Link key={item.id} href={`/academy/lectures/${item.id}`} className="block">
-              <Card className="p-4 shadow-sm border-border/50 hover:bg-muted/40 transition-colors">
-                <div className="flex items-start gap-4">
-                  <LectureThumbnail src={item.thumbnailUrl} className="h-16 w-16 shrink-0" />
+              <Card className="overflow-hidden p-3 shadow-sm border-border/50 hover:bg-muted/40 transition-colors">
+                {item.thumbnailUrl && (
+                  <LectureThumbnail src={item.thumbnailUrl} className="mb-3 w-full" />
+                )}
+                <div className="flex items-start gap-3">
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2 flex-wrap mb-1">
                       <h3 className="font-semibold leading-snug">{item.title}</h3>

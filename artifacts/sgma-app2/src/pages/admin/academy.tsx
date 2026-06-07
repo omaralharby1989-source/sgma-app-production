@@ -352,7 +352,7 @@ export default function AdminAcademy() {
             <Card key={l.id} className="p-4 shadow-sm border-border/50 space-y-2">
               <div className="flex items-start justify-between gap-3">
                 <div className="flex items-start gap-3 min-w-0">
-                  <LectureThumbnail src={l.thumbnailUrl} className="h-14 w-14 shrink-0" />
+                  <LectureThumbnail src={l.thumbnailUrl} className="h-14 w-14 shrink-0" maxHeightClass="max-h-14" />
                   <div className="min-w-0">
                     <div className="font-semibold">{l.title}</div>
                     <p className="text-sm text-muted-foreground mt-1 line-clamp-2">{l.description}</p>

@@ -150,7 +150,8 @@ export default function AcademyLectureDetail() {
           ) : lecture.thumbnailUrl ? (
             <LectureThumbnail
               src={lecture.thumbnailUrl}
-              className="aspect-video w-full border border-border"
+              className="w-full border border-border"
+              maxHeightClass="max-h-[70vh]"
             />
           ) : (
             <Card className="p-6 text-center text-sm text-muted-foreground">

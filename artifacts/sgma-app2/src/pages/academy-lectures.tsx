@@ -53,9 +53,11 @@ export default function AcademyLectures() {
         <div className="space-y-3">
           {lectures.map((lecture) => (
             <Link key={lecture.id} href={`/academy/lectures/${lecture.id}`} className="block">
-              <Card className="p-4 shadow-sm border-border/50 hover:bg-muted/40 transition-colors">
-                <div className="flex items-start gap-4">
-                  <LectureThumbnail src={lecture.thumbnailUrl} className="h-16 w-16 shrink-0" />
+              <Card className="overflow-hidden p-3 shadow-sm border-border/50 hover:bg-muted/40 transition-colors">
+                {lecture.thumbnailUrl && (
+                  <LectureThumbnail src={lecture.thumbnailUrl} className="mb-3 w-full" />
+                )}
+                <div className="flex items-start gap-3">
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2 flex-wrap mb-1">
                       <h3 className="font-semibold leading-snug">{lecture.title}</h3>

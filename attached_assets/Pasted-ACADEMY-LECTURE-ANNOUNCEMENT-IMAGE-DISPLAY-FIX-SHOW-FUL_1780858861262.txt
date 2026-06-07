@@ -1,0 +1,222 @@
+ACADEMY LECTURE / ANNOUNCEMENT IMAGE DISPLAY FIX — SHOW FULL IMAGE
+
+Start this small UI fix now.
+
+Scope:
+Fix image display for SGMA Academy lecture announcements and lecture cards.
+
+Current problem:
+Images uploaded for academy lecture announcements/recordings are not fitting correctly. The image is being cropped or forced into a fixed ratio, so it does not appear fully.
+
+Required:
+Academy images must display fully according to the uploaded image dimensions/aspect ratio.
+
+Do not change upload logic.
+Do not change database schema.
+Do not change backend validation.
+Do not change Google Drive video logic.
+Do not change watermark logic.
+Do not change academy permissions.
+Do not change unrelated modules.
+
+Current architecture:
+
+* PostgreSQL + Drizzle
+* JWT auth
+* Arabic RTL
+* Mobile-first
+* No Firebase
+* No MySQL migration
+
+==================================================
+A. AFFECTED AREAS
+=================
+
+Fix academy thumbnail/image display in:
+
+1. /academy
+
+* latest lectures/announcements if images are shown there
+
+2. /academy/announcements
+
+* announcement cards
+
+3. /academy/lectures
+
+* lecture recording cards
+
+4. /academy/lectures/:id
+
+* lecture detail image/hero image if shown
+
+5. /admin/academy
+
+* admin lecture list/cards if thumbnail shown
+
+Do not change news/articles unless they share the same image component safely.
+
+==================================================
+B. IMAGE DISPLAY REQUIREMENT
+============================
+
+For academy images:
+
+1. Do not crop uploaded images.
+2. Do not use object-cover if it hides parts of the image.
+3. Use object-contain or adaptive image sizing.
+4. Preserve original aspect ratio.
+5. Show the full image.
+6. No horizontal overflow on mobile.
+7. No broken image icon.
+
+Preferred CSS behavior:
+
+* image:
+  w-full
+  h-auto
+  object-contain
+  mx-auto
+  block
+
+* wrapper:
+  bg-muted/40 or soft blue background
+  rounded-xl or rounded-2xl
+  overflow-hidden
+  flex items-center justify-center
+
+For cards:
+
+* max-height around 260px–300px
+* use object-contain, not crop
+
+For detail page:
+
+* max-height around 70vh
+* object-contain
+* full image visible
+
+==================================================
+C. COMPONENT TO CHECK
+=====================
+
+Check if there is a reusable academy thumbnail component, likely:
+
+src/components/LectureThumbnail.tsx
+
+or similar.
+
+If it exists:
+
+* Update it centrally so all academy pages benefit.
+* Do not duplicate logic.
+
+Search for:
+
+* object-cover
+* aspect-video
+* aspect-[16/9]
+* fixed h-48 / h-56 / h-64
+* background image cropping
+
+Replace only where it affects Academy lecture/announcement thumbnails.
+
+Important:
+Fallback placeholder may still use aspect ratio if no image exists.
+But real uploaded images must not be cropped.
+
+==================================================
+D. FALLBACK BEHAVIOR
+====================
+
+If thumbnailUrl is missing:
+
+* show existing fallback icon/card.
+
+If image fails to load:
+
+* show fallback.
+* do not display broken image icon.
+
+==================================================
+E. MOBILE REQUIREMENTS
+======================
+
+Mobile behavior:
+
+* vertical images should display fully.
+* horizontal images should display fully.
+* tall images can be capped by max-height but not cropped.
+* soft background around contained images is acceptable.
+* no horizontal scroll.
+
+==================================================
+F. DO NOT CHANGE
+================
+
+Do not change:
+
+* academy upload form
+* ImageInput
+* thumbnailUrl storage
+* backend validation
+* Google Drive embed
+* video player
+* watermark
+* PDF attachments
+* accessScope / SY Academy rules
+* news/articles image components unless shared safely
+* database
+* backend
+* permissions
+
+This is a frontend display fix only.
+
+==================================================
+G. TESTING REQUIRED
+===================
+
+Test before reporting:
+
+1. Add or edit an academy announcement with a vertical image.
+2. /academy/announcements shows the full image without cropping.
+3. /academy/lectures shows the full image without cropping.
+4. /academy/lectures/:id shows the full image if displayed there.
+5. /admin/academy thumbnail shows the full image.
+6. Add or edit an academy item with a horizontal image.
+7. Horizontal image displays cleanly.
+8. Missing image fallback still works.
+9. Broken image fallback still works.
+10. Mobile layout remains clean.
+11. No horizontal scrolling.
+12. Typecheck passes.
+13. Preview works.
+
+==================================================
+H. REQUIRED REPORT
+==================
+
+After completion, provide:
+
+ACADEMY FULL IMAGE DISPLAY REPORT
+
+1. What was changed
+2. Files changed
+3. Component updated, if LectureThumbnail was used
+4. object-cover/fixed crop removal status
+5. Announcement card image status
+6. Lecture card image status
+7. Lecture detail image status
+8. Admin academy image status
+9. Vertical image test result
+10. Horizontal image test result
+11. Mobile preview status
+12. Confirmation:
+
+* no backend changed
+* no database changed
+* no upload logic changed
+* no academy permission changed
+* no unrelated modules changed
+
+Do not report success until academy announcement and lecture images display fully without cropping.
