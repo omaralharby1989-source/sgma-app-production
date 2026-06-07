@@ -148,7 +148,7 @@ export default function Login() {
               rel="noopener noreferrer"
               className="mt-3 inline-flex w-full items-center justify-center gap-2 rounded-lg border border-primary bg-background px-4 py-2.5 text-sm font-semibold text-primary transition-colors hover:bg-primary/10"
             >
-              الحصول على رقم عضوية في سجما
+              التسجيل على عضوية سجما
               <ExternalLink className="h-4 w-4" />
             </a>
             <p className="mt-2 text-xs text-muted-foreground">
