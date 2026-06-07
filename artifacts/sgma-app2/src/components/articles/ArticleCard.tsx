@@ -4,6 +4,8 @@ import { Badge } from "@/components/ui/badge";
 import { CalendarDays, ArrowLeft, User } from "lucide-react";
 import { ArticleImage } from "./ArticleImage";
 import { formatArticleDate } from "@/lib/articles";
+import { ViewCountBadge } from "@/components/engagement/ViewCountBadge";
+import { formatArabicNumber } from "@/lib/reactions";
 import type { ArticleItem } from "@workspace/api-client-react";
 
 export function ArticleCard({ item }: { item: ArticleItem }) {
@@ -30,12 +32,20 @@ export function ArticleCard({ item }: { item: ArticleItem }) {
             </p>
           )}
           <div className="flex items-center justify-between pt-1">
-            {item.authorName && (
-              <span className="flex items-center gap-1 text-[11px] text-muted-foreground">
-                <User className="h-3 w-3" />
-                {item.authorName}
-              </span>
-            )}
+            <div className="flex items-center gap-3">
+              {item.authorName && (
+                <span className="flex items-center gap-1 text-[11px] text-muted-foreground">
+                  <User className="h-3 w-3" />
+                  {item.authorName}
+                </span>
+              )}
+              <ViewCountBadge count={item.viewCount} />
+              {item.reactionSummary && item.reactionSummary.total > 0 && (
+                <span className="text-[11px] text-muted-foreground">
+                  {formatArabicNumber(item.reactionSummary.total)} تفاعل
+                </span>
+              )}
+            </div>
             <span className="flex items-center gap-1 text-sm font-medium text-primary">
               قراءة المقال
               <ArrowLeft className="h-4 w-4" />

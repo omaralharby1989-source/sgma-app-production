@@ -1,9 +1,15 @@
 import { Router } from "express";
 import { db, newsTable } from "@workspace/db";
 import { eq, and, sql } from "drizzle-orm";
-import { CreateNewsBody, UpdateNewsBody } from "@workspace/api-zod";
+import { CreateNewsBody, UpdateNewsBody, SetNewsReactionBody } from "@workspace/api-zod";
 import { requireAuth } from "../middlewares/auth";
 import { validateImageSource } from "../lib/imageValidation";
+import {
+  getNewsReactionData,
+  setNewsReaction,
+  isReactionType,
+  type ReactionData,
+} from "../lib/reactions";
 
 const router = Router();
 
@@ -15,7 +21,12 @@ function isStaff(role: string): boolean {
 
 type NewsRow = typeof newsTable.$inferSelect;
 
-function formatNews(row: NewsRow) {
+const EMPTY_REACTION: ReactionData = {
+  summary: { total: 0, counts: { LIKE: 0, LOVE: 0, SUPPORT: 0, THANKS: 0, INSIGHTFUL: 0 } },
+  myReaction: null,
+};
+
+function formatNews(row: NewsRow, reaction: ReactionData = EMPTY_REACTION) {
   return {
     id: row.id,
     title: row.title,
@@ -25,6 +36,9 @@ function formatNews(row: NewsRow) {
     category: row.category,
     status: row.status,
     authorId: row.authorId,
+    viewCount: row.viewCount,
+    reactionSummary: reaction.summary,
+    myReaction: reaction.myReaction,
     publishedAt: row.publishedAt ? row.publishedAt.toISOString() : null,
     createdAt: row.createdAt.toISOString(),
     updatedAt: row.updatedAt.toISOString(),
@@ -41,7 +55,8 @@ router.get("/news", requireAuth, async (req, res): Promise<void> => {
       .orderBy(sql`${newsTable.publishedAt} DESC NULLS LAST`, sql`${newsTable.id} DESC`)
       .limit(100);
 
-    res.json(rows.map(formatNews));
+    const reactionData = await getNewsReactionData(rows.map((r) => r.id), req.user!.userId);
+    res.json(rows.map((r) => formatNews(r, reactionData.get(r.id))));
   } catch (err) {
     req.log.error({ err }, "Get news list error");
     res.status(500).json({ error: "تعذر تحميل الأخبار، يرجى المحاولة لاحقاً" });
@@ -58,6 +73,46 @@ router.get("/news/:id", requireAuth, async (req, res): Promise<void> => {
 
   try {
     const [row] = await db
+      .update(newsTable)
+      .set({ viewCount: sql`${newsTable.viewCount} + 1` })
+      .where(and(eq(newsTable.id, id), eq(newsTable.status, "PUBLISHED")))
+      .returning();
+
+    if (!row) {
+      res.status(404).json({ error: "الخبر غير موجود أو لم يعد متاحاً" });
+      return;
+    }
+
+    const reactionData = await getNewsReactionData([row.id], req.user!.userId);
+    res.json(formatNews(row, reactionData.get(row.id)));
+  } catch (err) {
+    req.log.error({ err }, "Get news item error");
+    res.status(500).json({ error: "تعذر تحميل الخبر، يرجى المحاولة لاحقاً" });
+  }
+});
+
+// Set/change/remove the authenticated user's reaction on a news item
+router.post("/news/:id/reaction", requireAuth, async (req, res): Promise<void> => {
+  const id = Number(req.params.id);
+  if (!Number.isInteger(id)) {
+    res.status(400).json({ error: "معرّف الخبر غير صالح" });
+    return;
+  }
+
+  const parsed = SetNewsReactionBody.safeParse(req.body);
+  if (!parsed.success) {
+    res.status(400).json({ error: "نوع التفاعل غير صالح" });
+    return;
+  }
+
+  const target = parsed.data.reactionType ?? null;
+  if (target !== null && !isReactionType(target)) {
+    res.status(400).json({ error: "نوع التفاعل غير صالح" });
+    return;
+  }
+
+  try {
+    const [row] = await db
       .select()
       .from(newsTable)
       .where(and(eq(newsTable.id, id), eq(newsTable.status, "PUBLISHED")))
@@ -68,10 +123,13 @@ router.get("/news/:id", requireAuth, async (req, res): Promise<void> => {
       return;
     }
 
-    res.json(formatNews(row));
+    await setNewsReaction(id, req.user!.userId, target);
+    const reactionData = await getNewsReactionData([id], req.user!.userId);
+    const data = reactionData.get(id) ?? EMPTY_REACTION;
+    res.json({ summary: data.summary, myReaction: data.myReaction });
   } catch (err) {
-    req.log.error({ err }, "Get news item error");
-    res.status(500).json({ error: "تعذر تحميل الخبر، يرجى المحاولة لاحقاً" });
+    req.log.error({ err }, "Set news reaction error");
+    res.status(500).json({ error: "تعذر تسجيل التفاعل، يرجى المحاولة لاحقاً" });
   }
 });
 

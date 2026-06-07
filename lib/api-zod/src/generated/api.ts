@@ -1173,6 +1173,18 @@ export const GetNewsListResponseItem = zod.object({
   "category": zod.string().nullish(),
   "status": zod.enum(['DRAFT', 'PUBLISHED', 'ARCHIVED']),
   "authorId": zod.number().nullish(),
+  "viewCount": zod.number().optional(),
+  "reactionSummary": zod.object({
+  "total": zod.number(),
+  "counts": zod.object({
+  "LIKE": zod.number(),
+  "LOVE": zod.number(),
+  "SUPPORT": zod.number(),
+  "THANKS": zod.number(),
+  "INSIGHTFUL": zod.number()
+})
+}).optional(),
+  "myReaction": zod.union([zod.literal('LIKE'),zod.literal('LOVE'),zod.literal('SUPPORT'),zod.literal('THANKS'),zod.literal('INSIGHTFUL'),zod.literal(null)]).nullish(),
   "publishedAt": zod.coerce.date().nullish(),
   "createdAt": zod.coerce.date(),
   "updatedAt": zod.coerce.date()
@@ -1213,6 +1225,18 @@ export const GetNewsItemResponse = zod.object({
   "category": zod.string().nullish(),
   "status": zod.enum(['DRAFT', 'PUBLISHED', 'ARCHIVED']),
   "authorId": zod.number().nullish(),
+  "viewCount": zod.number().optional(),
+  "reactionSummary": zod.object({
+  "total": zod.number(),
+  "counts": zod.object({
+  "LIKE": zod.number(),
+  "LOVE": zod.number(),
+  "SUPPORT": zod.number(),
+  "THANKS": zod.number(),
+  "INSIGHTFUL": zod.number()
+})
+}).optional(),
+  "myReaction": zod.union([zod.literal('LIKE'),zod.literal('LOVE'),zod.literal('SUPPORT'),zod.literal('THANKS'),zod.literal('INSIGHTFUL'),zod.literal(null)]).nullish(),
   "publishedAt": zod.coerce.date().nullish(),
   "createdAt": zod.coerce.date(),
   "updatedAt": zod.coerce.date()
@@ -1248,6 +1272,18 @@ export const UpdateNewsResponse = zod.object({
   "category": zod.string().nullish(),
   "status": zod.enum(['DRAFT', 'PUBLISHED', 'ARCHIVED']),
   "authorId": zod.number().nullish(),
+  "viewCount": zod.number().optional(),
+  "reactionSummary": zod.object({
+  "total": zod.number(),
+  "counts": zod.object({
+  "LIKE": zod.number(),
+  "LOVE": zod.number(),
+  "SUPPORT": zod.number(),
+  "THANKS": zod.number(),
+  "INSIGHTFUL": zod.number()
+})
+}).optional(),
+  "myReaction": zod.union([zod.literal('LIKE'),zod.literal('LOVE'),zod.literal('SUPPORT'),zod.literal('THANKS'),zod.literal('INSIGHTFUL'),zod.literal(null)]).nullish(),
   "publishedAt": zod.coerce.date().nullish(),
   "createdAt": zod.coerce.date(),
   "updatedAt": zod.coerce.date()
@@ -1311,6 +1347,18 @@ export const GetArticlesResponseItem = zod.object({
   "authorId": zod.number().nullish(),
   "authorName": zod.string().nullish(),
   "rejectionReason": zod.string().nullish(),
+  "viewCount": zod.number().optional(),
+  "reactionSummary": zod.object({
+  "total": zod.number(),
+  "counts": zod.object({
+  "LIKE": zod.number(),
+  "LOVE": zod.number(),
+  "SUPPORT": zod.number(),
+  "THANKS": zod.number(),
+  "INSIGHTFUL": zod.number()
+})
+}).optional(),
+  "myReaction": zod.union([zod.literal('LIKE'),zod.literal('LOVE'),zod.literal('SUPPORT'),zod.literal('THANKS'),zod.literal('INSIGHTFUL'),zod.literal(null)]).nullish(),
   "publishedAt": zod.coerce.date().nullish(),
   "createdAt": zod.coerce.date(),
   "updatedAt": zod.coerce.date()
@@ -1354,6 +1402,18 @@ export const GetMyArticlesResponseItem = zod.object({
   "authorId": zod.number().nullish(),
   "authorName": zod.string().nullish(),
   "rejectionReason": zod.string().nullish(),
+  "viewCount": zod.number().optional(),
+  "reactionSummary": zod.object({
+  "total": zod.number(),
+  "counts": zod.object({
+  "LIKE": zod.number(),
+  "LOVE": zod.number(),
+  "SUPPORT": zod.number(),
+  "THANKS": zod.number(),
+  "INSIGHTFUL": zod.number()
+})
+}).optional(),
+  "myReaction": zod.union([zod.literal('LIKE'),zod.literal('LOVE'),zod.literal('SUPPORT'),zod.literal('THANKS'),zod.literal('INSIGHTFUL'),zod.literal(null)]).nullish(),
   "publishedAt": zod.coerce.date().nullish(),
   "createdAt": zod.coerce.date(),
   "updatedAt": zod.coerce.date()
@@ -1380,6 +1440,18 @@ export const GetArticleResponse = zod.object({
   "authorName": zod.string().nullish(),
   "reviewedById": zod.number().nullish(),
   "rejectionReason": zod.string().nullish(),
+  "viewCount": zod.number().optional(),
+  "reactionSummary": zod.object({
+  "total": zod.number(),
+  "counts": zod.object({
+  "LIKE": zod.number(),
+  "LOVE": zod.number(),
+  "SUPPORT": zod.number(),
+  "THANKS": zod.number(),
+  "INSIGHTFUL": zod.number()
+})
+}).optional(),
+  "myReaction": zod.union([zod.literal('LIKE'),zod.literal('LOVE'),zod.literal('SUPPORT'),zod.literal('THANKS'),zod.literal('INSIGHTFUL'),zod.literal(null)]).nullish(),
   "publishedAt": zod.coerce.date().nullish(),
   "createdAt": zod.coerce.date(),
   "updatedAt": zod.coerce.date()
@@ -1424,6 +1496,18 @@ export const UpdateArticleResponse = zod.object({
   "authorName": zod.string().nullish(),
   "reviewedById": zod.number().nullish(),
   "rejectionReason": zod.string().nullish(),
+  "viewCount": zod.number().optional(),
+  "reactionSummary": zod.object({
+  "total": zod.number(),
+  "counts": zod.object({
+  "LIKE": zod.number(),
+  "LOVE": zod.number(),
+  "SUPPORT": zod.number(),
+  "THANKS": zod.number(),
+  "INSIGHTFUL": zod.number()
+})
+}).optional(),
+  "myReaction": zod.union([zod.literal('LIKE'),zod.literal('LOVE'),zod.literal('SUPPORT'),zod.literal('THANKS'),zod.literal('INSIGHTFUL'),zod.literal(null)]).nullish(),
   "publishedAt": zod.coerce.date().nullish(),
   "createdAt": zod.coerce.date(),
   "updatedAt": zod.coerce.date()
@@ -1461,6 +1545,18 @@ export const ApproveArticleResponse = zod.object({
   "authorName": zod.string().nullish(),
   "reviewedById": zod.number().nullish(),
   "rejectionReason": zod.string().nullish(),
+  "viewCount": zod.number().optional(),
+  "reactionSummary": zod.object({
+  "total": zod.number(),
+  "counts": zod.object({
+  "LIKE": zod.number(),
+  "LOVE": zod.number(),
+  "SUPPORT": zod.number(),
+  "THANKS": zod.number(),
+  "INSIGHTFUL": zod.number()
+})
+}).optional(),
+  "myReaction": zod.union([zod.literal('LIKE'),zod.literal('LOVE'),zod.literal('SUPPORT'),zod.literal('THANKS'),zod.literal('INSIGHTFUL'),zod.literal(null)]).nullish(),
   "publishedAt": zod.coerce.date().nullish(),
   "createdAt": zod.coerce.date(),
   "updatedAt": zod.coerce.date()
@@ -1494,9 +1590,116 @@ export const RejectArticleResponse = zod.object({
   "authorName": zod.string().nullish(),
   "reviewedById": zod.number().nullish(),
   "rejectionReason": zod.string().nullish(),
+  "viewCount": zod.number().optional(),
+  "reactionSummary": zod.object({
+  "total": zod.number(),
+  "counts": zod.object({
+  "LIKE": zod.number(),
+  "LOVE": zod.number(),
+  "SUPPORT": zod.number(),
+  "THANKS": zod.number(),
+  "INSIGHTFUL": zod.number()
+})
+}).optional(),
+  "myReaction": zod.union([zod.literal('LIKE'),zod.literal('LOVE'),zod.literal('SUPPORT'),zod.literal('THANKS'),zod.literal('INSIGHTFUL'),zod.literal(null)]).nullish(),
   "publishedAt": zod.coerce.date().nullish(),
   "createdAt": zod.coerce.date(),
   "updatedAt": zod.coerce.date()
+})
+
+
+/**
+ * @summary Set, change, or remove the authenticated user's reaction on a news item
+ */
+export const SetNewsReactionParams = zod.object({
+  "id": zod.coerce.number()
+})
+
+export const SetNewsReactionBody = zod.object({
+  "reactionType": zod.union([zod.literal('LIKE'),zod.literal('LOVE'),zod.literal('SUPPORT'),zod.literal('THANKS'),zod.literal('INSIGHTFUL'),zod.literal(null)]).nullable().describe('Target reaction. Null (or the same value already set) removes the reaction.')
+})
+
+export const SetNewsReactionResponse = zod.object({
+  "summary": zod.object({
+  "total": zod.number(),
+  "counts": zod.object({
+  "LIKE": zod.number(),
+  "LOVE": zod.number(),
+  "SUPPORT": zod.number(),
+  "THANKS": zod.number(),
+  "INSIGHTFUL": zod.number()
+})
+}),
+  "myReaction": zod.union([zod.literal('LIKE'),zod.literal('LOVE'),zod.literal('SUPPORT'),zod.literal('THANKS'),zod.literal('INSIGHTFUL'),zod.literal(null)]).nullish()
+})
+
+
+/**
+ * @summary Set, change, or remove the authenticated user's reaction on an article
+ */
+export const SetArticleReactionParams = zod.object({
+  "id": zod.coerce.number()
+})
+
+export const SetArticleReactionBody = zod.object({
+  "reactionType": zod.union([zod.literal('LIKE'),zod.literal('LOVE'),zod.literal('SUPPORT'),zod.literal('THANKS'),zod.literal('INSIGHTFUL'),zod.literal(null)]).nullable().describe('Target reaction. Null (or the same value already set) removes the reaction.')
+})
+
+export const SetArticleReactionResponse = zod.object({
+  "summary": zod.object({
+  "total": zod.number(),
+  "counts": zod.object({
+  "LIKE": zod.number(),
+  "LOVE": zod.number(),
+  "SUPPORT": zod.number(),
+  "THANKS": zod.number(),
+  "INSIGHTFUL": zod.number()
+})
+}),
+  "myReaction": zod.union([zod.literal('LIKE'),zod.literal('LOVE'),zod.literal('SUPPORT'),zod.literal('THANKS'),zod.literal('INSIGHTFUL'),zod.literal(null)]).nullish()
+})
+
+
+/**
+ * @summary Heartbeat the authenticated user's presence in a chat room
+ */
+
+
+
+export const UpdateChatPresenceBody = zod.object({
+  "roomType": zod.enum(['PUBLIC_CHAT', 'ADMIN_DIRECT_CHAT']),
+  "roomKey": zod.string().min(1)
+})
+
+export const UpdateChatPresenceResponse = zod.object({
+  "count": zod.number(),
+  "users": zod.array(zod.object({
+  "id": zod.number(),
+  "fullName": zod.string(),
+  "account": zod.string(),
+  "role": zod.string(),
+  "lastSeenAt": zod.coerce.date()
+}))
+})
+
+
+/**
+ * @summary List users currently active in a chat room
+ */
+export const GetChatPresenceQueryParams = zod.object({
+  "roomType": zod.enum(['PUBLIC_CHAT', 'ADMIN_DIRECT_CHAT']),
+  "roomKey": zod.coerce.string()
+})
+
+export const GetChatPresenceResponse = zod.object({
+  "count": zod.number(),
+  "users": zod.array(zod.object({
+  "id": zod.number(),
+  "fullName": zod.string(),
+  "account": zod.string(),
+  "role": zod.string(),
+  "lastSeenAt": zod.coerce.date()
+}))
 })
 
 
@@ -1647,6 +1850,18 @@ export const GetAdminArticlesResponseItem = zod.object({
   "authorId": zod.number().nullish(),
   "authorName": zod.string().nullish(),
   "rejectionReason": zod.string().nullish(),
+  "viewCount": zod.number().optional(),
+  "reactionSummary": zod.object({
+  "total": zod.number(),
+  "counts": zod.object({
+  "LIKE": zod.number(),
+  "LOVE": zod.number(),
+  "SUPPORT": zod.number(),
+  "THANKS": zod.number(),
+  "INSIGHTFUL": zod.number()
+})
+}).optional(),
+  "myReaction": zod.union([zod.literal('LIKE'),zod.literal('LOVE'),zod.literal('SUPPORT'),zod.literal('THANKS'),zod.literal('INSIGHTFUL'),zod.literal(null)]).nullish(),
   "publishedAt": zod.coerce.date().nullish(),
   "createdAt": zod.coerce.date(),
   "updatedAt": zod.coerce.date()
@@ -1673,6 +1888,18 @@ export const ArchiveArticleResponse = zod.object({
   "authorName": zod.string().nullish(),
   "reviewedById": zod.number().nullish(),
   "rejectionReason": zod.string().nullish(),
+  "viewCount": zod.number().optional(),
+  "reactionSummary": zod.object({
+  "total": zod.number(),
+  "counts": zod.object({
+  "LIKE": zod.number(),
+  "LOVE": zod.number(),
+  "SUPPORT": zod.number(),
+  "THANKS": zod.number(),
+  "INSIGHTFUL": zod.number()
+})
+}).optional(),
+  "myReaction": zod.union([zod.literal('LIKE'),zod.literal('LOVE'),zod.literal('SUPPORT'),zod.literal('THANKS'),zod.literal('INSIGHTFUL'),zod.literal(null)]).nullish(),
   "publishedAt": zod.coerce.date().nullish(),
   "createdAt": zod.coerce.date(),
   "updatedAt": zod.coerce.date()
@@ -1695,6 +1922,18 @@ export const GetAdminNewsResponseItem = zod.object({
   "category": zod.string().nullish(),
   "status": zod.enum(['DRAFT', 'PUBLISHED', 'ARCHIVED']),
   "authorId": zod.number().nullish(),
+  "viewCount": zod.number().optional(),
+  "reactionSummary": zod.object({
+  "total": zod.number(),
+  "counts": zod.object({
+  "LIKE": zod.number(),
+  "LOVE": zod.number(),
+  "SUPPORT": zod.number(),
+  "THANKS": zod.number(),
+  "INSIGHTFUL": zod.number()
+})
+}).optional(),
+  "myReaction": zod.union([zod.literal('LIKE'),zod.literal('LOVE'),zod.literal('SUPPORT'),zod.literal('THANKS'),zod.literal('INSIGHTFUL'),zod.literal(null)]).nullish(),
   "publishedAt": zod.coerce.date().nullish(),
   "createdAt": zod.coerce.date(),
   "updatedAt": zod.coerce.date()
@@ -1718,6 +1957,18 @@ export const GetAdminNewsItemResponse = zod.object({
   "category": zod.string().nullish(),
   "status": zod.enum(['DRAFT', 'PUBLISHED', 'ARCHIVED']),
   "authorId": zod.number().nullish(),
+  "viewCount": zod.number().optional(),
+  "reactionSummary": zod.object({
+  "total": zod.number(),
+  "counts": zod.object({
+  "LIKE": zod.number(),
+  "LOVE": zod.number(),
+  "SUPPORT": zod.number(),
+  "THANKS": zod.number(),
+  "INSIGHTFUL": zod.number()
+})
+}).optional(),
+  "myReaction": zod.union([zod.literal('LIKE'),zod.literal('LOVE'),zod.literal('SUPPORT'),zod.literal('THANKS'),zod.literal('INSIGHTFUL'),zod.literal(null)]).nullish(),
   "publishedAt": zod.coerce.date().nullish(),
   "createdAt": zod.coerce.date(),
   "updatedAt": zod.coerce.date()

@@ -8,6 +8,9 @@ import { Button } from "@/components/ui/button";
 import { ArrowRight, CalendarDays, BookOpen, User } from "lucide-react";
 import { formatArticleDate } from "@/lib/articles";
 import { getStoredUser } from "@/lib/auth";
+import { ViewCountBadge } from "@/components/engagement/ViewCountBadge";
+import { ReactionBar } from "@/components/engagement/ReactionBar";
+import type { ReactionType } from "@/lib/reactions";
 
 export default function ArticleDetail() {
   const [, setLocation] = useLocation();
@@ -71,6 +74,7 @@ export default function ArticleDetail() {
                 <CalendarDays className="h-3.5 w-3.5" />
                 {formatArticleDate(item.publishedAt ?? item.createdAt)}
               </span>
+              <ViewCountBadge count={item.viewCount} />
             </div>
 
             <h1 className="text-xl font-bold leading-snug">{item.title}</h1>
@@ -89,6 +93,17 @@ export default function ArticleDetail() {
             <div className="whitespace-pre-wrap text-[15px] leading-loose text-foreground/90">
               {item.content}
             </div>
+
+            {item.status === "APPROVED" && (
+              <div className="border-t border-border pt-4">
+                <ReactionBar
+                  kind="article"
+                  id={item.id}
+                  summary={item.reactionSummary}
+                  myReaction={(item.myReaction ?? null) as ReactionType | null}
+                />
+              </div>
+            )}
 
             <Button variant="outline" className="mt-4 w-full" onClick={() => setLocation("/articles")}>
               <ArrowRight className="ml-1 h-4 w-4" />

@@ -8,6 +8,7 @@ import {
   getGetPublicChatMessagesQueryKey,
 } from "@workspace/api-client-react";
 import { ChatThread } from "@/components/chat/ChatThread";
+import { ChatPresencePanel } from "@/components/engagement/ChatPresencePanel";
 import { useToast } from "@/hooks/use-toast";
 import { ArrowRight } from "lucide-react";
 
@@ -45,6 +46,10 @@ export default function ChatPublic() {
           <p className="text-[11px] text-muted-foreground">غرفة عامة لجميع الأعضاء</p>
         </div>
       </header>
+
+      <div className="px-3 pt-2">
+        <ChatPresencePanel roomType="PUBLIC_CHAT" roomKey="PUBLIC" />
+      </div>
 
       <ChatThread
         messages={messages ?? []}

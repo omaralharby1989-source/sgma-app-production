@@ -4,6 +4,8 @@ import { Badge } from "@/components/ui/badge";
 import { CalendarDays, ArrowLeft } from "lucide-react";
 import { NewsImage } from "./NewsImage";
 import { formatNewsDate } from "@/lib/news";
+import { ViewCountBadge } from "@/components/engagement/ViewCountBadge";
+import { formatArabicNumber } from "@/lib/reactions";
 import type { NewsItem } from "@workspace/api-client-react";
 
 export function NewsCard({ item }: { item: NewsItem }) {
@@ -29,9 +31,19 @@ export function NewsCard({ item }: { item: NewsItem }) {
               {item.summary}
             </p>
           )}
-          <div className="flex items-center gap-1 pt-1 text-sm font-medium text-primary">
-            اقرأ المزيد
-            <ArrowLeft className="h-4 w-4" />
+          <div className="flex items-center justify-between pt-1">
+            <div className="flex items-center gap-3">
+              <ViewCountBadge count={item.viewCount} />
+              {item.reactionSummary && item.reactionSummary.total > 0 && (
+                <span className="text-[11px] text-muted-foreground">
+                  {formatArabicNumber(item.reactionSummary.total)} تفاعل
+                </span>
+              )}
+            </div>
+            <span className="flex items-center gap-1 text-sm font-medium text-primary">
+              اقرأ المزيد
+              <ArrowLeft className="h-4 w-4" />
+            </span>
           </div>
         </div>
       </Card>

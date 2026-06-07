@@ -1988,6 +1988,178 @@ paths:
               schema:
                 $ref: "#/components/schemas/ErrorResponse"
 
+  /news/{id}/reaction:
+    post:
+      operationId: setNewsReaction
+      tags: [news]
+      summary: Set, change, or remove the authenticated user's reaction on a news item
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/SetReactionInput"
+      responses:
+        "200":
+          description: Updated reaction state
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ReactionResponse"
+        "400":
+          description: Validation error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "404":
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /articles/{id}/reaction:
+    post:
+      operationId: setArticleReaction
+      tags: [articles]
+      summary: Set, change, or remove the authenticated user's reaction on an article
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/SetReactionInput"
+      responses:
+        "200":
+          description: Updated reaction state
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ReactionResponse"
+        "400":
+          description: Validation error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "404":
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /chat/presence:
+    post:
+      operationId: updateChatPresence
+      tags: [chat]
+      summary: Heartbeat the authenticated user's presence in a chat room
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ChatPresenceInput"
+      responses:
+        "200":
+          description: Presence updated; returns currently active users
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ChatPresenceResponse"
+        "400":
+          description: Validation error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "403":
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+    get:
+      operationId: getChatPresence
+      tags: [chat]
+      summary: List users currently active in a chat room
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: roomType
+          in: query
+          required: true
+          schema:
+            type: string
+            enum: [PUBLIC_CHAT, ADMIN_DIRECT_CHAT]
+        - name: roomKey
+          in: query
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Currently active users
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ChatPresenceResponse"
+        "400":
+          description: Validation error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "403":
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
   /admin/stats:
     get:
       operationId: getAdminStats
@@ -3123,6 +3295,91 @@ components:
           type: integer
           description: Required for staff replies; ignored for members
 
+    ReactionType:
+      type: string
+      enum: [LIKE, LOVE, SUPPORT, THANKS, INSIGHTFUL]
+
+    ReactionCounts:
+      type: object
+      required: [LIKE, LOVE, SUPPORT, THANKS, INSIGHTFUL]
+      properties:
+        LIKE:
+          type: integer
+        LOVE:
+          type: integer
+        SUPPORT:
+          type: integer
+        THANKS:
+          type: integer
+        INSIGHTFUL:
+          type: integer
+
+    ReactionSummary:
+      type: object
+      required: [total, counts]
+      properties:
+        total:
+          type: integer
+        counts:
+          $ref: "#/components/schemas/ReactionCounts"
+
+    SetReactionInput:
+      type: object
+      required: [reactionType]
+      properties:
+        reactionType:
+          type: ["string", "null"]
+          enum: [LIKE, LOVE, SUPPORT, THANKS, INSIGHTFUL, null]
+          description: Target reaction. Null (or the same value already set) removes the reaction.
+
+    ReactionResponse:
+      type: object
+      required: [summary]
+      properties:
+        summary:
+          $ref: "#/components/schemas/ReactionSummary"
+        myReaction:
+          type: ["string", "null"]
+          enum: [LIKE, LOVE, SUPPORT, THANKS, INSIGHTFUL, null]
+
+    ChatPresenceInput:
+      type: object
+      required: [roomType, roomKey]
+      properties:
+        roomType:
+          type: string
+          enum: [PUBLIC_CHAT, ADMIN_DIRECT_CHAT]
+        roomKey:
+          type: string
+          minLength: 1
+
+    ChatPresenceUser:
+      type: object
+      required: [id, fullName, account, role, lastSeenAt]
+      properties:
+        id:
+          type: integer
+        fullName:
+          type: string
+        account:
+          type: string
+        role:
+          type: string
+        lastSeenAt:
+          type: string
+          format: date-time
+
+    ChatPresenceResponse:
+      type: object
+      required: [count, users]
+      properties:
+        count:
+          type: integer
+        users:
+          type: array
+          items:
+            $ref: "#/components/schemas/ChatPresenceUser"
+
     NewsItem:
       type: object
       required: [id, title, content, status, createdAt, updatedAt]
@@ -3144,6 +3401,13 @@ components:
           enum: [DRAFT, PUBLISHED, ARCHIVED]
         authorId:
           type: ["integer", "null"]
+        viewCount:
+          type: integer
+        reactionSummary:
+          $ref: "#/components/schemas/ReactionSummary"
+        myReaction:
+          type: ["string", "null"]
+          enum: [LIKE, LOVE, SUPPORT, THANKS, INSIGHTFUL, null]
         publishedAt:
           type: ["string", "null"]
           format: date-time
@@ -3272,6 +3536,13 @@ components:
           type: ["string", "null"]
         rejectionReason:
           type: ["string", "null"]
+        viewCount:
+          type: integer
+        reactionSummary:
+          $ref: "#/components/schemas/ReactionSummary"
+        myReaction:
+          type: ["string", "null"]
+          enum: [LIKE, LOVE, SUPPORT, THANKS, INSIGHTFUL, null]
         publishedAt:
           type: ["string", "null"]
           format: date-time
@@ -3308,6 +3579,13 @@ components:
           type: ["integer", "null"]
         rejectionReason:
           type: ["string", "null"]
+        viewCount:
+          type: integer
+        reactionSummary:
+          $ref: "#/components/schemas/ReactionSummary"
+        myReaction:
+          type: ["string", "null"]
+          enum: [LIKE, LOVE, SUPPORT, THANKS, INSIGHTFUL, null]
         publishedAt:
           type: ["string", "null"]
           format: date-time

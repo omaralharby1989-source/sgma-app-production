@@ -5,7 +5,9 @@
  * SGMA APP2 API specification
  * OpenAPI spec version: 0.1.0
  */
+import type { ArticleItemMyReaction } from './articleItemMyReaction';
 import type { ArticleStatus } from './articleStatus';
+import type { ReactionSummary } from './reactionSummary';
 
 export interface ArticleItem {
   id: number;
@@ -23,6 +25,10 @@ export interface ArticleItem {
   authorName?: string | null;
   /** @nullable */
   rejectionReason?: string | null;
+  viewCount?: number;
+  reactionSummary?: ReactionSummary;
+  /** @nullable */
+  myReaction?: ArticleItemMyReaction;
   /** @nullable */
   publishedAt?: Date | null;
   createdAt: Date;

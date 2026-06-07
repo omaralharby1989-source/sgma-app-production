@@ -20,6 +20,7 @@ export const articlesTable = pgTable("articles", {
   authorId: integer("author_id").references(() => usersTable.id, { onDelete: "set null" }),
   reviewedById: integer("reviewed_by_id").references(() => usersTable.id, { onDelete: "set null" }),
   rejectionReason: text("rejection_reason"),
+  viewCount: integer("view_count").notNull().default(0),
   isPublished: boolean("is_published").notNull().default(false),
   publishedAt: timestamp("published_at", { withTimezone: true }),
   createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),

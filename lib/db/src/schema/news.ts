@@ -13,6 +13,7 @@ export const newsTable = pgTable("news", {
   category: text("category"),
   status: newsStatusEnum("status").notNull().default("DRAFT"),
   authorId: integer("author_id").references(() => usersTable.id, { onDelete: "set null" }),
+  viewCount: integer("view_count").notNull().default(0),
   isPublished: boolean("is_published").notNull().default(false),
   publishedAt: timestamp("published_at", { withTimezone: true }),
   createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),

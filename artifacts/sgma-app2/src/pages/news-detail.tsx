@@ -6,6 +6,9 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { Button } from "@/components/ui/button";
 import { ArrowRight, CalendarDays, Newspaper } from "lucide-react";
 import { formatNewsDate } from "@/lib/news";
+import { ViewCountBadge } from "@/components/engagement/ViewCountBadge";
+import { ReactionBar } from "@/components/engagement/ReactionBar";
+import type { ReactionType } from "@/lib/reactions";
 
 export default function NewsDetail() {
   const [, setLocation] = useLocation();
@@ -66,6 +69,7 @@ export default function NewsDetail() {
                 <CalendarDays className="h-3.5 w-3.5" />
                 {formatNewsDate(item.publishedAt ?? item.createdAt)}
               </span>
+              <ViewCountBadge count={item.viewCount} />
             </div>
 
             <h1 className="text-xl font-bold leading-snug">{item.title}</h1>
@@ -76,6 +80,15 @@ export default function NewsDetail() {
 
             <div className="whitespace-pre-wrap text-[15px] leading-loose text-foreground/90">
               {item.content}
+            </div>
+
+            <div className="border-t border-border pt-4">
+              <ReactionBar
+                kind="news"
+                id={item.id}
+                summary={item.reactionSummary}
+                myReaction={(item.myReaction ?? null) as ReactionType | null}
+              />
             </div>
 
             <Button variant="outline" className="mt-4 w-full" onClick={() => setLocation("/news")}>

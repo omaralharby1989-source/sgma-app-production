@@ -4,13 +4,15 @@ import {
   usersTable,
   publicChatMessagesTable,
   adminDirectChatMessagesTable,
+  chatPresenceTable,
 } from "@workspace/db";
-import { eq, desc, asc, sql } from "drizzle-orm";
+import { eq, desc, asc, sql, and, gte } from "drizzle-orm";
 import {
   SendPublicChatMessageBody,
   EditPublicChatMessageBody,
   SendAdminChatMessageBody,
   EditAdminChatMessageBody,
+  UpdateChatPresenceBody,
 } from "@workspace/api-zod";
 import { requireAuth, requireFullApp } from "../middlewares/auth";
 
@@ -546,6 +548,124 @@ router.delete("/chat/admin/messages/:id", requireAuth, requireFullApp, async (re
   } catch (err) {
     req.log.error({ err }, "Delete admin message error");
     res.status(500).json({ error: "تعذر حذف الرسالة" });
+  }
+});
+
+// ---------------------------------------------------------------------------
+// Chat presence (polling-based online indicator)
+// ---------------------------------------------------------------------------
+
+const PRESENCE_WINDOW_MS = 60_000;
+const PRESENCE_ROOM_TYPES = ["PUBLIC_CHAT", "ADMIN_DIRECT_CHAT"];
+
+// Validates that the caller is allowed to be present in / read the given room.
+// Returns null when allowed, otherwise an {status, error} to send back.
+function checkRoomAccess(
+  user: { userId: number; role: string },
+  roomType: string,
+  roomKey: string,
+): { status: number; error: string } | null {
+  if (!PRESENCE_ROOM_TYPES.includes(roomType)) {
+    return { status: 400, error: "نوع الغرفة غير صالح" };
+  }
+  if (roomType === "PUBLIC_CHAT") {
+    if (roomKey !== "PUBLIC") return { status: 400, error: "مفتاح الغرفة غير صالح" };
+    return null;
+  }
+  // ADMIN_DIRECT_CHAT: roomKey is the owning member's id.
+  const conversationUserId = Number(roomKey);
+  if (!Number.isInteger(conversationUserId) || conversationUserId <= 0) {
+    return { status: 400, error: "مفتاح الغرفة غير صالح" };
+  }
+  // Members may only be present in their own conversation; staff may view any.
+  if (!isStaff(user.role) && conversationUserId !== user.userId) {
+    return { status: 403, error: "ليس لديك صلاحية لهذا الإجراء" };
+  }
+  return null;
+}
+
+async function getActiveRoomUsers(roomType: string, roomKey: string) {
+  const cutoff = new Date(Date.now() - PRESENCE_WINDOW_MS);
+  const rows = await db
+    .select({
+      id: usersTable.id,
+      fullName: usersTable.fullName,
+      account: usersTable.account,
+      role: usersTable.role,
+      lastSeenAt: chatPresenceTable.lastSeenAt,
+    })
+    .from(chatPresenceTable)
+    .innerJoin(usersTable, eq(chatPresenceTable.userId, usersTable.id))
+    .where(
+      and(
+        eq(chatPresenceTable.roomType, roomType),
+        eq(chatPresenceTable.roomKey, roomKey),
+        gte(chatPresenceTable.lastSeenAt, cutoff),
+      ),
+    )
+    .orderBy(asc(usersTable.fullName));
+
+  const users = rows.map((r) => ({
+    id: r.id,
+    fullName: r.fullName,
+    account: r.account,
+    role: r.role,
+    lastSeenAt: r.lastSeenAt.toISOString(),
+  }));
+  return { count: users.length, users };
+}
+
+// Heartbeat presence + return currently active users
+router.post("/chat/presence", requireAuth, requireFullApp, async (req, res): Promise<void> => {
+  const parsed = UpdateChatPresenceBody.safeParse(req.body);
+  if (!parsed.success) {
+    res.status(400).json({ error: "بيانات غير صالحة" });
+    return;
+  }
+  const { roomType, roomKey } = parsed.data;
+
+  const accessError = checkRoomAccess(req.user!, roomType, roomKey);
+  if (accessError) {
+    res.status(accessError.status).json({ error: accessError.error });
+    return;
+  }
+
+  try {
+    await db
+      .insert(chatPresenceTable)
+      .values({ userId: req.user!.userId, roomType, roomKey, lastSeenAt: new Date() })
+      .onConflictDoUpdate({
+        target: [chatPresenceTable.userId, chatPresenceTable.roomType, chatPresenceTable.roomKey],
+        set: { lastSeenAt: new Date() },
+      });
+
+    res.json(await getActiveRoomUsers(roomType, roomKey));
+  } catch (err) {
+    req.log.error({ err }, "Update chat presence error");
+    res.status(500).json({ error: "تعذر تحديث الحضور" });
+  }
+});
+
+// Read currently active users in a room
+router.get("/chat/presence", requireAuth, requireFullApp, async (req, res): Promise<void> => {
+  const roomType = typeof req.query.roomType === "string" ? req.query.roomType : "";
+  const roomKey = typeof req.query.roomKey === "string" ? req.query.roomKey : "";
+  if (!roomType || !roomKey) {
+    res.status(400).json({ error: "بيانات غير صالحة" });
+    return;
+  }
+
+  const accessError = checkRoomAccess(req.user!, roomType, roomKey);
+  if (accessError) {
+    res.status(accessError.status).json({ error: accessError.error });
+    return;
+  }
+
+  try {
+    res.json(await getActiveRoomUsers(roomType, roomKey));
+  } catch (err) {
+    req.log.error({ err }, "Get chat presence error");
+    res.status(500).json({ error: "تعذر تحميل الحضور" });
   }
 });
 

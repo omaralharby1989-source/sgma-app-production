@@ -260,6 +260,16 @@ Internal Trello-like task module (no drag/drop). Staff (MODERATOR/ADMIN/SUPER_AD
 - Attachment validation (`lib/taskAttachmentValidation.ts`): pdf + jpeg/png/webp only, ≤5 files, ≤5MB decoded each; base64 data URIs.
 - Frontend: `/tasks` (مهامي list, empty="لا توجد مهام مكلّف بها حالياً"), `/tasks/:id` (role-aware: member report+progress+upload / staff admin-note + status change), `/admin/tasks` (filters, cards, CSV w/ UTF-8 BOM + print PDF title "تقرير المهام"), `/admin/tasks/new` (Checkbox multi-select assignees). `src/lib/taskLabels.ts` holds status/priority labels+variants+formatTaskDate. `/more` shows مهامي ONLY when `!isStaff && hasTasks`, إدارة المهام for staff. Routes: `/admin/tasks/new` BEFORE `/admin/tasks`.
 
+## Engagement Module Status — COMPLETE
+
+Additive module (polling-based, no WebSockets): view counts + reactions for news/articles, chat online-user presence.
+- DB: `viewCount` int (default 0) on news + articles; new tables `news_reactions`, `article_reactions` (UNIQUE on (newsId|articleId, userId)), `chat_presence` (UNIQUE on (userId, roomType, roomKey)) in `lib/db/src/schema/engagement.ts`.
+- Reactions: LIKE/LOVE/SUPPORT/THANKS/INSIGHTFUL. `POST /news/{id}/reaction`, `POST /articles/{id}/reaction` body `{reactionType}` (null toggles off). One reaction/user via UNIQUE + `onConflictDoUpdate`. List summaries use one batched `GROUP BY targetId,reactionType` query (no N+1). Helper: `artifacts/api-server/src/lib/reactions.ts`.
+- ACCESS: news reactions = any auth user; article reactions = any auth user incl. SY (Syria-academy) but ONLY on APPROVED articles — SY can read/react, still cannot WRITE articles. Chat presence is `requireFullApp` so SY → 403.
+- View counts: incremented on detail GET, re-checked in SQL WHERE (news `status='PUBLISHED'`, articles `status='APPROVED'`) so a concurrent status change can't accrue views.
+- Presence: `POST /chat/presence` (heartbeat upsert), `GET /chat/presence?roomType=&roomKey=` (users active in last 60s). roomType PUBLIC_CHAT (roomKey "PUBLIC") / ADMIN_DIRECT_CHAT (roomKey=conversationUserId); members only their own room, staff any.
+- Frontend: `components/engagement/{ReactionBar,ViewCountBadge,ChatPresencePanel}.tsx`, `lib/reactions.ts` (labels/emojis + Arabic number formatter). Wired into NewsCard/ArticleCard (views + total reactions), news-detail/article-detail (ReactionBar + ViewCountBadge; article bar only when APPROVED), chat-public (presence panel, 20s heartbeat+poll). ReactionBar uses server response as source of truth + invalidates list/detail keys.
+
 ## Test Accounts
 
 | account | email | password | role |

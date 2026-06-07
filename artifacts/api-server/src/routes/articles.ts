@@ -1,9 +1,15 @@
 import { Router } from "express";
 import { db, articlesTable, usersTable } from "@workspace/db";
 import { eq, and, or, sql } from "drizzle-orm";
-import { CreateArticleBody, UpdateArticleBody, RejectArticleBody } from "@workspace/api-zod";
+import { CreateArticleBody, UpdateArticleBody, RejectArticleBody, SetArticleReactionBody } from "@workspace/api-zod";
 import { requireAuth, requireFullApp } from "../middlewares/auth";
 import { validateImageSource } from "../lib/imageValidation";
+import {
+  getArticleReactionData,
+  setArticleReaction,
+  isReactionType,
+  type ReactionData,
+} from "../lib/reactions";
 
 const router = Router();
 
@@ -15,7 +21,12 @@ function isStaff(role: string): boolean {
 
 type ArticleRow = typeof articlesTable.$inferSelect;
 
-function formatArticle(row: ArticleRow, authorName: string | null) {
+const EMPTY_REACTION: ReactionData = {
+  summary: { total: 0, counts: { LIKE: 0, LOVE: 0, SUPPORT: 0, THANKS: 0, INSIGHTFUL: 0 } },
+  myReaction: null,
+};
+
+function formatArticle(row: ArticleRow, authorName: string | null, reaction: ReactionData = EMPTY_REACTION) {
   return {
     id: row.id,
     title: row.title,
@@ -28,6 +39,9 @@ function formatArticle(row: ArticleRow, authorName: string | null) {
     authorName: authorName ?? null,
     reviewedById: row.reviewedById,
     rejectionReason: row.rejectionReason,
+    viewCount: row.viewCount,
+    reactionSummary: reaction.summary,
+    myReaction: reaction.myReaction,
     publishedAt: row.publishedAt ? row.publishedAt.toISOString() : null,
     createdAt: row.createdAt.toISOString(),
     updatedAt: row.updatedAt.toISOString(),
@@ -45,7 +59,8 @@ router.get("/articles", requireAuth, async (req, res): Promise<void> => {
       .orderBy(sql`${articlesTable.publishedAt} DESC NULLS LAST`, sql`${articlesTable.id} DESC`)
       .limit(100);
 
-    res.json(rows.map((r) => formatArticle(r.article, r.authorName)));
+    const reactionData = await getArticleReactionData(rows.map((r) => r.article.id), req.user!.userId);
+    res.json(rows.map((r) => formatArticle(r.article, r.authorName, reactionData.get(r.article.id))));
   } catch (err) {
     req.log.error({ err }, "Get articles list error");
     res.status(500).json({ error: "تعذر تحميل المقالات، يرجى المحاولة لاحقاً" });
@@ -63,7 +78,8 @@ router.get("/articles/my", requireAuth, requireFullApp, async (req, res): Promis
       .orderBy(sql`${articlesTable.createdAt} DESC`, sql`${articlesTable.id} DESC`)
       .limit(200);
 
-    res.json(rows.map((r) => formatArticle(r.article, r.authorName)));
+    const reactionData = await getArticleReactionData(rows.map((r) => r.article.id), req.user!.userId);
+    res.json(rows.map((r) => formatArticle(r.article, r.authorName, reactionData.get(r.article.id))));
   } catch (err) {
     req.log.error({ err }, "Get my articles error");
     res.status(500).json({ error: "تعذر تحميل المقالات، يرجى المحاولة لاحقاً" });
@@ -100,10 +116,67 @@ router.get("/articles/:id", requireAuth, async (req, res): Promise<void> => {
       return;
     }
 
-    res.json(formatArticle(row.article, row.authorName));
+    // Count a view only for publicly-readable (APPROVED) articles. The status
+    // is re-checked in the UPDATE WHERE clause so a concurrent status change
+    // can never let a non-approved article accrue views.
+    let article = row.article;
+    if (isApproved) {
+      const [bumped] = await db
+        .update(articlesTable)
+        .set({ viewCount: sql`${articlesTable.viewCount} + 1` })
+        .where(and(eq(articlesTable.id, id), eq(articlesTable.status, "APPROVED")))
+        .returning();
+      if (bumped) article = bumped;
+    }
+
+    const reactionData = await getArticleReactionData([id], req.user!.userId);
+    res.json(formatArticle(article, row.authorName, reactionData.get(id)));
   } catch (err) {
     req.log.error({ err }, "Get article error");
     res.status(500).json({ error: "تعذر تحميل المقال، يرجى المحاولة لاحقاً" });
+  }
+});
+
+// Set/change/remove the authenticated user's reaction on an article.
+// Allowed for any authenticated user (incl. SY academy) on APPROVED articles.
+router.post("/articles/:id/reaction", requireAuth, async (req, res): Promise<void> => {
+  const id = Number(req.params.id);
+  if (!Number.isInteger(id)) {
+    res.status(400).json({ error: "معرّف المقال غير صالح" });
+    return;
+  }
+
+  const parsed = SetArticleReactionBody.safeParse(req.body);
+  if (!parsed.success) {
+    res.status(400).json({ error: "نوع التفاعل غير صالح" });
+    return;
+  }
+
+  const target = parsed.data.reactionType ?? null;
+  if (target !== null && !isReactionType(target)) {
+    res.status(400).json({ error: "نوع التفاعل غير صالح" });
+    return;
+  }
+
+  try {
+    const [existing] = await db
+      .select()
+      .from(articlesTable)
+      .where(eq(articlesTable.id, id))
+      .limit(1);
+
+    if (!existing || existing.status !== "APPROVED") {
+      res.status(404).json({ error: "المقال غير موجود أو لم يعد متاحاً" });
+      return;
+    }
+
+    await setArticleReaction(id, req.user!.userId, target);
+    const reactionData = await getArticleReactionData([id], req.user!.userId);
+    const data = reactionData.get(id) ?? EMPTY_REACTION;
+    res.json({ summary: data.summary, myReaction: data.myReaction });
+  } catch (err) {
+    req.log.error({ err }, "Set article reaction error");
+    res.status(500).json({ error: "تعذر تسجيل التفاعل، يرجى المحاولة لاحقاً" });
   }
 });
 

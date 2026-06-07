@@ -64,6 +64,100 @@ export interface SendAdminChatMessageInput {
   recipientId?: number;
 }
 
+export type ReactionType = typeof ReactionType[keyof typeof ReactionType];
+
+
+export const ReactionType = {
+  LIKE: 'LIKE',
+  LOVE: 'LOVE',
+  SUPPORT: 'SUPPORT',
+  THANKS: 'THANKS',
+  INSIGHTFUL: 'INSIGHTFUL',
+} as const;
+
+export interface ReactionCounts {
+  LIKE: number;
+  LOVE: number;
+  SUPPORT: number;
+  THANKS: number;
+  INSIGHTFUL: number;
+}
+
+export interface ReactionSummary {
+  total: number;
+  counts: ReactionCounts;
+}
+
+/**
+ * Target reaction. Null (or the same value already set) removes the reaction.
+ * @nullable
+ */
+export type SetReactionInputReactionType = typeof SetReactionInputReactionType[keyof typeof SetReactionInputReactionType] | null;
+
+
+export const SetReactionInputReactionType = {
+  LIKE: 'LIKE',
+  LOVE: 'LOVE',
+  SUPPORT: 'SUPPORT',
+  THANKS: 'THANKS',
+  INSIGHTFUL: 'INSIGHTFUL',
+} as const;
+
+export interface SetReactionInput {
+  /**
+     * Target reaction. Null (or the same value already set) removes the reaction.
+     * @nullable
+     */
+  reactionType: SetReactionInputReactionType;
+}
+
+/**
+ * @nullable
+ */
+export type ReactionResponseMyReaction = typeof ReactionResponseMyReaction[keyof typeof ReactionResponseMyReaction] | null;
+
+
+export const ReactionResponseMyReaction = {
+  LIKE: 'LIKE',
+  LOVE: 'LOVE',
+  SUPPORT: 'SUPPORT',
+  THANKS: 'THANKS',
+  INSIGHTFUL: 'INSIGHTFUL',
+} as const;
+
+export interface ReactionResponse {
+  summary: ReactionSummary;
+  /** @nullable */
+  myReaction?: ReactionResponseMyReaction;
+}
+
+export type ChatPresenceInputRoomType = typeof ChatPresenceInputRoomType[keyof typeof ChatPresenceInputRoomType];
+
+
+export const ChatPresenceInputRoomType = {
+  PUBLIC_CHAT: 'PUBLIC_CHAT',
+  ADMIN_DIRECT_CHAT: 'ADMIN_DIRECT_CHAT',
+} as const;
+
+export interface ChatPresenceInput {
+  roomType: ChatPresenceInputRoomType;
+  /** @minLength 1 */
+  roomKey: string;
+}
+
+export interface ChatPresenceUser {
+  id: number;
+  fullName: string;
+  account: string;
+  role: string;
+  lastSeenAt: string;
+}
+
+export interface ChatPresenceResponse {
+  count: number;
+  users: ChatPresenceUser[];
+}
+
 export type NewsItemStatus = typeof NewsItemStatus[keyof typeof NewsItemStatus];
 
 
@@ -71,6 +165,20 @@ export const NewsItemStatus = {
   DRAFT: 'DRAFT',
   PUBLISHED: 'PUBLISHED',
   ARCHIVED: 'ARCHIVED',
+} as const;
+
+/**
+ * @nullable
+ */
+export type NewsItemMyReaction = typeof NewsItemMyReaction[keyof typeof NewsItemMyReaction] | null;
+
+
+export const NewsItemMyReaction = {
+  LIKE: 'LIKE',
+  LOVE: 'LOVE',
+  SUPPORT: 'SUPPORT',
+  THANKS: 'THANKS',
+  INSIGHTFUL: 'INSIGHTFUL',
 } as const;
 
 export interface NewsItem {
@@ -86,6 +194,10 @@ export interface NewsItem {
   status: NewsItemStatus;
   /** @nullable */
   authorId?: number | null;
+  viewCount?: number;
+  reactionSummary?: ReactionSummary;
+  /** @nullable */
+  myReaction?: NewsItemMyReaction;
   /** @nullable */
   publishedAt?: string | null;
   createdAt: string;
@@ -177,6 +289,20 @@ export const ArticleStatus = {
   ARCHIVED: 'ARCHIVED',
 } as const;
 
+/**
+ * @nullable
+ */
+export type ArticleItemMyReaction = typeof ArticleItemMyReaction[keyof typeof ArticleItemMyReaction] | null;
+
+
+export const ArticleItemMyReaction = {
+  LIKE: 'LIKE',
+  LOVE: 'LOVE',
+  SUPPORT: 'SUPPORT',
+  THANKS: 'THANKS',
+  INSIGHTFUL: 'INSIGHTFUL',
+} as const;
+
 export interface ArticleItem {
   id: number;
   title: string;
@@ -193,11 +319,29 @@ export interface ArticleItem {
   authorName?: string | null;
   /** @nullable */
   rejectionReason?: string | null;
+  viewCount?: number;
+  reactionSummary?: ReactionSummary;
+  /** @nullable */
+  myReaction?: ArticleItemMyReaction;
   /** @nullable */
   publishedAt?: string | null;
   createdAt: string;
   updatedAt: string;
 }
+
+/**
+ * @nullable
+ */
+export type ArticleDetailMyReaction = typeof ArticleDetailMyReaction[keyof typeof ArticleDetailMyReaction] | null;
+
+
+export const ArticleDetailMyReaction = {
+  LIKE: 'LIKE',
+  LOVE: 'LOVE',
+  SUPPORT: 'SUPPORT',
+  THANKS: 'THANKS',
+  INSIGHTFUL: 'INSIGHTFUL',
+} as const;
 
 export interface ArticleDetail {
   id: number;
@@ -218,6 +362,10 @@ export interface ArticleDetail {
   reviewedById?: number | null;
   /** @nullable */
   rejectionReason?: string | null;
+  viewCount?: number;
+  reactionSummary?: ReactionSummary;
+  /** @nullable */
+  myReaction?: ArticleDetailMyReaction;
   /** @nullable */
   publishedAt?: string | null;
   createdAt: string;
@@ -1478,6 +1626,19 @@ export type GetAdminChatMessagesParams = {
  */
 userId?: number;
 };
+
+export type GetChatPresenceParams = {
+roomType: GetChatPresenceRoomType;
+roomKey: string;
+};
+
+export type GetChatPresenceRoomType = typeof GetChatPresenceRoomType[keyof typeof GetChatPresenceRoomType];
+
+
+export const GetChatPresenceRoomType = {
+  PUBLIC_CHAT: 'PUBLIC_CHAT',
+  ADMIN_DIRECT_CHAT: 'ADMIN_DIRECT_CHAT',
+} as const;
 
 export type GetAdminUsersParams = {
 q?: string;

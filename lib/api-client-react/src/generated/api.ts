@@ -44,6 +44,8 @@ import type {
   BroadcastItem,
   BroadcastListResponse,
   ChatMessage,
+  ChatPresenceInput,
+  ChatPresenceResponse,
   CreateAcademyLectureInput,
   CreateArticleInput,
   CreateBoardMemberInput,
@@ -67,6 +69,7 @@ import type {
   GetAdminUsersParams,
   GetAdminVolunteerDelegationsParams,
   GetBoardMembersParams,
+  GetChatPresenceParams,
   HealthStatus,
   LoginInput,
   MemberProfile,
@@ -78,9 +81,11 @@ import type {
   NewsItem,
   NewsListResponse,
   PasswordUpdate,
+  ReactionResponse,
   RejectArticleInput,
   SendAdminChatMessageInput,
   SendChatMessageInput,
+  SetReactionInput,
   SignupInput,
   SignupResponse,
   StaticPage,
@@ -4358,6 +4363,305 @@ export const useRejectArticle = <TError = ErrorType<ErrorResponse>,
       > => {
       return useMutation(getRejectArticleMutationOptions(options));
     }
+
+export const getSetNewsReactionUrl = (id: number,) => {
+
+
+
+
+  return `/api/news/${id}/reaction`
+}
+
+/**
+ * @summary Set, change, or remove the authenticated user's reaction on a news item
+ */
+export const setNewsReaction = async (id: number,
+    setReactionInput: SetReactionInput, options?: RequestInit): Promise<ReactionResponse> => {
+
+  return customFetch<ReactionResponse>(getSetNewsReactionUrl(id),
+  {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(
+      setReactionInput,)
+  }
+);}
+
+
+
+
+export const getSetNewsReactionMutationOptions = <TError = ErrorType<ErrorResponse>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof setNewsReaction>>, TError,{id: number;data: BodyType<SetReactionInput>}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof setNewsReaction>>, TError,{id: number;data: BodyType<SetReactionInput>}, TContext> => {
+
+const mutationKey = ['setNewsReaction'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof setNewsReaction>>, {id: number;data: BodyType<SetReactionInput>}> = (props) => {
+          const {id,data} = props ?? {};
+
+          return  setNewsReaction(id,data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type SetNewsReactionMutationResult = NonNullable<Awaited<ReturnType<typeof setNewsReaction>>>
+    export type SetNewsReactionMutationBody = BodyType<SetReactionInput>
+    export type SetNewsReactionMutationError = ErrorType<ErrorResponse>
+
+    /**
+ * @summary Set, change, or remove the authenticated user's reaction on a news item
+ */
+export const useSetNewsReaction = <TError = ErrorType<ErrorResponse>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof setNewsReaction>>, TError,{id: number;data: BodyType<SetReactionInput>}, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof setNewsReaction>>,
+        TError,
+        {id: number;data: BodyType<SetReactionInput>},
+        TContext
+      > => {
+      return useMutation(getSetNewsReactionMutationOptions(options));
+    }
+
+export const getSetArticleReactionUrl = (id: number,) => {
+
+
+
+
+  return `/api/articles/${id}/reaction`
+}
+
+/**
+ * @summary Set, change, or remove the authenticated user's reaction on an article
+ */
+export const setArticleReaction = async (id: number,
+    setReactionInput: SetReactionInput, options?: RequestInit): Promise<ReactionResponse> => {
+
+  return customFetch<ReactionResponse>(getSetArticleReactionUrl(id),
+  {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(
+      setReactionInput,)
+  }
+);}
+
+
+
+
+export const getSetArticleReactionMutationOptions = <TError = ErrorType<ErrorResponse>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof setArticleReaction>>, TError,{id: number;data: BodyType<SetReactionInput>}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof setArticleReaction>>, TError,{id: number;data: BodyType<SetReactionInput>}, TContext> => {
+
+const mutationKey = ['setArticleReaction'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof setArticleReaction>>, {id: number;data: BodyType<SetReactionInput>}> = (props) => {
+          const {id,data} = props ?? {};
+
+          return  setArticleReaction(id,data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type SetArticleReactionMutationResult = NonNullable<Awaited<ReturnType<typeof setArticleReaction>>>
+    export type SetArticleReactionMutationBody = BodyType<SetReactionInput>
+    export type SetArticleReactionMutationError = ErrorType<ErrorResponse>
+
+    /**
+ * @summary Set, change, or remove the authenticated user's reaction on an article
+ */
+export const useSetArticleReaction = <TError = ErrorType<ErrorResponse>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof setArticleReaction>>, TError,{id: number;data: BodyType<SetReactionInput>}, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof setArticleReaction>>,
+        TError,
+        {id: number;data: BodyType<SetReactionInput>},
+        TContext
+      > => {
+      return useMutation(getSetArticleReactionMutationOptions(options));
+    }
+
+export const getUpdateChatPresenceUrl = () => {
+
+
+
+
+  return `/api/chat/presence`
+}
+
+/**
+ * @summary Heartbeat the authenticated user's presence in a chat room
+ */
+export const updateChatPresence = async (chatPresenceInput: ChatPresenceInput, options?: RequestInit): Promise<ChatPresenceResponse> => {
+
+  return customFetch<ChatPresenceResponse>(getUpdateChatPresenceUrl(),
+  {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(
+      chatPresenceInput,)
+  }
+);}
+
+
+
+
+export const getUpdateChatPresenceMutationOptions = <TError = ErrorType<ErrorResponse>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof updateChatPresence>>, TError,{data: BodyType<ChatPresenceInput>}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof updateChatPresence>>, TError,{data: BodyType<ChatPresenceInput>}, TContext> => {
+
+const mutationKey = ['updateChatPresence'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof updateChatPresence>>, {data: BodyType<ChatPresenceInput>}> = (props) => {
+          const {data} = props ?? {};
+
+          return  updateChatPresence(data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type UpdateChatPresenceMutationResult = NonNullable<Awaited<ReturnType<typeof updateChatPresence>>>
+    export type UpdateChatPresenceMutationBody = BodyType<ChatPresenceInput>
+    export type UpdateChatPresenceMutationError = ErrorType<ErrorResponse>
+
+    /**
+ * @summary Heartbeat the authenticated user's presence in a chat room
+ */
+export const useUpdateChatPresence = <TError = ErrorType<ErrorResponse>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof updateChatPresence>>, TError,{data: BodyType<ChatPresenceInput>}, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof updateChatPresence>>,
+        TError,
+        {data: BodyType<ChatPresenceInput>},
+        TContext
+      > => {
+      return useMutation(getUpdateChatPresenceMutationOptions(options));
+    }
+
+export const getGetChatPresenceUrl = (params: GetChatPresenceParams,) => {
+  const normalizedParams = new URLSearchParams();
+
+  Object.entries(params || {}).forEach(([key, value]) => {
+
+    if (value !== undefined) {
+      normalizedParams.append(key, value === null ? 'null' : value.toString())
+    }
+  });
+
+  const stringifiedParams = normalizedParams.toString();
+
+  return stringifiedParams.length > 0 ? `/api/chat/presence?${stringifiedParams}` : `/api/chat/presence`
+}
+
+/**
+ * @summary List users currently active in a chat room
+ */
+export const getChatPresence = async (params: GetChatPresenceParams, options?: RequestInit): Promise<ChatPresenceResponse> => {
+
+  return customFetch<ChatPresenceResponse>(getGetChatPresenceUrl(params),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getGetChatPresenceQueryKey = (params?: GetChatPresenceParams,) => {
+    return [
+    `/api/chat/presence`, ...(params ? [params] : [])
+    ] as const;
+    }
+
+
+export const getGetChatPresenceQueryOptions = <TData = Awaited<ReturnType<typeof getChatPresence>>, TError = ErrorType<ErrorResponse>>(params: GetChatPresenceParams, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getChatPresence>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetChatPresenceQueryKey(params);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getChatPresence>>> = ({ signal }) => getChatPresence(params, { signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getChatPresence>>, TError, TData> & { queryKey: QueryKey }
+}
+
+export type GetChatPresenceQueryResult = NonNullable<Awaited<ReturnType<typeof getChatPresence>>>
+export type GetChatPresenceQueryError = ErrorType<ErrorResponse>
+
+
+/**
+ * @summary List users currently active in a chat room
+ */
+
+export function useGetChatPresence<TData = Awaited<ReturnType<typeof getChatPresence>>, TError = ErrorType<ErrorResponse>>(
+ params: GetChatPresenceParams, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getChatPresence>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+
+ ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+
+  const queryOptions = getGetChatPresenceQueryOptions(params,options)
+
+  const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
+
+  return { ...query, queryKey: queryOptions.queryKey };
+}
+
+
+
+
+
+
 
 export const getGetAdminStatsUrl = () => {
 

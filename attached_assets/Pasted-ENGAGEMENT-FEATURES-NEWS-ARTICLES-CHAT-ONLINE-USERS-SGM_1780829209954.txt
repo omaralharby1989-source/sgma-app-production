@@ -1,0 +1,527 @@
+ENGAGEMENT FEATURES — NEWS / ARTICLES / CHAT ONLINE USERS — SGMA APP
+
+Start this task now.
+
+Scope:
+Add engagement features to News, Articles, and Chat:
+
+1. View count for news.
+2. View count for articles.
+3. Facebook-like reaction buttons for news.
+4. Facebook-like reaction buttons for articles.
+5. In chat, show number of currently active users in the chat and a list of their names.
+
+Do not rebuild existing modules.
+Do not rewrite chat.
+Do not add WebSockets unless already available.
+Use the current polling-based architecture if needed.
+
+Existing stable modules must remain working:
+
+* login
+* register
+* home/my account
+* news
+* articles
+* chat
+* broadcast
+* admin dashboard
+* board
+* volunteer delegations
+* task management
+* ads management
+* academy
+* more page
+* developer-info
+* static pages
+* membership approval flow
+* logo/branding
+
+Current architecture:
+
+* PostgreSQL + Drizzle
+* JWT auth
+* Arabic RTL
+* Mobile-first
+* No Firebase
+* No MySQL migration
+* No old SGMA APP1 routes
+
+==================================================
+A. NEWS VIEW COUNT
+==================
+
+Add view count to news.
+
+Behavior:
+
+* Every time an authenticated user opens a news detail page, increment the view count.
+* Avoid extreme duplicate counting on fast refresh if easy:
+
+  * either count one view per user per news per day
+  * or count once per session/localStorage
+  * if too complex, simple increment is acceptable for first version, but document it.
+
+Display:
+
+* On /news list cards:
+
+  * show عدد المشاهدات
+  * icon: eye if available
+* On /news/:id detail:
+
+  * show عدد المشاهدات clearly near date/category.
+
+Backend:
+
+* Add view tracking table or viewCount column.
+  Preferred:
+
+  * add newsViews table with userId/newsId/createdAt for uniqueness
+  * add denormalized viewCount if useful
+    Acceptable simple version:
+  * add viewCount integer to news table
+
+API:
+
+* GET /api/news/:id should register a view for authenticated users.
+* Or add POST /api/news/:id/view if cleaner.
+
+Security:
+
+* userId from JWT only.
+* Do not trust client userId.
+
+==================================================
+B. ARTICLE VIEW COUNT
+=====================
+
+Same as News.
+
+Behavior:
+
+* Opening article detail increments view count.
+* Display views on /articles list and /articles/:id detail.
+
+Important:
+
+* Syria Academy users can read published articles, so their views should count too.
+* Pending/inactive users cannot view because they cannot log in.
+
+Backend:
+
+* Add articleViews table or viewCount integer to articles.
+* Same counting behavior as news.
+
+==================================================
+C. REACTIONS FOR NEWS AND ARTICLES
+==================================
+
+Add Facebook-like reactions.
+
+Reaction types:
+
+* LIKE: أعجبني
+* LOVE: أحببته
+* SUPPORT: داعم
+* THANKS: شكراً
+* INSIGHTFUL: مفيد
+
+Use icons if available:
+
+* thumbs up
+* heart
+* hand/medical/support icon if available
+* thanks icon
+* lightbulb
+
+Rules:
+
+* Each authenticated user can have one active reaction per news item.
+* Clicking a different reaction changes their reaction.
+* Clicking the same reaction again removes it.
+* Show total reaction count and reaction breakdown.
+* Show the current user’s selected reaction highlighted.
+
+Apply to:
+
+* News detail page
+* News cards if not too crowded: show summary only
+* Article detail page
+* Article cards if not too crowded: show summary only
+
+Backend tables:
+
+1. news_reactions
+
+* id
+* newsId
+* userId
+* reactionType
+* createdAt
+* updatedAt
+  Unique:
+* newsId + userId
+
+2. article_reactions
+
+* id
+* articleId
+* userId
+* reactionType
+* createdAt
+* updatedAt
+  Unique:
+* articleId + userId
+
+APIs:
+News:
+
+* GET /api/news/:id should return:
+
+  * viewCount
+  * reactionSummary
+  * myReaction
+* POST /api/news/:id/reaction
+  body: { reactionType }
+  sets/changes/removes reaction
+  If reactionType is null or same reaction toggled, remove.
+
+Articles:
+
+* GET /api/articles/:id returns:
+
+  * viewCount
+  * reactionSummary
+  * myReaction
+* POST /api/articles/:id/reaction
+
+Validation:
+
+* reject invalid reactionType with 400.
+* unauthenticated 401.
+
+==================================================
+D. CHAT ONLINE USERS
+====================
+
+Add online users/active users indicator in chat.
+
+Goal:
+Inside chat pages, show:
+
+* عدد المتواجدين الآن
+* list of names currently active in the chat
+
+Applies to:
+
+* /chat/public
+* /chat/admin if meaningful
+* /chat center if useful
+
+Recommended first implementation:
+Polling presence, not WebSocket.
+
+Create table:
+chat_presence
+
+Fields:
+
+* id
+* userId
+* roomType
+* roomKey
+* lastSeenAt
+* createdAt
+* updatedAt
+
+roomType values:
+
+* PUBLIC_CHAT
+* ADMIN_DIRECT_CHAT
+
+roomKey:
+
+* PUBLIC for public chat
+* for admin direct chat:
+
+  * member user id or conversation key if needed
+
+Behavior:
+
+* When user opens /chat/public, frontend periodically calls:
+  POST /api/chat/presence
+  with roomType=PUBLIC_CHAT, roomKey=PUBLIC
+* Server updates lastSeenAt for current user.
+* GET /api/chat/presence?roomType=PUBLIC_CHAT&roomKey=PUBLIC returns users with lastSeenAt within last 60 seconds.
+* Poll every 20–30 seconds.
+* Online cutoff: 60–90 seconds.
+
+Display:
+
+* In public chat:
+
+  * small card/sidebar/top drawer:
+    المتواجدون الآن: X
+  * list of names:
+    fullName + role badge
+* On mobile:
+
+  * do not take too much space
+  * use collapsible section:
+    المتواجدون الآن
+  * tap expands/collapses list.
+
+For admin direct chat:
+
+* If easy, show active users in the selected conversation.
+* If not, apply only to public chat first and document admin direct chat as not implemented yet.
+  But preferred:
+
+  * ADMIN_DIRECT_CHAT roomKey = conversationUserId
+  * member and staff in that conversation update presence there.
+
+Security:
+
+* userId from JWT.
+* Only users allowed to access that chat room can update/read presence.
+* Syria Academy-only users should not access chat at all, consistent with existing academy rules.
+
+==================================================
+E. BACKEND API REQUIREMENTS
+===========================
+
+Add/extend APIs:
+
+News:
+
+* reaction endpoint
+* view tracking if separate
+
+Articles:
+
+* reaction endpoint
+* view tracking if separate
+
+Chat:
+POST /api/chat/presence
+GET /api/chat/presence
+
+Payload:
+{
+roomType,
+roomKey
+}
+
+Response:
+{
+count,
+users: [
+{
+id,
+fullName,
+account,
+role,
+lastSeenAt
+}
+]
+}
+
+Do not expose:
+
+* passwords
+* private data
+* emails unless already shown elsewhere; for chat presence prefer name/account only.
+
+==================================================
+F. OPENAPI / GENERATED CLIENT
+=============================
+
+Update OpenAPI.
+
+Schemas:
+
+* ReactionType
+* ReactionSummary
+* SetReactionInput
+* EngagementStats if needed
+* ChatPresenceInput
+* ChatPresenceResponse
+* ChatPresenceUser
+
+Update NewsItem / NewsDetail if separate:
+
+* viewCount
+* reactionSummary
+* myReaction
+
+Update ArticleItem / ArticleDetail:
+
+* viewCount
+* reactionSummary
+* myReaction
+
+Add paths:
+
+* POST /api/news/{id}/reaction
+* POST /api/articles/{id}/reaction
+* POST /api/chat/presence
+* GET /api/chat/presence
+
+Then:
+
+* Regenerate client
+* Do not manually edit generated files
+* Run typecheck
+
+==================================================
+G. FRONTEND UI REQUIREMENTS
+===========================
+
+Create reusable component if helpful:
+ReactionBar
+
+Props:
+
+* summary
+* myReaction
+* onReact
+* disabled
+
+Arabic reaction labels:
+
+* أعجبني
+* أحببته
+* داعم
+* شكراً
+* مفيد
+
+Design:
+
+* mobile-first
+* small horizontal scroll if needed
+* no layout breaking
+* active reaction visually highlighted
+* show total count
+* show per-reaction counts if space allows
+
+Create reusable component:
+ViewCountBadge
+
+* icon + count
+
+Create reusable component:
+ChatPresencePanel
+
+* count
+* collapsible user list
+* role badges
+
+Use on:
+
+* news cards/detail
+* article cards/detail
+* public chat
+* admin chat if implemented
+
+==================================================
+H. ACCESS / PERMISSION RULES
+============================
+
+Views:
+
+* only authenticated users count as views.
+* Syria Academy-only users can count views for readable news/articles.
+
+Reactions:
+
+* authenticated active users only.
+* Syria Academy-only users can react to news/articles they can read.
+* pending/inactive users cannot log in, so no access.
+
+Chat presence:
+
+* only users allowed in that chat can appear.
+* Syria Academy-only users blocked from chat.
+
+==================================================
+I. TESTING REQUIRED
+===================
+
+Do not report completion until tested.
+
+News:
+
+1. Open news detail increments view count.
+2. View count appears on news card/detail.
+3. User can react to news.
+4. Changing reaction updates summary.
+5. Clicking same reaction removes it.
+6. Invalid reaction rejected.
+
+Articles:
+
+1. Open article detail increments view count.
+2. View count appears on article card/detail.
+3. User can react to article.
+4. Changing reaction updates summary.
+5. Clicking same reaction removes it.
+6. Syria Academy-only user can react to a readable article.
+7. Syria user still cannot write articles.
+
+Chat:
+
+1. Open /chat/public as user A.
+2. Presence count shows user A.
+3. Open /chat/public as user B.
+4. Presence count shows 2 users.
+5. User list displays names.
+6. After timeout/inactivity, user disappears.
+7. Syria Academy-only user cannot access chat/presence.
+8. Public chat messages still work.
+
+Regression:
+
+1. /login works.
+2. /register works.
+3. /home works.
+4. /news works.
+5. /articles works.
+6. /chat works.
+7. /academy works.
+8. /admin works.
+9. /tasks works.
+10. /more works.
+11. Typecheck passes.
+12. Backend starts cleanly.
+13. Preview works.
+
+==================================================
+J. REQUIRED REPORT
+==================
+
+After completion, provide:
+
+ENGAGEMENT FEATURES REPORT
+
+1. What was implemented
+2. Files changed
+3. Database/table changes
+4. News view/reaction status
+5. Article view/reaction status
+6. Chat presence status
+7. Backend API endpoints
+8. OpenAPI/client generation status
+9. Permission/security test results
+10. Runtime test results
+11. Preview status
+12. Known issues, if any
+13. Confirmation:
+
+* no Firebase
+* no MySQL migration
+* no unrelated modules changed
+* academy access rules unchanged
+* existing modules still work
+
+Do not report success until view counts, reactions, and chat presence are tested.
