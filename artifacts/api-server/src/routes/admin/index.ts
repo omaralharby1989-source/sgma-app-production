@@ -7,6 +7,7 @@ import broadcastsRouter from "./broadcasts";
 import volunteerDelegationsRouter from "./volunteer-delegations";
 import adsRouter from "./ads";
 import tasksRouter from "./tasks";
+import academyRouter from "./academy";
 
 const router: IRouter = Router();
 
@@ -18,5 +19,6 @@ router.use(broadcastsRouter);
 router.use(volunteerDelegationsRouter);
 router.use(adsRouter);
 router.use(tasksRouter);
+router.use(academyRouter);
 
 export default router;

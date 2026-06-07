@@ -11,3 +11,4 @@
 - [API error shape & body limits](api-error-shape-and-body-limits.md) — read server errors from err.data.error (not err.response.data); express body limit raised to 8mb for base64 avatars.
 - [Last super-admin guard](admin-last-super-guard.md) — demote/deactivate guards must count LOGIN-ELIGIBLE supers (status=ACTIVE AND is_active) and treat any login-blocking state (incl. PENDING) as deactivation, or you lock everyone out.
 - [api-server new route restart](api-server-new-route-restart.md) — a brand-new route file can 404 until the api-server workflow is restarted; tsx watch may not register newly added modules.
+- [Syria academy access scope](access-scope-syria.md) — SYRIA_ACADEMY_ONLY gating needs requireFullApp on backend + fullAppOnly route; admin-users list omits academyAllowedSpecialties (preload via getAdminUser or you wipe it).

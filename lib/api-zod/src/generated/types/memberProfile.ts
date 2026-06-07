@@ -5,6 +5,7 @@
  * SGMA APP2 API specification
  * OpenAPI spec version: 0.1.0
  */
+import type { MemberProfileAccessScope } from './memberProfileAccessScope';
 import type { MemberProfileRole } from './memberProfileRole';
 import type { MemberProfileStatus } from './memberProfileStatus';
 
@@ -35,6 +36,10 @@ export interface MemberProfile {
   avatarUrl?: string | null;
   /** @nullable */
   membershipNumber?: string | null;
+  accessScope?: MemberProfileAccessScope;
+  /** @nullable */
+  academySpecialty?: string | null;
+  academyAllowedSpecialties?: string[];
   createdAt: Date;
   /** @nullable */
   updatedAt?: Date | null;

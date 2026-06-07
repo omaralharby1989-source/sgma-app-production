@@ -2,18 +2,20 @@ import { Link, useLocation } from "wouter";
 import { useGetMemberProfile, useGetMyTasks } from "@workspace/api-client-react";
 import { Card } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Info, LogOut, MessageSquare, Newspaper, FileText, Radio, ChevronLeft, LayoutDashboard, Users, Building2, ShieldCheck, ScrollText, Landmark, HandHeart, Megaphone, ClipboardList } from "lucide-react";
-import { getStoredUser, isStaffRole, isAdminOrSuper, isSuperAdminRole } from "@/lib/auth";
+import { Info, LogOut, MessageSquare, Newspaper, FileText, Radio, ChevronLeft, LayoutDashboard, Users, Building2, ShieldCheck, ScrollText, Landmark, HandHeart, Megaphone, ClipboardList, GraduationCap } from "lucide-react";
+import { getStoredUser, isStaffRole, isAdminOrSuper, isSuperAdminRole, isSyriaUser } from "@/lib/auth";
 
 export default function More() {
   const [, setLocation] = useLocation();
   const { data: profile, isLoading } = useGetMemberProfile();
-  const role = getStoredUser()?.role;
+  const user = getStoredUser();
+  const role = user?.role;
   const isStaff = isStaffRole(role);
   const adminOrSuper = isAdminOrSuper(role);
   const superAdmin = isSuperAdminRole(role);
+  const syria = isSyriaUser(user);
   const { data: myTasks } = useGetMyTasks({
-    query: { queryKey: ["/api/tasks/my"], retry: false },
+    query: { queryKey: ["/api/tasks/my"], retry: false, enabled: !syria && !isStaff },
   });
   const hasTasks = !!myTasks && myTasks.length > 0;
 
@@ -32,10 +34,37 @@ export default function More() {
     destructive?: boolean;
   };
 
-  const menuGroups: { title: string; items: MenuItem[] }[] = [
+  const syriaMenuGroups: { title: string; items: MenuItem[] }[] = [
+    {
+      title: "أكاديمية سوريا",
+      items: [
+        { icon: GraduationCap, label: "الأكاديمية", href: "/academy" },
+        { icon: Newspaper, label: "الأخبار", href: "/news" },
+        { icon: FileText, label: "المقالات", href: "/articles" },
+      ],
+    },
+    {
+      title: "الجمعية والمعلومات",
+      items: [
+        { icon: Building2, label: "من نحن", href: "/about-sgma" },
+        { icon: ShieldCheck, label: "سياسة الخصوصية", href: "/privacy-policy" },
+        { icon: ScrollText, label: "الشروط والأحكام", href: "/terms" },
+        { icon: Info, label: "معلومات المطور", href: "/developer-info" },
+      ],
+    },
+    {
+      title: "الحساب",
+      items: [
+        { icon: LogOut, label: "تسجيل الخروج", onClick: handleLogout, destructive: true },
+      ],
+    },
+  ];
+
+  const fullMenuGroups: { title: string; items: MenuItem[] }[] = [
     {
       title: "التطبيقات والخدمات",
       items: [
+        { icon: GraduationCap, label: "أكاديمية سوريا", href: "/academy" },
         { icon: MessageSquare, label: "المحادثات", href: "/chat" },
         { icon: Newspaper, label: "الأخبار", href: "/news" },
         { icon: FileText, label: "المقالات", href: "/articles" },
@@ -85,6 +114,8 @@ export default function More() {
       ],
     },
   ];
+
+  const menuGroups = syria ? syriaMenuGroups : fullMenuGroups;
 
   return (
     <div className="p-4 space-y-6 max-w-lg mx-auto bg-muted/20 min-h-[100dvh]">

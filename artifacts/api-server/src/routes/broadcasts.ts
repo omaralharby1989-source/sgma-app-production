@@ -2,7 +2,7 @@ import { Router } from "express";
 import { db, broadcastMessagesTable } from "@workspace/db";
 import { eq, and, or, gt, isNull, sql } from "drizzle-orm";
 import { CreateBroadcastBody } from "@workspace/api-zod";
-import { requireAuth } from "../middlewares/auth";
+import { requireAuth, requireFullApp } from "../middlewares/auth";
 import { isAdminOrSuper } from "../lib/permissions";
 
 const router = Router();
@@ -49,7 +49,7 @@ router.get("/broadcasts/active", requireAuth, async (req, res): Promise<void> =>
 });
 
 // Create a broadcast (admin/super only)
-router.post("/broadcasts", requireAuth, async (req, res): Promise<void> => {
+router.post("/broadcasts", requireAuth, requireFullApp, async (req, res): Promise<void> => {
   if (!isAdminOrSuper(req.user!.role)) {
     res.status(403).json({ error: "ليس لديك صلاحية لهذا الإجراء" });
     return;

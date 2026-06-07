@@ -20,6 +20,9 @@ import type {
 } from '@tanstack/react-query';
 
 import type {
+  AcademyFileDownload,
+  AcademyLectureDetail,
+  AcademyLecturesResponse,
   ActiveAdsResponse,
   ActiveBroadcastResponse,
   AdSettings,
@@ -41,6 +44,7 @@ import type {
   BroadcastItem,
   BroadcastListResponse,
   ChatMessage,
+  CreateAcademyLectureInput,
   CreateArticleInput,
   CreateBoardMemberInput,
   CreateBroadcastInput,
@@ -53,7 +57,9 @@ import type {
   CustomAdListResponse,
   DeveloperInfo,
   ErrorResponse,
+  GetAcademyLecturesParams,
   GetActiveAdsParams,
+  GetAdminAcademyLecturesParams,
   GetAdminArticlesParams,
   GetAdminChatMessagesParams,
   GetAdminNewsParams,
@@ -82,6 +88,7 @@ import type {
   TaskExportResponse,
   TaskReportAttachmentData,
   TasksResponse,
+  UpdateAcademyLectureInput,
   UpdateAdSettingsInput,
   UpdateArticleInput,
   UpdateBoardMemberInput,
@@ -5787,5 +5794,694 @@ export const useDeleteAdminCustomAd = <TError = ErrorType<ErrorResponse>,
         TContext
       > => {
       return useMutation(getDeleteAdminCustomAdMutationOptions(options));
+    }
+
+export const getGetAcademyLecturesUrl = (params?: GetAcademyLecturesParams,) => {
+  const normalizedParams = new URLSearchParams();
+
+  Object.entries(params || {}).forEach(([key, value]) => {
+
+    if (value !== undefined) {
+      normalizedParams.append(key, value === null ? 'null' : value.toString())
+    }
+  });
+
+  const stringifiedParams = normalizedParams.toString();
+
+  return stringifiedParams.length > 0 ? `/api/academy/lectures?${stringifiedParams}` : `/api/academy/lectures`
+}
+
+/**
+ * @summary List academy lectures visible to the current user
+ */
+export const getAcademyLectures = async (params?: GetAcademyLecturesParams, options?: RequestInit): Promise<AcademyLecturesResponse> => {
+
+  return customFetch<AcademyLecturesResponse>(getGetAcademyLecturesUrl(params),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getGetAcademyLecturesQueryKey = (params?: GetAcademyLecturesParams,) => {
+    return [
+    `/api/academy/lectures`, ...(params ? [params] : [])
+    ] as const;
+    }
+
+
+export const getGetAcademyLecturesQueryOptions = <TData = Awaited<ReturnType<typeof getAcademyLectures>>, TError = ErrorType<ErrorResponse>>(params?: GetAcademyLecturesParams, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getAcademyLectures>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetAcademyLecturesQueryKey(params);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getAcademyLectures>>> = ({ signal }) => getAcademyLectures(params, { signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getAcademyLectures>>, TError, TData> & { queryKey: QueryKey }
+}
+
+export type GetAcademyLecturesQueryResult = NonNullable<Awaited<ReturnType<typeof getAcademyLectures>>>
+export type GetAcademyLecturesQueryError = ErrorType<ErrorResponse>
+
+
+/**
+ * @summary List academy lectures visible to the current user
+ */
+
+export function useGetAcademyLectures<TData = Awaited<ReturnType<typeof getAcademyLectures>>, TError = ErrorType<ErrorResponse>>(
+ params?: GetAcademyLecturesParams, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getAcademyLectures>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+
+ ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+
+  const queryOptions = getGetAcademyLecturesQueryOptions(params,options)
+
+  const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
+
+  return { ...query, queryKey: queryOptions.queryKey };
+}
+
+
+
+
+
+
+
+export const getGetAcademyAnnouncementsUrl = () => {
+
+
+
+
+  return `/api/academy/announcements`
+}
+
+/**
+ * @summary List published upcoming lecture announcements visible to the current user
+ */
+export const getAcademyAnnouncements = async ( options?: RequestInit): Promise<AcademyLecturesResponse> => {
+
+  return customFetch<AcademyLecturesResponse>(getGetAcademyAnnouncementsUrl(),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getGetAcademyAnnouncementsQueryKey = () => {
+    return [
+    `/api/academy/announcements`
+    ] as const;
+    }
+
+
+export const getGetAcademyAnnouncementsQueryOptions = <TData = Awaited<ReturnType<typeof getAcademyAnnouncements>>, TError = ErrorType<ErrorResponse>>( options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getAcademyAnnouncements>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetAcademyAnnouncementsQueryKey();
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getAcademyAnnouncements>>> = ({ signal }) => getAcademyAnnouncements({ signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getAcademyAnnouncements>>, TError, TData> & { queryKey: QueryKey }
+}
+
+export type GetAcademyAnnouncementsQueryResult = NonNullable<Awaited<ReturnType<typeof getAcademyAnnouncements>>>
+export type GetAcademyAnnouncementsQueryError = ErrorType<ErrorResponse>
+
+
+/**
+ * @summary List published upcoming lecture announcements visible to the current user
+ */
+
+export function useGetAcademyAnnouncements<TData = Awaited<ReturnType<typeof getAcademyAnnouncements>>, TError = ErrorType<ErrorResponse>>(
+  options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getAcademyAnnouncements>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+
+ ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+
+  const queryOptions = getGetAcademyAnnouncementsQueryOptions(options)
+
+  const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
+
+  return { ...query, queryKey: queryOptions.queryKey };
+}
+
+
+
+
+
+
+
+export const getGetAcademyLectureUrl = (id: number,) => {
+
+
+
+
+  return `/api/academy/lectures/${id}`
+}
+
+/**
+ * @summary Get an academy lecture if visible to the current user
+ */
+export const getAcademyLecture = async (id: number, options?: RequestInit): Promise<AcademyLectureDetail> => {
+
+  return customFetch<AcademyLectureDetail>(getGetAcademyLectureUrl(id),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getGetAcademyLectureQueryKey = (id: number,) => {
+    return [
+    `/api/academy/lectures/${id}`
+    ] as const;
+    }
+
+
+export const getGetAcademyLectureQueryOptions = <TData = Awaited<ReturnType<typeof getAcademyLecture>>, TError = ErrorType<ErrorResponse>>(id: number, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getAcademyLecture>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetAcademyLectureQueryKey(id);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getAcademyLecture>>> = ({ signal }) => getAcademyLecture(id, { signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, enabled: !!(id), ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getAcademyLecture>>, TError, TData> & { queryKey: QueryKey }
+}
+
+export type GetAcademyLectureQueryResult = NonNullable<Awaited<ReturnType<typeof getAcademyLecture>>>
+export type GetAcademyLectureQueryError = ErrorType<ErrorResponse>
+
+
+/**
+ * @summary Get an academy lecture if visible to the current user
+ */
+
+export function useGetAcademyLecture<TData = Awaited<ReturnType<typeof getAcademyLecture>>, TError = ErrorType<ErrorResponse>>(
+ id: number, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getAcademyLecture>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+
+ ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+
+  const queryOptions = getGetAcademyLectureQueryOptions(id,options)
+
+  const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
+
+  return { ...query, queryKey: queryOptions.queryKey };
+}
+
+
+
+
+
+
+
+export const getGetAcademyFileUrl = (fileId: number,) => {
+
+
+
+
+  return `/api/academy/files/${fileId}`
+}
+
+/**
+ * @summary Download a lecture PDF if the lecture is visible to the current user
+ */
+export const getAcademyFile = async (fileId: number, options?: RequestInit): Promise<AcademyFileDownload> => {
+
+  return customFetch<AcademyFileDownload>(getGetAcademyFileUrl(fileId),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getGetAcademyFileQueryKey = (fileId: number,) => {
+    return [
+    `/api/academy/files/${fileId}`
+    ] as const;
+    }
+
+
+export const getGetAcademyFileQueryOptions = <TData = Awaited<ReturnType<typeof getAcademyFile>>, TError = ErrorType<ErrorResponse>>(fileId: number, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getAcademyFile>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetAcademyFileQueryKey(fileId);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getAcademyFile>>> = ({ signal }) => getAcademyFile(fileId, { signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, enabled: !!(fileId), ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getAcademyFile>>, TError, TData> & { queryKey: QueryKey }
+}
+
+export type GetAcademyFileQueryResult = NonNullable<Awaited<ReturnType<typeof getAcademyFile>>>
+export type GetAcademyFileQueryError = ErrorType<ErrorResponse>
+
+
+/**
+ * @summary Download a lecture PDF if the lecture is visible to the current user
+ */
+
+export function useGetAcademyFile<TData = Awaited<ReturnType<typeof getAcademyFile>>, TError = ErrorType<ErrorResponse>>(
+ fileId: number, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getAcademyFile>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+
+ ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+
+  const queryOptions = getGetAcademyFileQueryOptions(fileId,options)
+
+  const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
+
+  return { ...query, queryKey: queryOptions.queryKey };
+}
+
+
+
+
+
+
+
+export const getGetAdminAcademyLecturesUrl = (params?: GetAdminAcademyLecturesParams,) => {
+  const normalizedParams = new URLSearchParams();
+
+  Object.entries(params || {}).forEach(([key, value]) => {
+
+    if (value !== undefined) {
+      normalizedParams.append(key, value === null ? 'null' : value.toString())
+    }
+  });
+
+  const stringifiedParams = normalizedParams.toString();
+
+  return stringifiedParams.length > 0 ? `/api/admin/academy/lectures?${stringifiedParams}` : `/api/admin/academy/lectures`
+}
+
+/**
+ * @summary List all academy lectures (MODERATOR/ADMIN/SUPER_ADMIN)
+ */
+export const getAdminAcademyLectures = async (params?: GetAdminAcademyLecturesParams, options?: RequestInit): Promise<AcademyLecturesResponse> => {
+
+  return customFetch<AcademyLecturesResponse>(getGetAdminAcademyLecturesUrl(params),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getGetAdminAcademyLecturesQueryKey = (params?: GetAdminAcademyLecturesParams,) => {
+    return [
+    `/api/admin/academy/lectures`, ...(params ? [params] : [])
+    ] as const;
+    }
+
+
+export const getGetAdminAcademyLecturesQueryOptions = <TData = Awaited<ReturnType<typeof getAdminAcademyLectures>>, TError = ErrorType<ErrorResponse>>(params?: GetAdminAcademyLecturesParams, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getAdminAcademyLectures>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetAdminAcademyLecturesQueryKey(params);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getAdminAcademyLectures>>> = ({ signal }) => getAdminAcademyLectures(params, { signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getAdminAcademyLectures>>, TError, TData> & { queryKey: QueryKey }
+}
+
+export type GetAdminAcademyLecturesQueryResult = NonNullable<Awaited<ReturnType<typeof getAdminAcademyLectures>>>
+export type GetAdminAcademyLecturesQueryError = ErrorType<ErrorResponse>
+
+
+/**
+ * @summary List all academy lectures (MODERATOR/ADMIN/SUPER_ADMIN)
+ */
+
+export function useGetAdminAcademyLectures<TData = Awaited<ReturnType<typeof getAdminAcademyLectures>>, TError = ErrorType<ErrorResponse>>(
+ params?: GetAdminAcademyLecturesParams, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getAdminAcademyLectures>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+
+ ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+
+  const queryOptions = getGetAdminAcademyLecturesQueryOptions(params,options)
+
+  const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
+
+  return { ...query, queryKey: queryOptions.queryKey };
+}
+
+
+
+
+
+
+
+export const getCreateAdminAcademyLectureUrl = () => {
+
+
+
+
+  return `/api/admin/academy/lectures`
+}
+
+/**
+ * @summary Create an academy lecture (MODERATOR/ADMIN/SUPER_ADMIN)
+ */
+export const createAdminAcademyLecture = async (createAcademyLectureInput: CreateAcademyLectureInput, options?: RequestInit): Promise<AcademyLectureDetail> => {
+
+  return customFetch<AcademyLectureDetail>(getCreateAdminAcademyLectureUrl(),
+  {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(
+      createAcademyLectureInput,)
+  }
+);}
+
+
+
+
+export const getCreateAdminAcademyLectureMutationOptions = <TError = ErrorType<ErrorResponse>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof createAdminAcademyLecture>>, TError,{data: BodyType<CreateAcademyLectureInput>}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof createAdminAcademyLecture>>, TError,{data: BodyType<CreateAcademyLectureInput>}, TContext> => {
+
+const mutationKey = ['createAdminAcademyLecture'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof createAdminAcademyLecture>>, {data: BodyType<CreateAcademyLectureInput>}> = (props) => {
+          const {data} = props ?? {};
+
+          return  createAdminAcademyLecture(data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type CreateAdminAcademyLectureMutationResult = NonNullable<Awaited<ReturnType<typeof createAdminAcademyLecture>>>
+    export type CreateAdminAcademyLectureMutationBody = BodyType<CreateAcademyLectureInput>
+    export type CreateAdminAcademyLectureMutationError = ErrorType<ErrorResponse>
+
+    /**
+ * @summary Create an academy lecture (MODERATOR/ADMIN/SUPER_ADMIN)
+ */
+export const useCreateAdminAcademyLecture = <TError = ErrorType<ErrorResponse>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof createAdminAcademyLecture>>, TError,{data: BodyType<CreateAcademyLectureInput>}, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof createAdminAcademyLecture>>,
+        TError,
+        {data: BodyType<CreateAcademyLectureInput>},
+        TContext
+      > => {
+      return useMutation(getCreateAdminAcademyLectureMutationOptions(options));
+    }
+
+export const getGetAdminAcademyFileUrl = (fileId: number,) => {
+
+
+
+
+  return `/api/admin/academy/files/${fileId}`
+}
+
+/**
+ * @summary Download a lecture PDF (MODERATOR/ADMIN/SUPER_ADMIN)
+ */
+export const getAdminAcademyFile = async (fileId: number, options?: RequestInit): Promise<AcademyFileDownload> => {
+
+  return customFetch<AcademyFileDownload>(getGetAdminAcademyFileUrl(fileId),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getGetAdminAcademyFileQueryKey = (fileId: number,) => {
+    return [
+    `/api/admin/academy/files/${fileId}`
+    ] as const;
+    }
+
+
+export const getGetAdminAcademyFileQueryOptions = <TData = Awaited<ReturnType<typeof getAdminAcademyFile>>, TError = ErrorType<ErrorResponse>>(fileId: number, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getAdminAcademyFile>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetAdminAcademyFileQueryKey(fileId);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getAdminAcademyFile>>> = ({ signal }) => getAdminAcademyFile(fileId, { signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, enabled: !!(fileId), ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getAdminAcademyFile>>, TError, TData> & { queryKey: QueryKey }
+}
+
+export type GetAdminAcademyFileQueryResult = NonNullable<Awaited<ReturnType<typeof getAdminAcademyFile>>>
+export type GetAdminAcademyFileQueryError = ErrorType<ErrorResponse>
+
+
+/**
+ * @summary Download a lecture PDF (MODERATOR/ADMIN/SUPER_ADMIN)
+ */
+
+export function useGetAdminAcademyFile<TData = Awaited<ReturnType<typeof getAdminAcademyFile>>, TError = ErrorType<ErrorResponse>>(
+ fileId: number, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getAdminAcademyFile>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+
+ ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+
+  const queryOptions = getGetAdminAcademyFileQueryOptions(fileId,options)
+
+  const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
+
+  return { ...query, queryKey: queryOptions.queryKey };
+}
+
+
+
+
+
+
+
+export const getUpdateAdminAcademyLectureUrl = (id: number,) => {
+
+
+
+
+  return `/api/admin/academy/lectures/${id}`
+}
+
+/**
+ * @summary Update an academy lecture (MODERATOR/ADMIN/SUPER_ADMIN)
+ */
+export const updateAdminAcademyLecture = async (id: number,
+    updateAcademyLectureInput: UpdateAcademyLectureInput, options?: RequestInit): Promise<AcademyLectureDetail> => {
+
+  return customFetch<AcademyLectureDetail>(getUpdateAdminAcademyLectureUrl(id),
+  {
+    ...options,
+    method: 'PATCH',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(
+      updateAcademyLectureInput,)
+  }
+);}
+
+
+
+
+export const getUpdateAdminAcademyLectureMutationOptions = <TError = ErrorType<ErrorResponse>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof updateAdminAcademyLecture>>, TError,{id: number;data: BodyType<UpdateAcademyLectureInput>}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof updateAdminAcademyLecture>>, TError,{id: number;data: BodyType<UpdateAcademyLectureInput>}, TContext> => {
+
+const mutationKey = ['updateAdminAcademyLecture'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof updateAdminAcademyLecture>>, {id: number;data: BodyType<UpdateAcademyLectureInput>}> = (props) => {
+          const {id,data} = props ?? {};
+
+          return  updateAdminAcademyLecture(id,data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type UpdateAdminAcademyLectureMutationResult = NonNullable<Awaited<ReturnType<typeof updateAdminAcademyLecture>>>
+    export type UpdateAdminAcademyLectureMutationBody = BodyType<UpdateAcademyLectureInput>
+    export type UpdateAdminAcademyLectureMutationError = ErrorType<ErrorResponse>
+
+    /**
+ * @summary Update an academy lecture (MODERATOR/ADMIN/SUPER_ADMIN)
+ */
+export const useUpdateAdminAcademyLecture = <TError = ErrorType<ErrorResponse>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof updateAdminAcademyLecture>>, TError,{id: number;data: BodyType<UpdateAcademyLectureInput>}, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof updateAdminAcademyLecture>>,
+        TError,
+        {id: number;data: BodyType<UpdateAcademyLectureInput>},
+        TContext
+      > => {
+      return useMutation(getUpdateAdminAcademyLectureMutationOptions(options));
+    }
+
+export const getDeleteAdminAcademyLectureUrl = (id: number,) => {
+
+
+
+
+  return `/api/admin/academy/lectures/${id}`
+}
+
+/**
+ * @summary Soft-delete (archive) an academy lecture (MODERATOR/ADMIN/SUPER_ADMIN)
+ */
+export const deleteAdminAcademyLecture = async (id: number, options?: RequestInit): Promise<MessageResponse> => {
+
+  return customFetch<MessageResponse>(getDeleteAdminAcademyLectureUrl(id),
+  {
+    ...options,
+    method: 'DELETE'
+
+
+  }
+);}
+
+
+
+
+export const getDeleteAdminAcademyLectureMutationOptions = <TError = ErrorType<ErrorResponse>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof deleteAdminAcademyLecture>>, TError,{id: number}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof deleteAdminAcademyLecture>>, TError,{id: number}, TContext> => {
+
+const mutationKey = ['deleteAdminAcademyLecture'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof deleteAdminAcademyLecture>>, {id: number}> = (props) => {
+          const {id} = props ?? {};
+
+          return  deleteAdminAcademyLecture(id,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type DeleteAdminAcademyLectureMutationResult = NonNullable<Awaited<ReturnType<typeof deleteAdminAcademyLecture>>>
+
+    export type DeleteAdminAcademyLectureMutationError = ErrorType<ErrorResponse>
+
+    /**
+ * @summary Soft-delete (archive) an academy lecture (MODERATOR/ADMIN/SUPER_ADMIN)
+ */
+export const useDeleteAdminAcademyLecture = <TError = ErrorType<ErrorResponse>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof deleteAdminAcademyLecture>>, TError,{id: number}, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof deleteAdminAcademyLecture>>,
+        TError,
+        {id: number},
+        TContext
+      > => {
+      return useMutation(getDeleteAdminAcademyLectureMutationOptions(options));
     }
 

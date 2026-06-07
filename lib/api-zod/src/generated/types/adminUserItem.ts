@@ -5,6 +5,7 @@
  * SGMA APP2 API specification
  * OpenAPI spec version: 0.1.0
  */
+import type { AdminUserItemAccessScope } from './adminUserItemAccessScope';
 import type { AdminUserItemRole } from './adminUserItemRole';
 import type { AdminUserItemStatus } from './adminUserItemStatus';
 
@@ -20,5 +21,8 @@ export interface AdminUserItem {
   professionGroup?: string | null;
   /** @nullable */
   membershipNumber?: string | null;
+  accessScope?: AdminUserItemAccessScope;
+  /** @nullable */
+  academySpecialty?: string | null;
   createdAt: Date;
 }

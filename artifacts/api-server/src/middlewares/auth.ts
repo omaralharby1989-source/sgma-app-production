@@ -16,6 +16,17 @@ export interface JwtPayload {
   account: string;
   role: string;
   status: string;
+  accessScope: string;
+}
+
+// Blocks SYRIA_ACADEMY_ONLY users from full-app-only features.
+// Academy + read-only news/articles routes do NOT use this guard.
+export function requireFullApp(req: Request, res: Response, next: NextFunction): void {
+  if (req.user?.accessScope === "SYRIA_ACADEMY_ONLY") {
+    res.status(403).json({ error: "هذه الميزة غير متاحة لحسابك" });
+    return;
+  }
+  next();
 }
 
 declare global {

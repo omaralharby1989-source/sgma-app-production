@@ -35,8 +35,13 @@ import BoardCurrent from "./pages/board-current";
 import BoardPrevious from "./pages/board-previous";
 import BoardHistory from "./pages/board-history";
 import Unauthorized from "./pages/unauthorized";
+import Academy from "./pages/academy";
+import AcademyAnnouncements from "./pages/academy-announcements";
+import AcademyLectures from "./pages/academy-lectures";
+import AcademyLectureDetail from "./pages/academy-lecture-detail";
+import AdminAcademy from "./pages/admin/academy";
 import { ProtectedLayout } from "./components/layout/ProtectedLayout";
-import { getStoredUser, isStaffRole } from "./lib/auth";
+import { getStoredUser, isStaffRole, isSyriaUser } from "./lib/auth";
 import AdminDashboard from "./pages/admin/dashboard";
 import AdminUsers from "./pages/admin/users";
 import AdminArticles from "./pages/admin/articles";
@@ -52,10 +57,12 @@ function ProtectedRoute({
   component: Component,
   staffOnly = false,
   allowedRoles,
+  fullAppOnly = false,
 }: {
   component: React.ComponentType;
   staffOnly?: boolean;
   allowedRoles?: string[];
+  fullAppOnly?: boolean;
 }) {
   const [isChecking, setIsChecking] = useState(true);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -63,9 +70,12 @@ function ProtectedRoute({
 
   useEffect(() => {
     const token = localStorage.getItem("sgma_auth_token");
-    const role = getStoredUser()?.role;
+    const user = getStoredUser();
+    const role = user?.role;
     if (!token) {
       setLocation("/login");
+    } else if (fullAppOnly && isSyriaUser(user)) {
+      setLocation("/unauthorized");
     } else if (staffOnly && !isStaffRole(role)) {
       setLocation("/unauthorized");
     } else if (allowedRoles && !(role && allowedRoles.includes(role))) {
@@ -74,7 +84,7 @@ function ProtectedRoute({
       setIsAuthenticated(true);
     }
     setIsChecking(false);
-  }, [setLocation, staffOnly, allowedRoles]);
+  }, [setLocation, staffOnly, allowedRoles, fullAppOnly]);
 
   if (isChecking) {
     return (
@@ -97,7 +107,11 @@ function RootRedirect() {
   const [, setLocation] = useLocation();
   useEffect(() => {
     const token = localStorage.getItem("sgma_auth_token");
-    setLocation(token ? "/home" : "/login");
+    if (!token) {
+      setLocation("/login");
+    } else {
+      setLocation(isSyriaUser(getStoredUser()) ? "/academy" : "/home");
+    }
   }, [setLocation]);
   return null;
 }
@@ -127,13 +141,13 @@ function Router() {
         <ProtectedRoute component={More} />
       </Route>
       <Route path="/chat">
-        <ProtectedRoute component={Chat} />
+        <ProtectedRoute component={Chat} fullAppOnly />
       </Route>
       <Route path="/chat/public">
-        <ProtectedRoute component={ChatPublic} />
+        <ProtectedRoute component={ChatPublic} fullAppOnly />
       </Route>
       <Route path="/chat/admin">
-        <ProtectedRoute component={ChatAdmin} />
+        <ProtectedRoute component={ChatAdmin} fullAppOnly />
       </Route>
       <Route path="/news">
         <ProtectedRoute component={News} />
@@ -145,37 +159,53 @@ function Router() {
         <ProtectedRoute component={Articles} />
       </Route>
       <Route path="/articles/new">
-        <ProtectedRoute component={ArticleNew} />
+        <ProtectedRoute component={ArticleNew} fullAppOnly />
       </Route>
       <Route path="/articles/my">
-        <ProtectedRoute component={ArticleMy} />
+        <ProtectedRoute component={ArticleMy} fullAppOnly />
       </Route>
       <Route path="/articles/:id/edit">
-        <ProtectedRoute component={ArticleEdit} />
+        <ProtectedRoute component={ArticleEdit} fullAppOnly />
       </Route>
       <Route path="/articles/:id">
         <ProtectedRoute component={ArticleDetail} />
       </Route>
       <Route path="/volunteer-delegations">
-        <ProtectedRoute component={VolunteerDelegations} />
+        <ProtectedRoute component={VolunteerDelegations} fullAppOnly />
       </Route>
       <Route path="/tasks">
-        <ProtectedRoute component={Tasks} />
+        <ProtectedRoute component={Tasks} fullAppOnly />
       </Route>
       <Route path="/tasks/:id">
-        <ProtectedRoute component={TaskDetail} />
+        <ProtectedRoute component={TaskDetail} fullAppOnly />
       </Route>
       <Route path="/board">
-        <ProtectedRoute component={Board} />
+        <ProtectedRoute component={Board} fullAppOnly />
       </Route>
       <Route path="/board/current">
-        <ProtectedRoute component={BoardCurrent} />
+        <ProtectedRoute component={BoardCurrent} fullAppOnly />
       </Route>
       <Route path="/board/previous">
-        <ProtectedRoute component={BoardPrevious} />
+        <ProtectedRoute component={BoardPrevious} fullAppOnly />
       </Route>
       <Route path="/board/history">
-        <ProtectedRoute component={BoardHistory} />
+        <ProtectedRoute component={BoardHistory} fullAppOnly />
+      </Route>
+
+      <Route path="/academy">
+        <ProtectedRoute component={Academy} />
+      </Route>
+      <Route path="/academy/announcements">
+        <ProtectedRoute component={AcademyAnnouncements} />
+      </Route>
+      <Route path="/academy/lectures">
+        <ProtectedRoute component={AcademyLectures} />
+      </Route>
+      <Route path="/academy/lectures/:id">
+        <ProtectedRoute component={AcademyLectureDetail} />
+      </Route>
+      <Route path="/admin/academy">
+        <ProtectedRoute component={AdminAcademy} staffOnly fullAppOnly />
       </Route>
 
       <Route path="/broadcast">

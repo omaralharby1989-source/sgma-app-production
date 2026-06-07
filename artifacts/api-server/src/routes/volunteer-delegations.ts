@@ -6,7 +6,7 @@ import {
 } from "@workspace/db";
 import { eq, sql } from "drizzle-orm";
 import { CreateVolunteerDelegationBody } from "@workspace/api-zod";
-import { requireAuth } from "../middlewares/auth";
+import { requireAuth, requireFullApp } from "../middlewares/auth";
 import { validatePdfFile, MAX_PDF_FILES, type ParsedPdfFile } from "../lib/pdfValidation";
 
 const router = Router();
@@ -54,7 +54,7 @@ function formatRequest(row: RequestRow, files: FileRow[]) {
 }
 
 // POST /volunteer-delegations — authenticated ACTIVE user submits a request
-router.post("/volunteer-delegations", requireAuth, async (req, res): Promise<void> => {
+router.post("/volunteer-delegations", requireAuth, requireFullApp, async (req, res): Promise<void> => {
   if (req.user!.status !== "ACTIVE") {
     res.status(403).json({ error: "حسابك غير مُفعّل، لا يمكنك إرسال الطلب" });
     return;
@@ -178,7 +178,7 @@ router.post("/volunteer-delegations", requireAuth, async (req, res): Promise<voi
 });
 
 // GET /volunteer-delegations/my — the current user's own requests (metadata only)
-router.get("/volunteer-delegations/my", requireAuth, async (req, res): Promise<void> => {
+router.get("/volunteer-delegations/my", requireAuth, requireFullApp, async (req, res): Promise<void> => {
   try {
     const rows = await db
       .select()
@@ -217,6 +217,7 @@ router.get("/volunteer-delegations/my", requireAuth, async (req, res): Promise<v
 router.get(
   "/volunteer-delegations/files/:fileId",
   requireAuth,
+  requireFullApp,
   async (req, res): Promise<void> => {
     const fileId = Number(req.params.fileId);
     if (!Number.isInteger(fileId)) {

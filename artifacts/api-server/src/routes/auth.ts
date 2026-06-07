@@ -4,6 +4,7 @@ import { db, usersTable } from "@workspace/db";
 import { eq, or } from "drizzle-orm";
 import { SignupBody, LoginBody } from "@workspace/api-zod";
 import { signToken } from "../middlewares/auth";
+import { parseSpecialties, specialtyFromProfessionGroup } from "../lib/academy";
 
 const router = Router();
 
@@ -26,6 +27,9 @@ function formatUser(user: typeof usersTable.$inferSelect) {
     bio: user.bio ?? null,
     avatarUrl: user.avatarUrl ?? null,
     membershipNumber: user.membershipNumber ?? null,
+    accessScope: user.accessScope ?? "FULL_APP",
+    academySpecialty: user.academySpecialty ?? null,
+    academyAllowedSpecialties: parseSpecialties(user.academyAllowedSpecialties),
     createdAt: user.createdAt.toISOString(),
     updatedAt: user.updatedAt?.toISOString() ?? null,
   };
@@ -46,6 +50,23 @@ router.post("/auth/signup", async (req, res): Promise<void> => {
     return;
   }
 
+  // Classify membership number: numeric → FULL_APP applicant (existing flow);
+  // exactly "SY" → Syria-academy applicant (number generated on activation);
+  // anything else → rejected.
+  const isNumeric = /^\d+$/.test(trimmedMembership);
+  const isSyRequest = /^sy$/i.test(trimmedMembership);
+  if (!isNumeric && !isSyRequest) {
+    res.status(400).json({
+      error: "رقم العضوية غير صحيح. أدخل رقم عضويتك الرقمي أو SY لأكاديمية سوريا.",
+    });
+    return;
+  }
+
+  const accessScope = isSyRequest ? "SYRIA_ACADEMY_ONLY" : "FULL_APP";
+  const academySpecialty = isSyRequest ? specialtyFromProfessionGroup(professionGroup) : null;
+  // SY applicants get NO membership number yet (generated as SY1/SY2… on activation).
+  const storedMembership = isSyRequest ? null : trimmedMembership;
+
   try {
     const existing = await db
       .select()
@@ -58,15 +79,17 @@ router.post("/auth/signup", async (req, res): Promise<void> => {
       return;
     }
 
-    const [membershipConflict] = await db
-      .select()
-      .from(usersTable)
-      .where(eq(usersTable.membershipNumber, trimmedMembership))
-      .limit(1);
+    if (storedMembership) {
+      const [membershipConflict] = await db
+        .select()
+        .from(usersTable)
+        .where(eq(usersTable.membershipNumber, storedMembership))
+        .limit(1);
 
-    if (membershipConflict) {
-      res.status(409).json({ error: "رقم العضوية مستخدم بالفعل" });
-      return;
+      if (membershipConflict) {
+        res.status(409).json({ error: "رقم العضوية مستخدم بالفعل" });
+        return;
+      }
     }
 
     const passwordHash = await bcrypt.hash(password, 10);
@@ -88,7 +111,9 @@ router.post("/auth/signup", async (req, res): Promise<void> => {
         address,
         professionGroup,
         specialtyText,
-        membershipNumber: trimmedMembership,
+        membershipNumber: storedMembership,
+        accessScope,
+        academySpecialty,
       })
       .returning();
 
@@ -159,6 +184,7 @@ router.post("/auth/login", async (req, res): Promise<void> => {
       account: user.account,
       role: user.role,
       status: user.status,
+      accessScope: user.accessScope ?? "FULL_APP",
     });
 
     res.json({ token, user: formatUser(user) });

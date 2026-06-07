@@ -9,6 +9,7 @@ import {
   canChangeRole,
   type Role,
 } from "../../lib/permissions";
+import { parseSpecialties, serializeSpecialties } from "../../lib/academy";
 
 const router = Router();
 
@@ -29,6 +30,8 @@ function formatUserItem(row: UserRow) {
     isActive: row.isActive,
     professionGroup: row.professionGroup,
     membershipNumber: row.membershipNumber ?? null,
+    accessScope: row.accessScope ?? "FULL_APP",
+    academySpecialty: row.academySpecialty ?? null,
     createdAt: row.createdAt.toISOString(),
   };
 }
@@ -52,9 +55,29 @@ function formatUserDetail(row: UserRow) {
     bio: row.bio,
     avatarUrl: row.avatarUrl,
     membershipNumber: row.membershipNumber ?? null,
+    accessScope: row.accessScope ?? "FULL_APP",
+    academySpecialty: row.academySpecialty ?? null,
+    academyAllowedSpecialties: parseSpecialties(row.academyAllowedSpecialties),
     createdAt: row.createdAt.toISOString(),
     updatedAt: row.updatedAt.toISOString(),
   };
+}
+
+const VALID_ACCESS_SCOPES = ["FULL_APP", "SYRIA_ACADEMY_ONLY"];
+
+// Generates the next SY membership number (SY1, SY2, …) by scanning existing
+// SY-prefixed numbers and taking max+1.
+async function generateNextSyNumber(): Promise<string> {
+  const rows = await db
+    .select({ m: usersTable.membershipNumber })
+    .from(usersTable)
+    .where(ilike(usersTable.membershipNumber, "SY%"));
+  let max = 0;
+  for (const r of rows) {
+    const match = /^SY(\d+)$/i.exec(r.m ?? "");
+    if (match) max = Math.max(max, parseInt(match[1], 10));
+  }
+  return `SY${max + 1}`;
 }
 
 async function countUsersWhere(where: ReturnType<typeof eq>): Promise<number> {
@@ -218,6 +241,20 @@ router.patch("/admin/users/:id", requireAuth, async (req, res): Promise<void> =>
       updates.membershipNumber = trimmed;
     }
 
+    if (d.accessScope !== undefined) {
+      if (!VALID_ACCESS_SCOPES.includes(d.accessScope)) {
+        res.status(400).json({ error: "نطاق الوصول غير صالح" });
+        return;
+      }
+      updates.accessScope = d.accessScope;
+    }
+    if (d.academySpecialty !== undefined) {
+      updates.academySpecialty = d.academySpecialty?.trim() || null;
+    }
+    if (d.academyAllowedSpecialties !== undefined) {
+      updates.academyAllowedSpecialties = serializeSpecialties(d.academyAllowedSpecialties);
+    }
+
     // Role change
     if (d.role !== undefined && d.role !== target.role) {
       if (target.id === actorId) {
@@ -264,6 +301,23 @@ router.patch("/admin/users/:id", requireAuth, async (req, res): Promise<void> =>
       }
       if (wantsStatus) updates.status = d.status!;
       if (wantsActive) updates.isActive = d.isActive!;
+    }
+
+    // Auto-generate an SY membership number when activating a Syria-academy
+    // applicant that doesn't have a number yet (and admin didn't set one).
+    const finalAccessScope = updates.accessScope ?? target.accessScope ?? "FULL_APP";
+    const finalStatus = updates.status ?? target.status;
+    const finalIsActive = updates.isActive ?? target.isActive;
+    const becomingActive = finalStatus === "ACTIVE" && finalIsActive === true;
+    const currentMembership = updates.membershipNumber ?? target.membershipNumber;
+    const hasNumericMembership = !!currentMembership && /^\d+$/.test(currentMembership);
+    if (
+      finalAccessScope === "SYRIA_ACADEMY_ONLY" &&
+      becomingActive &&
+      !currentMembership &&
+      !hasNumericMembership
+    ) {
+      updates.membershipNumber = await generateNextSyNumber();
     }
 
     if (Object.keys(updates).length === 0) {

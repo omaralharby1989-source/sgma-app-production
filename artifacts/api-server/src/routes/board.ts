@@ -2,7 +2,7 @@ import { Router } from "express";
 import { db, boardMembersTable } from "@workspace/db";
 import { eq, and, sql } from "drizzle-orm";
 import { CreateBoardMemberBody, UpdateBoardMemberBody } from "@workspace/api-zod";
-import { requireAuth } from "../middlewares/auth";
+import { requireAuth, requireFullApp } from "../middlewares/auth";
 import { isAdminOrSuper } from "../lib/permissions";
 
 const router = Router();
@@ -112,7 +112,7 @@ async function ensureSeeded(): Promise<void> {
 }
 
 // GET /board/members?boardType=CURRENT — any authenticated user; active only
-router.get("/board/members", requireAuth, async (req, res): Promise<void> => {
+router.get("/board/members", requireAuth, requireFullApp, async (req, res): Promise<void> => {
   const raw = typeof req.query.boardType === "string" ? req.query.boardType : "CURRENT";
   const boardType: BoardType = isBoardType(raw) ? raw : "CURRENT";
 
@@ -139,7 +139,7 @@ router.get("/board/members", requireAuth, async (req, res): Promise<void> => {
 });
 
 // GET /board/members/:id — any authenticated user; active only
-router.get("/board/members/:id", requireAuth, async (req, res): Promise<void> => {
+router.get("/board/members/:id", requireAuth, requireFullApp, async (req, res): Promise<void> => {
   const id = Number(req.params.id);
   if (!Number.isInteger(id)) {
     res.status(400).json({ error: "معرّف العضو غير صالح" });
@@ -163,7 +163,7 @@ router.get("/board/members/:id", requireAuth, async (req, res): Promise<void> =>
 });
 
 // POST /board/members — ADMIN/SUPER_ADMIN only
-router.post("/board/members", requireAuth, async (req, res): Promise<void> => {
+router.post("/board/members", requireAuth, requireFullApp, async (req, res): Promise<void> => {
   if (!isAdminOrSuper(req.user!.role)) {
     res.status(403).json({ error: "ليس لديك صلاحية لإدارة مجلس الإدارة" });
     return;
@@ -223,7 +223,7 @@ router.post("/board/members", requireAuth, async (req, res): Promise<void> => {
 });
 
 // PATCH /board/members/:id — ADMIN/SUPER_ADMIN only
-router.patch("/board/members/:id", requireAuth, async (req, res): Promise<void> => {
+router.patch("/board/members/:id", requireAuth, requireFullApp, async (req, res): Promise<void> => {
   if (!isAdminOrSuper(req.user!.role)) {
     res.status(403).json({ error: "ليس لديك صلاحية لإدارة مجلس الإدارة" });
     return;
@@ -314,7 +314,7 @@ router.patch("/board/members/:id", requireAuth, async (req, res): Promise<void> 
 });
 
 // DELETE /board/members/:id — ADMIN/SUPER_ADMIN only; soft delete
-router.delete("/board/members/:id", requireAuth, async (req, res): Promise<void> => {
+router.delete("/board/members/:id", requireAuth, requireFullApp, async (req, res): Promise<void> => {
   if (!isAdminOrSuper(req.user!.role)) {
     res.status(403).json({ error: "ليس لديك صلاحية لإدارة مجلس الإدارة" });
     return;

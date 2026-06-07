@@ -1,18 +1,27 @@
 import { Link, useLocation } from "wouter";
-import { UserCircle, Menu, MessageSquare, Newspaper, LayoutDashboard } from "lucide-react";
-import { getStoredUser, isStaffRole } from "@/lib/auth";
+import { UserCircle, Menu, MessageSquare, Newspaper, LayoutDashboard, GraduationCap } from "lucide-react";
+import { getStoredUser, isStaffRole, isSyriaUser } from "@/lib/auth";
 
 export function MobileNav() {
   const [location] = useLocation();
-  const isStaff = isStaffRole(getStoredUser()?.role);
+  const user = getStoredUser();
+  const isStaff = isStaffRole(user?.role);
+  const syria = isSyriaUser(user);
 
-  const navItems = [
-    { href: "/home", icon: UserCircle, label: "حسابي" },
-    { href: "/chat", icon: MessageSquare, label: "المحادثات" },
-    { href: "/news", icon: Newspaper, label: "الأخبار" },
-    ...(isStaff ? [{ href: "/admin", icon: LayoutDashboard, label: "الإدارة" }] : []),
-    { href: "/more", icon: Menu, label: "المزيد" },
-  ];
+  const navItems = syria
+    ? [
+        { href: "/academy", icon: GraduationCap, label: "الأكاديمية" },
+        { href: "/news", icon: Newspaper, label: "الأخبار" },
+        { href: "/home", icon: UserCircle, label: "حسابي" },
+        { href: "/more", icon: Menu, label: "المزيد" },
+      ]
+    : [
+        { href: "/home", icon: UserCircle, label: "حسابي" },
+        { href: "/chat", icon: MessageSquare, label: "المحادثات" },
+        { href: "/news", icon: Newspaper, label: "الأخبار" },
+        ...(isStaff ? [{ href: "/admin", icon: LayoutDashboard, label: "الإدارة" }] : []),
+        { href: "/more", icon: Menu, label: "المزيد" },
+      ];
 
   return (
     <nav className="fixed bottom-0 left-0 right-0 border-t border-border bg-card pb-safe z-50">

@@ -361,6 +361,14 @@ export const MemberProfileStatus = {
   SUSPENDED: 'SUSPENDED',
 } as const;
 
+export type MemberProfileAccessScope = typeof MemberProfileAccessScope[keyof typeof MemberProfileAccessScope];
+
+
+export const MemberProfileAccessScope = {
+  FULL_APP: 'FULL_APP',
+  SYRIA_ACADEMY_ONLY: 'SYRIA_ACADEMY_ONLY',
+} as const;
+
 export interface MemberProfile {
   id: number;
   account: string;
@@ -388,6 +396,10 @@ export interface MemberProfile {
   avatarUrl?: string | null;
   /** @nullable */
   membershipNumber?: string | null;
+  accessScope?: MemberProfileAccessScope;
+  /** @nullable */
+  academySpecialty?: string | null;
+  academyAllowedSpecialties?: string[];
   createdAt: string;
   /** @nullable */
   updatedAt?: string | null;
@@ -986,6 +998,14 @@ export const AdminUserItemStatus = {
   SUSPENDED: 'SUSPENDED',
 } as const;
 
+export type AdminUserItemAccessScope = typeof AdminUserItemAccessScope[keyof typeof AdminUserItemAccessScope];
+
+
+export const AdminUserItemAccessScope = {
+  FULL_APP: 'FULL_APP',
+  SYRIA_ACADEMY_ONLY: 'SYRIA_ACADEMY_ONLY',
+} as const;
+
 export interface AdminUserItem {
   id: number;
   fullName: string;
@@ -998,6 +1018,9 @@ export interface AdminUserItem {
   professionGroup?: string | null;
   /** @nullable */
   membershipNumber?: string | null;
+  accessScope?: AdminUserItemAccessScope;
+  /** @nullable */
+  academySpecialty?: string | null;
   createdAt: string;
 }
 
@@ -1020,6 +1043,14 @@ export const AdminUserDetailStatus = {
   PENDING: 'PENDING',
   ACTIVE: 'ACTIVE',
   SUSPENDED: 'SUSPENDED',
+} as const;
+
+export type AdminUserDetailAccessScope = typeof AdminUserDetailAccessScope[keyof typeof AdminUserDetailAccessScope];
+
+
+export const AdminUserDetailAccessScope = {
+  FULL_APP: 'FULL_APP',
+  SYRIA_ACADEMY_ONLY: 'SYRIA_ACADEMY_ONLY',
 } as const;
 
 export interface AdminUserDetail {
@@ -1049,6 +1080,10 @@ export interface AdminUserDetail {
   avatarUrl?: string | null;
   /** @nullable */
   membershipNumber?: string | null;
+  accessScope?: AdminUserDetailAccessScope;
+  /** @nullable */
+  academySpecialty?: string | null;
+  academyAllowedSpecialties?: string[];
   createdAt: string;
   updatedAt: string;
 }
@@ -1070,6 +1105,14 @@ export const AdminUpdateUserInputStatus = {
   PENDING: 'PENDING',
   ACTIVE: 'ACTIVE',
   SUSPENDED: 'SUSPENDED',
+} as const;
+
+export type AdminUpdateUserInputAccessScope = typeof AdminUpdateUserInputAccessScope[keyof typeof AdminUpdateUserInputAccessScope];
+
+
+export const AdminUpdateUserInputAccessScope = {
+  FULL_APP: 'FULL_APP',
+  SYRIA_ACADEMY_ONLY: 'SYRIA_ACADEMY_ONLY',
 } as const;
 
 export interface AdminUpdateUserInput {
@@ -1097,6 +1140,10 @@ export interface AdminUpdateUserInput {
   role?: AdminUpdateUserInputRole;
   status?: AdminUpdateUserInputStatus;
   isActive?: boolean;
+  accessScope?: AdminUpdateUserInputAccessScope;
+  /** @nullable */
+  academySpecialty?: string | null;
+  academyAllowedSpecialties?: string[];
 }
 
 export type BroadcastListResponse = BroadcastItem[];
@@ -1264,6 +1311,154 @@ export interface ActiveAdsResponse {
   ads: ActiveAdCustom[];
 }
 
+export type AccessScope = typeof AccessScope[keyof typeof AccessScope];
+
+
+export const AccessScope = {
+  FULL_APP: 'FULL_APP',
+  SYRIA_ACADEMY_ONLY: 'SYRIA_ACADEMY_ONLY',
+} as const;
+
+export type AcademySpecialty = typeof AcademySpecialty[keyof typeof AcademySpecialty];
+
+
+export const AcademySpecialty = {
+  GENERAL: 'GENERAL',
+  NURSING: 'NURSING',
+  ANESTHESIA_ICU: 'ANESTHESIA_ICU',
+  EMERGENCY: 'EMERGENCY',
+  MEDICINE: 'MEDICINE',
+  SURGERY: 'SURGERY',
+  INTERNAL_MEDICINE: 'INTERNAL_MEDICINE',
+  PEDIATRICS: 'PEDIATRICS',
+  PHARMACY: 'PHARMACY',
+  DENTISTRY: 'DENTISTRY',
+  RADIOLOGY: 'RADIOLOGY',
+  LAB: 'LAB',
+  PHYSIOTHERAPY: 'PHYSIOTHERAPY',
+  MEDICAL_ENGINEERING: 'MEDICAL_ENGINEERING',
+  OTHER: 'OTHER',
+} as const;
+
+export type AcademyLectureStatus = typeof AcademyLectureStatus[keyof typeof AcademyLectureStatus];
+
+
+export const AcademyLectureStatus = {
+  DRAFT: 'DRAFT',
+  PUBLISHED: 'PUBLISHED',
+  HIDDEN: 'HIDDEN',
+  ARCHIVED: 'ARCHIVED',
+} as const;
+
+export interface AcademyFile {
+  id: number;
+  lectureId: number;
+  fileName: string;
+  mimeType: string;
+  fileSize: number;
+  /** @nullable */
+  createdAt?: string | null;
+}
+
+export interface AcademyFileDownload {
+  id: number;
+  fileName: string;
+  mimeType: string;
+  fileSize: number;
+  fileData: string;
+}
+
+export interface AcademyLecture {
+  id: number;
+  title: string;
+  description: string;
+  lecturerName: string;
+  /** @nullable */
+  lectureDate?: string | null;
+  /** @nullable */
+  lectureTime?: string | null;
+  isUpcoming: boolean;
+  /** @nullable */
+  liveMeetingUrl?: string | null;
+  /** @nullable */
+  recordingDriveUrl?: string | null;
+  /** @nullable */
+  recordingEmbedUrl?: string | null;
+  /** @nullable */
+  thumbnailUrl?: string | null;
+  allowedSpecialties: string[];
+  isGeneral: boolean;
+  status: AcademyLectureStatus;
+  /** @nullable */
+  createdById?: number | null;
+  /** @nullable */
+  updatedById?: number | null;
+  createdAt: string;
+  /** @nullable */
+  updatedAt?: string | null;
+}
+
+export type AcademyLectureDetail = AcademyLecture & {
+  attachments: AcademyFile[];
+};
+
+export type AcademyLecturesResponse = AcademyLecture[];
+
+export interface CreateAcademyFileInput {
+  fileName: string;
+  mimeType: string;
+  /** Base64 encoded PDF data URI */
+  fileData: string;
+}
+
+export interface CreateAcademyLectureInput {
+  /** @minLength 1 */
+  title: string;
+  /** @minLength 1 */
+  description: string;
+  /** @minLength 1 */
+  lecturerName: string;
+  /** @nullable */
+  lectureDate?: string | null;
+  /** @nullable */
+  lectureTime?: string | null;
+  isUpcoming?: boolean;
+  /** @nullable */
+  liveMeetingUrl?: string | null;
+  /** @nullable */
+  recordingDriveUrl?: string | null;
+  /** @nullable */
+  thumbnailUrl?: string | null;
+  allowedSpecialties?: string[];
+  isGeneral?: boolean;
+  status?: AcademyLectureStatus;
+  attachments?: CreateAcademyFileInput[];
+}
+
+export interface UpdateAcademyLectureInput {
+  /** @minLength 1 */
+  title?: string;
+  /** @minLength 1 */
+  description?: string;
+  /** @minLength 1 */
+  lecturerName?: string;
+  /** @nullable */
+  lectureDate?: string | null;
+  /** @nullable */
+  lectureTime?: string | null;
+  isUpcoming?: boolean;
+  /** @nullable */
+  liveMeetingUrl?: string | null;
+  /** @nullable */
+  recordingDriveUrl?: string | null;
+  /** @nullable */
+  thumbnailUrl?: string | null;
+  allowedSpecialties?: string[];
+  isGeneral?: boolean;
+  status?: AcademyLectureStatus;
+  attachments?: CreateAcademyFileInput[];
+}
+
 export type GetBoardMembersParams = {
 boardType?: BoardType;
 };
@@ -1328,5 +1523,15 @@ export const GetAdminNewsStatus = {
 
 export type GetActiveAdsParams = {
 placement?: string;
+};
+
+export type GetAcademyLecturesParams = {
+specialty?: string;
+upcoming?: boolean;
+};
+
+export type GetAdminAcademyLecturesParams = {
+status?: AcademyLectureStatus;
+specialty?: string;
 };
 

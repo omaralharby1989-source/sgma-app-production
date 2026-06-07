@@ -5,12 +5,20 @@ export type StoredUser = {
   role: string;
   email?: string;
   isDeveloper?: boolean;
+  accessScope?: string;
+  academySpecialty?: string | null;
+  membershipNumber?: string | null;
 };
 
 const DEVELOPER_EMAIL = "lordhygm@gmail.com";
 
 export function isDeveloperUser(user: StoredUser | null): boolean {
   return !!user && user.isDeveloper === true && user.email === DEVELOPER_EMAIL;
+}
+
+// A Syria-academy-only user: restricted to the academy + read-only news/articles.
+export function isSyriaUser(user: StoredUser | null): boolean {
+  return !!user && user.accessScope === "SYRIA_ACADEMY_ONLY";
 }
 
 const STAFF_ROLES = ["MODERATOR", "ADMIN", "SUPER_ADMIN"];

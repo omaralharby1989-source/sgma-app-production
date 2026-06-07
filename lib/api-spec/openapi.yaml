@@ -2688,6 +2688,339 @@ paths:
               schema:
                 $ref: "#/components/schemas/ErrorResponse"
 
+  /academy/lectures:
+    get:
+      operationId: getAcademyLectures
+      tags: [academy]
+      summary: List academy lectures visible to the current user
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: specialty
+          in: query
+          required: false
+          schema:
+            type: string
+        - name: upcoming
+          in: query
+          required: false
+          schema:
+            type: boolean
+      responses:
+        "200":
+          description: Visible lectures
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AcademyLecturesResponse"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /academy/announcements:
+    get:
+      operationId: getAcademyAnnouncements
+      tags: [academy]
+      summary: List published upcoming lecture announcements visible to the current user
+      security:
+        - BearerAuth: []
+      responses:
+        "200":
+          description: Visible announcements
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AcademyLecturesResponse"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /academy/lectures/{id}:
+    get:
+      operationId: getAcademyLecture
+      tags: [academy]
+      summary: Get an academy lecture if visible to the current user
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Lecture detail
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AcademyLectureDetail"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "403":
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "404":
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /academy/files/{fileId}:
+    get:
+      operationId: getAcademyFile
+      tags: [academy]
+      summary: Download a lecture PDF if the lecture is visible to the current user
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: fileId
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: File payload
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AcademyFileDownload"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "403":
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "404":
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /admin/academy/lectures:
+    get:
+      operationId: getAdminAcademyLectures
+      tags: [academy]
+      summary: List all academy lectures (MODERATOR/ADMIN/SUPER_ADMIN)
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: status
+          in: query
+          required: false
+          schema:
+            $ref: "#/components/schemas/AcademyLectureStatus"
+        - name: specialty
+          in: query
+          required: false
+          schema:
+            type: string
+      responses:
+        "200":
+          description: All lectures
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AcademyLecturesResponse"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "403":
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+    post:
+      operationId: createAdminAcademyLecture
+      tags: [academy]
+      summary: Create an academy lecture (MODERATOR/ADMIN/SUPER_ADMIN)
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateAcademyLectureInput"
+      responses:
+        "201":
+          description: Created lecture
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AcademyLectureDetail"
+        "400":
+          description: Invalid input
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "403":
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /admin/academy/files/{fileId}:
+    get:
+      operationId: getAdminAcademyFile
+      tags: [academy]
+      summary: Download a lecture PDF (MODERATOR/ADMIN/SUPER_ADMIN)
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: fileId
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: File payload
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AcademyFileDownload"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "403":
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "404":
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /admin/academy/lectures/{id}:
+    patch:
+      operationId: updateAdminAcademyLecture
+      tags: [academy]
+      summary: Update an academy lecture (MODERATOR/ADMIN/SUPER_ADMIN)
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateAcademyLectureInput"
+      responses:
+        "200":
+          description: Updated lecture
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AcademyLectureDetail"
+        "400":
+          description: Invalid input
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "403":
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "404":
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+    delete:
+      operationId: deleteAdminAcademyLecture
+      tags: [academy]
+      summary: Soft-delete (archive) an academy lecture (MODERATOR/ADMIN/SUPER_ADMIN)
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Archived
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MessageResponse"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "403":
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "404":
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
 components:
   securitySchemes:
     BearerAuth:
@@ -3176,6 +3509,15 @@ components:
           type: ["string", "null"]
         membershipNumber:
           type: ["string", "null"]
+        accessScope:
+          type: string
+          enum: [FULL_APP, SYRIA_ACADEMY_ONLY]
+        academySpecialty:
+          type: ["string", "null"]
+        academyAllowedSpecialties:
+          type: array
+          items:
+            type: string
         createdAt:
           type: string
           format: date-time
@@ -4082,6 +4424,11 @@ components:
           type: ["string", "null"]
         membershipNumber:
           type: ["string", "null"]
+        accessScope:
+          type: string
+          enum: [FULL_APP, SYRIA_ACADEMY_ONLY]
+        academySpecialty:
+          type: ["string", "null"]
         createdAt:
           type: string
           format: date-time
@@ -4131,6 +4478,15 @@ components:
           type: ["string", "null"]
         membershipNumber:
           type: ["string", "null"]
+        accessScope:
+          type: string
+          enum: [FULL_APP, SYRIA_ACADEMY_ONLY]
+        academySpecialty:
+          type: ["string", "null"]
+        academyAllowedSpecialties:
+          type: array
+          items:
+            type: string
         createdAt:
           type: string
           format: date-time
@@ -4173,6 +4529,15 @@ components:
           enum: [PENDING, ACTIVE, SUSPENDED]
         isActive:
           type: boolean
+        accessScope:
+          type: string
+          enum: [FULL_APP, SYRIA_ACADEMY_ONLY]
+        academySpecialty:
+          type: ["string", "null"]
+        academyAllowedSpecialties:
+          type: array
+          items:
+            type: string
 
     BroadcastListResponse:
       type: array
@@ -4426,3 +4791,211 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/ActiveAdCustom"
+
+    AccessScope:
+      type: string
+      enum: [FULL_APP, SYRIA_ACADEMY_ONLY]
+
+    AcademySpecialty:
+      type: string
+      enum:
+        - GENERAL
+        - NURSING
+        - ANESTHESIA_ICU
+        - EMERGENCY
+        - MEDICINE
+        - SURGERY
+        - INTERNAL_MEDICINE
+        - PEDIATRICS
+        - PHARMACY
+        - DENTISTRY
+        - RADIOLOGY
+        - LAB
+        - PHYSIOTHERAPY
+        - MEDICAL_ENGINEERING
+        - OTHER
+
+    AcademyLectureStatus:
+      type: string
+      enum: [DRAFT, PUBLISHED, HIDDEN, ARCHIVED]
+
+    AcademyFile:
+      type: object
+      required: [id, lectureId, fileName, mimeType, fileSize]
+      properties:
+        id:
+          type: integer
+        lectureId:
+          type: integer
+        fileName:
+          type: string
+        mimeType:
+          type: string
+        fileSize:
+          type: integer
+        createdAt:
+          type: ["string", "null"]
+          format: date-time
+
+    AcademyFileDownload:
+      type: object
+      required: [id, fileName, mimeType, fileSize, fileData]
+      properties:
+        id:
+          type: integer
+        fileName:
+          type: string
+        mimeType:
+          type: string
+        fileSize:
+          type: integer
+        fileData:
+          type: string
+
+    AcademyLecture:
+      type: object
+      required: [id, title, description, lecturerName, isUpcoming, isGeneral, status, allowedSpecialties, createdAt]
+      properties:
+        id:
+          type: integer
+        title:
+          type: string
+        description:
+          type: string
+        lecturerName:
+          type: string
+        lectureDate:
+          type: ["string", "null"]
+        lectureTime:
+          type: ["string", "null"]
+        isUpcoming:
+          type: boolean
+        liveMeetingUrl:
+          type: ["string", "null"]
+        recordingDriveUrl:
+          type: ["string", "null"]
+        recordingEmbedUrl:
+          type: ["string", "null"]
+        thumbnailUrl:
+          type: ["string", "null"]
+        allowedSpecialties:
+          type: array
+          items:
+            type: string
+        isGeneral:
+          type: boolean
+        status:
+          $ref: "#/components/schemas/AcademyLectureStatus"
+        createdById:
+          type: ["integer", "null"]
+        updatedById:
+          type: ["integer", "null"]
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: ["string", "null"]
+          format: date-time
+
+    AcademyLectureDetail:
+      allOf:
+        - $ref: "#/components/schemas/AcademyLecture"
+        - type: object
+          required: [attachments]
+          properties:
+            attachments:
+              type: array
+              items:
+                $ref: "#/components/schemas/AcademyFile"
+
+    AcademyLecturesResponse:
+      type: array
+      items:
+        $ref: "#/components/schemas/AcademyLecture"
+
+    CreateAcademyFileInput:
+      type: object
+      required: [fileName, mimeType, fileData]
+      properties:
+        fileName:
+          type: string
+        mimeType:
+          type: string
+        fileData:
+          type: string
+          description: Base64 encoded PDF data URI
+
+    CreateAcademyLectureInput:
+      type: object
+      required: [title, description, lecturerName]
+      properties:
+        title:
+          type: string
+          minLength: 1
+        description:
+          type: string
+          minLength: 1
+        lecturerName:
+          type: string
+          minLength: 1
+        lectureDate:
+          type: ["string", "null"]
+        lectureTime:
+          type: ["string", "null"]
+        isUpcoming:
+          type: boolean
+        liveMeetingUrl:
+          type: ["string", "null"]
+        recordingDriveUrl:
+          type: ["string", "null"]
+        thumbnailUrl:
+          type: ["string", "null"]
+        allowedSpecialties:
+          type: array
+          items:
+            type: string
+        isGeneral:
+          type: boolean
+        status:
+          $ref: "#/components/schemas/AcademyLectureStatus"
+        attachments:
+          type: array
+          items:
+            $ref: "#/components/schemas/CreateAcademyFileInput"
+
+    UpdateAcademyLectureInput:
+      type: object
+      properties:
+        title:
+          type: string
+          minLength: 1
+        description:
+          type: string
+          minLength: 1
+        lecturerName:
+          type: string
+          minLength: 1
+        lectureDate:
+          type: ["string", "null"]
+        lectureTime:
+          type: ["string", "null"]
+        isUpcoming:
+          type: boolean
+        liveMeetingUrl:
+          type: ["string", "null"]
+        recordingDriveUrl:
+          type: ["string", "null"]
+        thumbnailUrl:
+          type: ["string", "null"]
+        allowedSpecialties:
+          type: array
+          items:
+            type: string
+        isGeneral:
+          type: boolean
+        status:
+          $ref: "#/components/schemas/AcademyLectureStatus"
+        attachments:
+          type: array
+          items:
+            $ref: "#/components/schemas/CreateAcademyFileInput"

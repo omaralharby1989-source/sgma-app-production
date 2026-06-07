@@ -3,6 +3,7 @@ import {
   useGetAdminUsers,
   useUpdateAdminUser,
   getGetAdminUsersQueryKey,
+  getAdminUser,
 } from "@workspace/api-client-react";
 import type {
   AdminUserItem,
@@ -18,6 +19,12 @@ import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
+import { Checkbox } from "@/components/ui/checkbox";
+import {
+  ACADEMY_SPECIALTY_LABELS,
+  ACADEMY_SPECIALTY_OPTIONS,
+  specialtyLabel,
+} from "@/lib/academyLabels";
 import {
   Select,
   SelectContent,
@@ -50,6 +57,11 @@ const STATUS_LABELS: Record<string, string> = {
   SUSPENDED: "موقوف",
 };
 
+const ACCESS_SCOPE_LABELS: Record<string, string> = {
+  FULL_APP: "التطبيق الكامل",
+  SYRIA_ACADEMY_ONLY: "أكاديمية سوريا فقط",
+};
+
 function statusBadgeVariant(status: string): "default" | "secondary" | "outline" | "destructive" {
   if (status === "ACTIVE") return "default";
   if (status === "SUSPENDED") return "destructive";
@@ -67,11 +79,22 @@ export default function AdminUsers() {
   const [roleFilter, setRoleFilter] = useState<string>("ALL");
   const [statusFilter, setStatusFilter] = useState<string>("ALL");
   const [editing, setEditing] = useState<AdminUserItem | null>(null);
-  const [form, setForm] = useState<{ role: string; status: string; isActive: boolean; membershipNumber: string }>({
+  const [form, setForm] = useState<{
+    role: string;
+    status: string;
+    isActive: boolean;
+    membershipNumber: string;
+    accessScope: string;
+    academySpecialty: string;
+    academyAllowedSpecialties: string[];
+  }>({
     role: "MEMBER",
     status: "ACTIVE",
     isActive: true,
     membershipNumber: "",
+    accessScope: "FULL_APP",
+    academySpecialty: "",
+    academyAllowedSpecialties: [],
   });
 
   const params = {
@@ -93,9 +116,42 @@ export default function AdminUsers() {
     ? ["MEMBER", "MODERATOR", "ADMIN", "SUPER_ADMIN"]
     : ["MEMBER", "MODERATOR"];
 
-  function openEdit(u: AdminUserItem) {
+  const [allowedTouched, setAllowedTouched] = useState(false);
+
+  async function openEdit(u: AdminUserItem) {
     setEditing(u);
-    setForm({ role: u.role, status: u.status, isActive: u.isActive, membershipNumber: u.membershipNumber ?? "" });
+    setAllowedTouched(false);
+    setForm({
+      role: u.role,
+      status: u.status,
+      isActive: u.isActive,
+      membershipNumber: u.membershipNumber ?? "",
+      accessScope: u.accessScope ?? "FULL_APP",
+      academySpecialty: u.academySpecialty ?? "",
+      academyAllowedSpecialties: [],
+    });
+    // Preload authoritative academy specialties from the detail endpoint so
+    // editing the checklist never overwrites previously-stored values.
+    try {
+      const detail = await getAdminUser(u.id);
+      setForm((f) => ({
+        ...f,
+        academySpecialty: detail.academySpecialty ?? "",
+        academyAllowedSpecialties: detail.academyAllowedSpecialties ?? [],
+      }));
+    } catch {
+      /* keep list-derived defaults if detail fetch fails */
+    }
+  }
+
+  function toggleAllowedSpecialty(s: string) {
+    setAllowedTouched(true);
+    setForm((f) => ({
+      ...f,
+      academyAllowedSpecialties: f.academyAllowedSpecialties.includes(s)
+        ? f.academyAllowedSpecialties.filter((x) => x !== s)
+        : [...f.academyAllowedSpecialties, s],
+    }));
   }
 
   // ADMIN cannot act on SUPER_ADMIN users at all
@@ -124,11 +180,17 @@ export default function AdminUsers() {
 
   function handleSave() {
     if (!editing) return;
+    const isSyria = form.accessScope === "SYRIA_ACADEMY_ONLY";
     const payload: AdminUpdateUserInput = {
       role: form.role as AdminUpdateUserInput["role"],
       status: form.status as AdminUpdateUserInput["status"],
       isActive: form.isActive,
       membershipNumber: form.membershipNumber.trim() || null,
+      accessScope: form.accessScope as AdminUpdateUserInput["accessScope"],
+      academySpecialty: isSyria ? form.academySpecialty.trim() || null : null,
+      ...(allowedTouched
+        ? { academyAllowedSpecialties: isSyria ? form.academyAllowedSpecialties : [] }
+        : {}),
     };
     updateUser.mutate(
       { id: editing.id, data: payload },
@@ -226,6 +288,12 @@ export default function AdminUsers() {
                       {STATUS_LABELS[u.status] ?? u.status}
                     </Badge>
                     {!u.isActive && <Badge variant="destructive">معطل</Badge>}
+                    {u.accessScope === "SYRIA_ACADEMY_ONLY" && (
+                      <Badge variant="outline" className="border-primary text-primary">
+                        أكاديمية سوريا
+                        {u.academySpecialty ? ` · ${specialtyLabel(u.academySpecialty)}` : ""}
+                      </Badge>
+                    )}
                   </div>
                 </div>
                 <div className="flex flex-col gap-2 shrink-0">
@@ -314,6 +382,62 @@ export default function AdminUsers() {
                   onCheckedChange={(v) => setForm((f) => ({ ...f, isActive: v }))}
                 />
               </div>
+
+              <div className="space-y-2">
+                <Label>نطاق الوصول</Label>
+                <Select
+                  value={form.accessScope}
+                  onValueChange={(v) => setForm((f) => ({ ...f, accessScope: v }))}
+                >
+                  <SelectTrigger>
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {Object.entries(ACCESS_SCOPE_LABELS).map(([value, label]) => (
+                      <SelectItem key={value} value={value}>{label}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+
+              {form.accessScope === "SYRIA_ACADEMY_ONLY" && (
+                <>
+                  <div className="space-y-2">
+                    <Label>الاختصاص</Label>
+                    <Select
+                      value={form.academySpecialty || "GENERAL"}
+                      onValueChange={(v) => setForm((f) => ({ ...f, academySpecialty: v }))}
+                    >
+                      <SelectTrigger>
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {ACADEMY_SPECIALTY_OPTIONS.map((s) => (
+                          <SelectItem key={s} value={s}>{ACADEMY_SPECIALTY_LABELS[s]}</SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label>اختصاصات إضافية مسموح بها</Label>
+                    <div className="grid grid-cols-2 gap-2 rounded-lg border border-border p-3 max-h-44 overflow-y-auto">
+                      {ACADEMY_SPECIALTY_OPTIONS.filter((s) => s !== "GENERAL").map((s) => (
+                        <label key={s} className="flex items-center gap-2 text-sm cursor-pointer">
+                          <Checkbox
+                            checked={form.academyAllowedSpecialties.includes(s)}
+                            onCheckedChange={() => toggleAllowedSpecialty(s)}
+                          />
+                          <span>{ACADEMY_SPECIALTY_LABELS[s]}</span>
+                        </label>
+                      ))}
+                    </div>
+                    <p className="text-xs text-muted-foreground leading-relaxed">
+                      اتركها فارغة للاكتفاء باختصاص العضو الأساسي. عند عدم التعديل لن تتغير القيمة الحالية.
+                    </p>
+                  </div>
+                </>
+              )}
             </div>
           )}
           <DialogFooter className="gap-2 sm:gap-0">

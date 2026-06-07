@@ -24,6 +24,9 @@ export const usersTable = pgTable("users", {
   bio: text("bio"),
   avatarUrl: text("avatar_url"),
   membershipNumber: text("membership_number").unique(),
+  accessScope: text("access_scope").notNull().default("FULL_APP"),
+  academySpecialty: text("academy_specialty"),
+  academyAllowedSpecialties: text("academy_allowed_specialties"),
   createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
   updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow().$onUpdate(() => new Date()),
 });

@@ -12,7 +12,7 @@ import {
   SendAdminChatMessageBody,
   EditAdminChatMessageBody,
 } from "@workspace/api-zod";
-import { requireAuth } from "../middlewares/auth";
+import { requireAuth, requireFullApp } from "../middlewares/auth";
 
 const router = Router();
 
@@ -57,7 +57,7 @@ function formatMessage(row: MessageRow, viewer: { userId: number; role: string }
 // Public chat
 // ---------------------------------------------------------------------------
 
-router.get("/chat/public/messages", requireAuth, async (req, res): Promise<void> => {
+router.get("/chat/public/messages", requireAuth, requireFullApp, async (req, res): Promise<void> => {
   try {
     const rows = await db
       .select({
@@ -84,7 +84,7 @@ router.get("/chat/public/messages", requireAuth, async (req, res): Promise<void>
   }
 });
 
-router.post("/chat/public/messages", requireAuth, async (req, res): Promise<void> => {
+router.post("/chat/public/messages", requireAuth, requireFullApp, async (req, res): Promise<void> => {
   const parsed = SendPublicChatMessageBody.safeParse(req.body);
   if (!parsed.success) {
     res.status(400).json({ error: "لا يمكن إرسال رسالة فارغة" });
@@ -130,7 +130,7 @@ router.post("/chat/public/messages", requireAuth, async (req, res): Promise<void
   }
 });
 
-router.patch("/chat/public/messages/:id", requireAuth, async (req, res): Promise<void> => {
+router.patch("/chat/public/messages/:id", requireAuth, requireFullApp, async (req, res): Promise<void> => {
   const id = Number(req.params.id);
   if (!Number.isInteger(id)) {
     res.status(400).json({ error: "معرّف الرسالة غير صحيح" });
@@ -201,7 +201,7 @@ router.patch("/chat/public/messages/:id", requireAuth, async (req, res): Promise
   }
 });
 
-router.delete("/chat/public/messages/:id", requireAuth, async (req, res): Promise<void> => {
+router.delete("/chat/public/messages/:id", requireAuth, requireFullApp, async (req, res): Promise<void> => {
   const id = Number(req.params.id);
   if (!Number.isInteger(id)) {
     res.status(400).json({ error: "معرّف الرسالة غير صحيح" });
@@ -264,7 +264,7 @@ router.delete("/chat/public/messages/:id", requireAuth, async (req, res): Promis
 // Admin direct chat
 // ---------------------------------------------------------------------------
 
-router.get("/chat/admin/conversations", requireAuth, async (req, res): Promise<void> => {
+router.get("/chat/admin/conversations", requireAuth, requireFullApp, async (req, res): Promise<void> => {
   if (!isStaff(req.user!.role)) {
     res.status(403).json({ error: "ليس لديك صلاحية لهذا الإجراء" });
     return;
@@ -307,7 +307,7 @@ router.get("/chat/admin/conversations", requireAuth, async (req, res): Promise<v
   }
 });
 
-router.get("/chat/admin/messages", requireAuth, async (req, res): Promise<void> => {
+router.get("/chat/admin/messages", requireAuth, requireFullApp, async (req, res): Promise<void> => {
   const staff = isStaff(req.user!.role);
   let conversationUserId: number;
 
@@ -347,7 +347,7 @@ router.get("/chat/admin/messages", requireAuth, async (req, res): Promise<void> 
   }
 });
 
-router.post("/chat/admin/messages", requireAuth, async (req, res): Promise<void> => {
+router.post("/chat/admin/messages", requireAuth, requireFullApp, async (req, res): Promise<void> => {
   const parsed = SendAdminChatMessageBody.safeParse(req.body);
   if (!parsed.success) {
     res.status(400).json({ error: "لا يمكن إرسال رسالة فارغة" });
@@ -419,7 +419,7 @@ router.post("/chat/admin/messages", requireAuth, async (req, res): Promise<void>
   }
 });
 
-router.patch("/chat/admin/messages/:id", requireAuth, async (req, res): Promise<void> => {
+router.patch("/chat/admin/messages/:id", requireAuth, requireFullApp, async (req, res): Promise<void> => {
   const id = Number(req.params.id);
   if (!Number.isInteger(id)) {
     res.status(400).json({ error: "معرّف الرسالة غير صحيح" });
@@ -490,7 +490,7 @@ router.patch("/chat/admin/messages/:id", requireAuth, async (req, res): Promise<
   }
 });
 
-router.delete("/chat/admin/messages/:id", requireAuth, async (req, res): Promise<void> => {
+router.delete("/chat/admin/messages/:id", requireAuth, requireFullApp, async (req, res): Promise<void> => {
   const id = Number(req.params.id);
   if (!Number.isInteger(id)) {
     res.status(400).json({ error: "معرّف الرسالة غير صحيح" });

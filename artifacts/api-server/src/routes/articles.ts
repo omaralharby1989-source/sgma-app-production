@@ -2,7 +2,7 @@ import { Router } from "express";
 import { db, articlesTable, usersTable } from "@workspace/db";
 import { eq, and, or, sql } from "drizzle-orm";
 import { CreateArticleBody, UpdateArticleBody, RejectArticleBody } from "@workspace/api-zod";
-import { requireAuth } from "../middlewares/auth";
+import { requireAuth, requireFullApp } from "../middlewares/auth";
 import { validateImageSource } from "../lib/imageValidation";
 
 const router = Router();
@@ -53,7 +53,7 @@ router.get("/articles", requireAuth, async (req, res): Promise<void> => {
 });
 
 // List current user's articles (all statuses), newest first
-router.get("/articles/my", requireAuth, async (req, res): Promise<void> => {
+router.get("/articles/my", requireAuth, requireFullApp, async (req, res): Promise<void> => {
   try {
     const rows = await db
       .select({ article: articlesTable, authorName: usersTable.fullName })
@@ -108,7 +108,7 @@ router.get("/articles/:id", requireAuth, async (req, res): Promise<void> => {
 });
 
 // Create article (any authenticated user). Default status PENDING (review).
-router.post("/articles", requireAuth, async (req, res): Promise<void> => {
+router.post("/articles", requireAuth, requireFullApp, async (req, res): Promise<void> => {
   const parsed = CreateArticleBody.safeParse(req.body);
   if (!parsed.success) {
     res.status(400).json({ error: "بيانات المقال غير صحيحة" });
@@ -150,7 +150,7 @@ router.post("/articles", requireAuth, async (req, res): Promise<void> => {
 });
 
 // Update own article (only when DRAFT or PENDING)
-router.patch("/articles/:id", requireAuth, async (req, res): Promise<void> => {
+router.patch("/articles/:id", requireAuth, requireFullApp, async (req, res): Promise<void> => {
   const id = Number(req.params.id);
   if (!Number.isInteger(id)) {
     res.status(400).json({ error: "معرّف المقال غير صالح" });
@@ -224,7 +224,7 @@ router.patch("/articles/:id", requireAuth, async (req, res): Promise<void> => {
 });
 
 // Archive own article (soft delete; only when DRAFT or PENDING)
-router.delete("/articles/:id", requireAuth, async (req, res): Promise<void> => {
+router.delete("/articles/:id", requireAuth, requireFullApp, async (req, res): Promise<void> => {
   const id = Number(req.params.id);
   if (!Number.isInteger(id)) {
     res.status(400).json({ error: "معرّف المقال غير صالح" });
@@ -266,7 +266,7 @@ router.delete("/articles/:id", requireAuth, async (req, res): Promise<void> => {
 });
 
 // Approve article (staff only) — backend only, no admin UI in this phase
-router.post("/articles/:id/approve", requireAuth, async (req, res): Promise<void> => {
+router.post("/articles/:id/approve", requireAuth, requireFullApp, async (req, res): Promise<void> => {
   if (!isStaff(req.user!.role)) {
     res.status(403).json({ error: "ليس لديك صلاحية لهذا الإجراء" });
     return;
@@ -310,7 +310,7 @@ router.post("/articles/:id/approve", requireAuth, async (req, res): Promise<void
 });
 
 // Reject article (staff only) — backend only, no admin UI in this phase
-router.post("/articles/:id/reject", requireAuth, async (req, res): Promise<void> => {
+router.post("/articles/:id/reject", requireAuth, requireFullApp, async (req, res): Promise<void> => {
   if (!isStaff(req.user!.role)) {
     res.status(403).json({ error: "ليس لديك صلاحية لهذا الإجراء" });
     return;

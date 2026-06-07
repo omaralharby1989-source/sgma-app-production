@@ -211,6 +211,10 @@ export default function Register() {
               <div className="space-y-2">
                 <Label htmlFor="membershipNumber">رقم العضوية</Label>
                 <Input id="membershipNumber" type="text" {...form.register("membershipNumber")} disabled={isPending} className="text-left" dir="ltr" placeholder="أدخل رقم عضويتك في SGMA" />
+                <p className="text-xs text-muted-foreground leading-relaxed">
+                  أعضاء SGMA: أدخل رقم عضويتك الرقمي. للتسجيل في أكاديمية سوريا فقط:
+                  اكتب <span className="font-semibold">SY</span> في هذا الحقل.
+                </p>
                 {form.formState.errors.membershipNumber && (
                   <p className="text-xs text-destructive">{form.formState.errors.membershipNumber.message}</p>
                 )}

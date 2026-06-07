@@ -5,6 +5,7 @@
  * SGMA APP2 API specification
  * OpenAPI spec version: 0.1.0
  */
+import type { AdminUpdateUserInputAccessScope } from './adminUpdateUserInputAccessScope';
 import type { AdminUpdateUserInputRole } from './adminUpdateUserInputRole';
 import type { AdminUpdateUserInputStatus } from './adminUpdateUserInputStatus';
 
@@ -33,4 +34,8 @@ export interface AdminUpdateUserInput {
   role?: AdminUpdateUserInputRole;
   status?: AdminUpdateUserInputStatus;
   isActive?: boolean;
+  accessScope?: AdminUpdateUserInputAccessScope;
+  /** @nullable */
+  academySpecialty?: string | null;
+  academyAllowedSpecialties?: string[];
 }

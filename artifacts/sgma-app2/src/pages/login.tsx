@@ -38,7 +38,9 @@ export default function Login() {
         localStorage.setItem("sgma_auth_token", response.token);
         localStorage.setItem("sgma_auth_user", JSON.stringify(response.user));
         toast({ title: "تم تسجيل الدخول بنجاح" });
-        setLocation("/home");
+        setLocation(
+          response.user?.accessScope === "SYRIA_ACADEMY_ONLY" ? "/academy" : "/home",
+        );
       },
       onError: (error: any) => {
         toast({

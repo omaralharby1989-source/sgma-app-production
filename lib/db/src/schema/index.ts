@@ -9,3 +9,4 @@ export * from "./boardMembers";
 export * from "./volunteerDelegations";
 export * from "./ads";
 export * from "./tasks";
+export * from "./academy";

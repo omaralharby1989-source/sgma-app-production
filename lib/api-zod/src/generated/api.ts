@@ -79,6 +79,9 @@ export const LoginResponse = zod.object({
   "bio": zod.string().nullish(),
   "avatarUrl": zod.string().nullish(),
   "membershipNumber": zod.string().nullish(),
+  "accessScope": zod.enum(['FULL_APP', 'SYRIA_ACADEMY_ONLY']).optional(),
+  "academySpecialty": zod.string().nullish(),
+  "academyAllowedSpecialties": zod.array(zod.string()).optional(),
   "createdAt": zod.coerce.date(),
   "updatedAt": zod.coerce.date().nullish()
 })
@@ -106,6 +109,9 @@ export const GetMemberProfileResponse = zod.object({
   "bio": zod.string().nullish(),
   "avatarUrl": zod.string().nullish(),
   "membershipNumber": zod.string().nullish(),
+  "accessScope": zod.enum(['FULL_APP', 'SYRIA_ACADEMY_ONLY']).optional(),
+  "academySpecialty": zod.string().nullish(),
+  "academyAllowedSpecialties": zod.array(zod.string()).optional(),
   "createdAt": zod.coerce.date(),
   "updatedAt": zod.coerce.date().nullish()
 })
@@ -157,6 +163,9 @@ export const UpdateMemberProfileResponse = zod.object({
   "bio": zod.string().nullish(),
   "avatarUrl": zod.string().nullish(),
   "membershipNumber": zod.string().nullish(),
+  "accessScope": zod.enum(['FULL_APP', 'SYRIA_ACADEMY_ONLY']).optional(),
+  "academySpecialty": zod.string().nullish(),
+  "academyAllowedSpecialties": zod.array(zod.string()).optional(),
   "createdAt": zod.coerce.date(),
   "updatedAt": zod.coerce.date().nullish()
 })
@@ -1524,6 +1533,8 @@ export const GetAdminUsersResponseItem = zod.object({
   "isActive": zod.boolean(),
   "professionGroup": zod.string().nullish(),
   "membershipNumber": zod.string().nullish(),
+  "accessScope": zod.enum(['FULL_APP', 'SYRIA_ACADEMY_ONLY']).optional(),
+  "academySpecialty": zod.string().nullish(),
   "createdAt": zod.coerce.date()
 })
 export const GetAdminUsersResponse = zod.array(GetAdminUsersResponseItem)
@@ -1554,6 +1565,9 @@ export const GetAdminUserResponse = zod.object({
   "bio": zod.string().nullish(),
   "avatarUrl": zod.string().nullish(),
   "membershipNumber": zod.string().nullish(),
+  "accessScope": zod.enum(['FULL_APP', 'SYRIA_ACADEMY_ONLY']).optional(),
+  "academySpecialty": zod.string().nullish(),
+  "academyAllowedSpecialties": zod.array(zod.string()).optional(),
   "createdAt": zod.coerce.date(),
   "updatedAt": zod.coerce.date()
 })
@@ -1584,7 +1598,10 @@ export const UpdateAdminUserBody = zod.object({
   "membershipNumber": zod.string().nullish(),
   "role": zod.enum(['MEMBER', 'MODERATOR', 'ADMIN', 'SUPER_ADMIN']).optional(),
   "status": zod.enum(['PENDING', 'ACTIVE', 'SUSPENDED']).optional(),
-  "isActive": zod.boolean().optional()
+  "isActive": zod.boolean().optional(),
+  "accessScope": zod.enum(['FULL_APP', 'SYRIA_ACADEMY_ONLY']).optional(),
+  "academySpecialty": zod.string().nullish(),
+  "academyAllowedSpecialties": zod.array(zod.string()).optional()
 })
 
 export const UpdateAdminUserResponse = zod.object({
@@ -1605,6 +1622,9 @@ export const UpdateAdminUserResponse = zod.object({
   "bio": zod.string().nullish(),
   "avatarUrl": zod.string().nullish(),
   "membershipNumber": zod.string().nullish(),
+  "accessScope": zod.enum(['FULL_APP', 'SYRIA_ACADEMY_ONLY']).optional(),
+  "academySpecialty": zod.string().nullish(),
+  "academyAllowedSpecialties": zod.array(zod.string()).optional(),
   "createdAt": zod.coerce.date(),
   "updatedAt": zod.coerce.date()
 })
@@ -1969,6 +1989,268 @@ export const DeleteAdminCustomAdParams = zod.object({
 })
 
 export const DeleteAdminCustomAdResponse = zod.object({
+  "message": zod.string()
+})
+
+
+/**
+ * @summary List academy lectures visible to the current user
+ */
+export const GetAcademyLecturesQueryParams = zod.object({
+  "specialty": zod.coerce.string().optional(),
+  "upcoming": zod.coerce.boolean().optional()
+})
+
+export const GetAcademyLecturesResponseItem = zod.object({
+  "id": zod.number(),
+  "title": zod.string(),
+  "description": zod.string(),
+  "lecturerName": zod.string(),
+  "lectureDate": zod.string().nullish(),
+  "lectureTime": zod.string().nullish(),
+  "isUpcoming": zod.boolean(),
+  "liveMeetingUrl": zod.string().nullish(),
+  "recordingDriveUrl": zod.string().nullish(),
+  "recordingEmbedUrl": zod.string().nullish(),
+  "thumbnailUrl": zod.string().nullish(),
+  "allowedSpecialties": zod.array(zod.string()),
+  "isGeneral": zod.boolean(),
+  "status": zod.enum(['DRAFT', 'PUBLISHED', 'HIDDEN', 'ARCHIVED']),
+  "createdById": zod.number().nullish(),
+  "updatedById": zod.number().nullish(),
+  "createdAt": zod.coerce.date(),
+  "updatedAt": zod.coerce.date().nullish()
+})
+export const GetAcademyLecturesResponse = zod.array(GetAcademyLecturesResponseItem)
+
+
+/**
+ * @summary List published upcoming lecture announcements visible to the current user
+ */
+export const GetAcademyAnnouncementsResponseItem = zod.object({
+  "id": zod.number(),
+  "title": zod.string(),
+  "description": zod.string(),
+  "lecturerName": zod.string(),
+  "lectureDate": zod.string().nullish(),
+  "lectureTime": zod.string().nullish(),
+  "isUpcoming": zod.boolean(),
+  "liveMeetingUrl": zod.string().nullish(),
+  "recordingDriveUrl": zod.string().nullish(),
+  "recordingEmbedUrl": zod.string().nullish(),
+  "thumbnailUrl": zod.string().nullish(),
+  "allowedSpecialties": zod.array(zod.string()),
+  "isGeneral": zod.boolean(),
+  "status": zod.enum(['DRAFT', 'PUBLISHED', 'HIDDEN', 'ARCHIVED']),
+  "createdById": zod.number().nullish(),
+  "updatedById": zod.number().nullish(),
+  "createdAt": zod.coerce.date(),
+  "updatedAt": zod.coerce.date().nullish()
+})
+export const GetAcademyAnnouncementsResponse = zod.array(GetAcademyAnnouncementsResponseItem)
+
+
+/**
+ * @summary Get an academy lecture if visible to the current user
+ */
+export const GetAcademyLectureParams = zod.object({
+  "id": zod.coerce.number()
+})
+
+export const GetAcademyLectureResponse = zod.object({
+  "id": zod.number(),
+  "title": zod.string(),
+  "description": zod.string(),
+  "lecturerName": zod.string(),
+  "lectureDate": zod.string().nullish(),
+  "lectureTime": zod.string().nullish(),
+  "isUpcoming": zod.boolean(),
+  "liveMeetingUrl": zod.string().nullish(),
+  "recordingDriveUrl": zod.string().nullish(),
+  "recordingEmbedUrl": zod.string().nullish(),
+  "thumbnailUrl": zod.string().nullish(),
+  "allowedSpecialties": zod.array(zod.string()),
+  "isGeneral": zod.boolean(),
+  "status": zod.enum(['DRAFT', 'PUBLISHED', 'HIDDEN', 'ARCHIVED']),
+  "createdById": zod.number().nullish(),
+  "updatedById": zod.number().nullish(),
+  "createdAt": zod.coerce.date(),
+  "updatedAt": zod.coerce.date().nullish()
+}).and(zod.object({
+  "attachments": zod.array(zod.object({
+  "id": zod.number(),
+  "lectureId": zod.number(),
+  "fileName": zod.string(),
+  "mimeType": zod.string(),
+  "fileSize": zod.number(),
+  "createdAt": zod.coerce.date().nullish()
+}))
+}))
+
+
+/**
+ * @summary Download a lecture PDF if the lecture is visible to the current user
+ */
+export const GetAcademyFileParams = zod.object({
+  "fileId": zod.coerce.number()
+})
+
+export const GetAcademyFileResponse = zod.object({
+  "id": zod.number(),
+  "fileName": zod.string(),
+  "mimeType": zod.string(),
+  "fileSize": zod.number(),
+  "fileData": zod.string()
+})
+
+
+/**
+ * @summary List all academy lectures (MODERATOR/ADMIN/SUPER_ADMIN)
+ */
+export const GetAdminAcademyLecturesQueryParams = zod.object({
+  "status": zod.enum(['DRAFT', 'PUBLISHED', 'HIDDEN', 'ARCHIVED']).optional(),
+  "specialty": zod.coerce.string().optional()
+})
+
+export const GetAdminAcademyLecturesResponseItem = zod.object({
+  "id": zod.number(),
+  "title": zod.string(),
+  "description": zod.string(),
+  "lecturerName": zod.string(),
+  "lectureDate": zod.string().nullish(),
+  "lectureTime": zod.string().nullish(),
+  "isUpcoming": zod.boolean(),
+  "liveMeetingUrl": zod.string().nullish(),
+  "recordingDriveUrl": zod.string().nullish(),
+  "recordingEmbedUrl": zod.string().nullish(),
+  "thumbnailUrl": zod.string().nullish(),
+  "allowedSpecialties": zod.array(zod.string()),
+  "isGeneral": zod.boolean(),
+  "status": zod.enum(['DRAFT', 'PUBLISHED', 'HIDDEN', 'ARCHIVED']),
+  "createdById": zod.number().nullish(),
+  "updatedById": zod.number().nullish(),
+  "createdAt": zod.coerce.date(),
+  "updatedAt": zod.coerce.date().nullish()
+})
+export const GetAdminAcademyLecturesResponse = zod.array(GetAdminAcademyLecturesResponseItem)
+
+
+/**
+ * @summary Create an academy lecture (MODERATOR/ADMIN/SUPER_ADMIN)
+ */
+
+
+
+
+
+export const CreateAdminAcademyLectureBody = zod.object({
+  "title": zod.string().min(1),
+  "description": zod.string().min(1),
+  "lecturerName": zod.string().min(1),
+  "lectureDate": zod.string().nullish(),
+  "lectureTime": zod.string().nullish(),
+  "isUpcoming": zod.boolean().optional(),
+  "liveMeetingUrl": zod.string().nullish(),
+  "recordingDriveUrl": zod.string().nullish(),
+  "thumbnailUrl": zod.string().nullish(),
+  "allowedSpecialties": zod.array(zod.string()).optional(),
+  "isGeneral": zod.boolean().optional(),
+  "status": zod.enum(['DRAFT', 'PUBLISHED', 'HIDDEN', 'ARCHIVED']).optional(),
+  "attachments": zod.array(zod.object({
+  "fileName": zod.string(),
+  "mimeType": zod.string(),
+  "fileData": zod.string().describe('Base64 encoded PDF data URI')
+})).optional()
+})
+
+
+/**
+ * @summary Download a lecture PDF (MODERATOR/ADMIN/SUPER_ADMIN)
+ */
+export const GetAdminAcademyFileParams = zod.object({
+  "fileId": zod.coerce.number()
+})
+
+export const GetAdminAcademyFileResponse = zod.object({
+  "id": zod.number(),
+  "fileName": zod.string(),
+  "mimeType": zod.string(),
+  "fileSize": zod.number(),
+  "fileData": zod.string()
+})
+
+
+/**
+ * @summary Update an academy lecture (MODERATOR/ADMIN/SUPER_ADMIN)
+ */
+export const UpdateAdminAcademyLectureParams = zod.object({
+  "id": zod.coerce.number()
+})
+
+
+
+
+
+
+export const UpdateAdminAcademyLectureBody = zod.object({
+  "title": zod.string().min(1).optional(),
+  "description": zod.string().min(1).optional(),
+  "lecturerName": zod.string().min(1).optional(),
+  "lectureDate": zod.string().nullish(),
+  "lectureTime": zod.string().nullish(),
+  "isUpcoming": zod.boolean().optional(),
+  "liveMeetingUrl": zod.string().nullish(),
+  "recordingDriveUrl": zod.string().nullish(),
+  "thumbnailUrl": zod.string().nullish(),
+  "allowedSpecialties": zod.array(zod.string()).optional(),
+  "isGeneral": zod.boolean().optional(),
+  "status": zod.enum(['DRAFT', 'PUBLISHED', 'HIDDEN', 'ARCHIVED']).optional(),
+  "attachments": zod.array(zod.object({
+  "fileName": zod.string(),
+  "mimeType": zod.string(),
+  "fileData": zod.string().describe('Base64 encoded PDF data URI')
+})).optional()
+})
+
+export const UpdateAdminAcademyLectureResponse = zod.object({
+  "id": zod.number(),
+  "title": zod.string(),
+  "description": zod.string(),
+  "lecturerName": zod.string(),
+  "lectureDate": zod.string().nullish(),
+  "lectureTime": zod.string().nullish(),
+  "isUpcoming": zod.boolean(),
+  "liveMeetingUrl": zod.string().nullish(),
+  "recordingDriveUrl": zod.string().nullish(),
+  "recordingEmbedUrl": zod.string().nullish(),
+  "thumbnailUrl": zod.string().nullish(),
+  "allowedSpecialties": zod.array(zod.string()),
+  "isGeneral": zod.boolean(),
+  "status": zod.enum(['DRAFT', 'PUBLISHED', 'HIDDEN', 'ARCHIVED']),
+  "createdById": zod.number().nullish(),
+  "updatedById": zod.number().nullish(),
+  "createdAt": zod.coerce.date(),
+  "updatedAt": zod.coerce.date().nullish()
+}).and(zod.object({
+  "attachments": zod.array(zod.object({
+  "id": zod.number(),
+  "lectureId": zod.number(),
+  "fileName": zod.string(),
+  "mimeType": zod.string(),
+  "fileSize": zod.number(),
+  "createdAt": zod.coerce.date().nullish()
+}))
+}))
+
+
+/**
+ * @summary Soft-delete (archive) an academy lecture (MODERATOR/ADMIN/SUPER_ADMIN)
+ */
+export const DeleteAdminAcademyLectureParams = zod.object({
+  "id": zod.coerce.number()
+})
+
+export const DeleteAdminAcademyLectureResponse = zod.object({
   "message": zod.string()
 })
 

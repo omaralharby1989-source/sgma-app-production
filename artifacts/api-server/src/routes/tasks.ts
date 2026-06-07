@@ -9,7 +9,7 @@ import {
 } from "@workspace/db";
 import { eq, and, inArray, desc } from "drizzle-orm";
 import { CreateTaskReportBody } from "@workspace/api-zod";
-import { requireAuth } from "../middlewares/auth";
+import { requireAuth, requireFullApp } from "../middlewares/auth";
 import { isStaff } from "../lib/permissions";
 import {
   validateTaskAttachment,
@@ -42,7 +42,7 @@ async function isAssignedTo(taskId: number, userId: number): Promise<boolean> {
 }
 
 // GET /tasks/my — tasks assigned to the current user
-router.get("/tasks/my", requireAuth, async (req, res): Promise<void> => {
+router.get("/tasks/my", requireAuth, requireFullApp, async (req, res): Promise<void> => {
   try {
     const assigned = await db
       .select({ taskId: taskAssigneesTable.taskId })
@@ -90,6 +90,7 @@ router.get("/tasks/my", requireAuth, async (req, res): Promise<void> => {
 router.get(
   "/tasks/reports/attachments/:attachmentId",
   requireAuth,
+  requireFullApp,
   async (req, res): Promise<void> => {
     const attachmentId = Number(req.params.attachmentId);
     if (!Number.isInteger(attachmentId)) {
@@ -134,7 +135,7 @@ router.get(
 );
 
 // GET /tasks/:id — assigned member or staff
-router.get("/tasks/:id", requireAuth, async (req, res): Promise<void> => {
+router.get("/tasks/:id", requireAuth, requireFullApp, async (req, res): Promise<void> => {
   const id = Number(req.params.id);
   if (!Number.isInteger(id)) {
     res.status(400).json({ error: "معرّف المهمة غير صالح" });
@@ -165,7 +166,7 @@ router.get("/tasks/:id", requireAuth, async (req, res): Promise<void> => {
 });
 
 // POST /tasks/:id/reports — member submits a report; staff adds an admin note
-router.post("/tasks/:id/reports", requireAuth, async (req, res): Promise<void> => {
+router.post("/tasks/:id/reports", requireAuth, requireFullApp, async (req, res): Promise<void> => {
   const id = Number(req.params.id);
   if (!Number.isInteger(id)) {
     res.status(400).json({ error: "معرّف المهمة غير صالح" });
