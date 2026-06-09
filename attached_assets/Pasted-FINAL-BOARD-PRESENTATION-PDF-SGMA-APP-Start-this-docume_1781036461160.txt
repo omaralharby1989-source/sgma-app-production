@@ -1,0 +1,446 @@
+FINAL BOARD PRESENTATION PDF — SGMA APP
+
+Start this documentation task now.
+
+Scope:
+Create a final professional PDF document explaining SGMA APP for presentation to the SGMA Board of Directors for approval.
+
+This is documentation/report generation only.
+
+Do NOT add features.
+Do NOT change app logic.
+Do NOT change database.
+Do NOT change backend.
+Do NOT change frontend code unless only needed for screenshots and must be avoided if possible.
+Do NOT change permissions.
+Do NOT change routes.
+
+Important:
+Do NOT mention Google Ads.
+Do NOT mention Google AdSense.
+Do NOT show or include the SUPER_ADMIN page/screens.
+Do NOT include secrets, passwords, tokens, DATABASE_URL, or private technical credentials.
+
+It is allowed to mention:
+The platform can support private internal advertisements or sponsored announcements for partner companies cooperating with SGMA.
+
+==================================================
+A. OUTPUT REQUIREMENT
+=====================
+
+Create a final professional PDF file.
+
+Suggested filename:
+SGMA_APP_Board_Presentation_AR.pdf
+
+Language:
+Arabic
+
+Audience:
+SGMA Board of Directors
+
+Tone:
+Formal, professional, clear, suitable for official approval.
+
+Style:
+Modern medical association style, using SGMA blue visual identity and the new 3D SGMA logo.
+
+Include screenshots from the current app.
+
+Do not include screenshots of:
+
+* Super Admin-only sensitive screens
+* secrets
+* tokens
+* passwords
+* database settings
+* Replit Secrets
+* internal logs
+
+==================================================
+B. DOCUMENT TITLE
+=================
+
+Cover page title:
+
+تطبيق SGMA APP
+
+Subtitle:
+منصة رقمية متكاملة لخدمة أعضاء الجمعية الطبية السورية الألمانية
+
+Slogan:
+منصة تربط الكفاءات الطبية السورية بين ألمانيا وسوريا، لأن سوريا تستحق
+
+Include:
+
+* SGMA 3D logo
+* date
+* version: النسخة التجريبية المستقرة
+* prepared by:
+  برمجة وتصميم: عمر الحربي
+
+==================================================
+C. DOCUMENT STRUCTURE
+=====================
+
+The PDF must include the following sections:
+
+1. مقدمة تنفيذية
+   Explain that SGMA APP is a unified digital platform for SGMA members, administration, education, communication, and volunteer coordination.
+
+2. الهدف من التطبيق
+   Explain:
+
+* تنظيم العضوية
+* تسهيل التواصل
+* نشر الأخبار والمقالات
+* دعم العمل التطوعي
+* إدارة المهام
+* دعم التعليم الطبي عبر أكاديمية سجما - سوريا
+* توفير أدوات إدارية تساعد على المتابعة والتوثيق
+
+3. الفئات المستهدفة
+   Explain user types:
+
+* أعضاء SGMA الكاملون
+* أعضاء أكاديمية سجما - سوريا
+* المشرفون
+* المديرون
+* السوبر أدمن, describe conceptually only, without showing page/screens
+
+4. نظام تسجيل الحسابات والعضوية
+   Explain:
+
+* registration form
+* membership number required
+* SGMA members use numeric membership number
+* Syria Academy users enter SY
+* account remains pending until approved
+* admin activates account
+* Syria Academy users receive automatic numbers like SY1, SY2 after approval
+
+5. الصفحة الرئيسية وحسابي
+   Explain:
+
+* profile information
+* membership number
+* avatar
+* profile editing
+* password management if available
+* member information display
+
+6. الأخبار
+   Explain:
+
+* public SGMA news
+* news image support
+* view count
+* member reactions
+* news detail page
+* staff/news management conceptually if applicable
+
+7. المقالات
+   Explain:
+
+* published articles
+* article writing and review workflow for eligible users
+* approval before publishing
+* images from URL or phone upload
+* view count and reactions
+* Syria Academy users can read only, not write
+
+8. المحادثات
+   Explain:
+
+* public member chat
+* direct communication with administration
+* active users count/list in chat
+* basic interaction rules
+* do not expose private chat contents in screenshots
+
+9. البث والتنبيهات الداخلية
+   Explain:
+
+* official announcements/broadcast banner
+* appears across app pages
+* used for urgent notices and official messages
+* users read; staff manage according to permissions
+
+10. مجلس الإدارة
+    Explain:
+
+* Board of Directors page
+* current board
+* previous board
+* board archive
+* member cards with photo/contact/bio bullet points
+* admin can move board cards between current/previous/archive without deleting
+
+11. الوفود التطوعية
+    Explain:
+
+* volunteer delegation registration
+* form fields
+* file/PDF uploads
+* member can save or submit
+* admin/staff review requests
+
+12. إدارة المهام
+    Explain:
+
+* staff can create tasks
+* assign supervisor, assignees, supporters
+* assigned users see their tasks
+* task reports
+* attachments from phone/device
+* export task data as PDF/CSV where available
+* members only see their own tasks
+
+13. أكاديمية سجما - سوريا
+    Explain:
+
+* academy module
+* lecture announcements
+* recorded lectures
+* Google Drive video displayed inside the platform
+* watermark on video with user identity
+* PDF lecture attachments
+* Syria users filtered by specialty
+* FULL_APP members can view all lectures
+* admins can grant extra specialty access or all access
+
+14. إدارة الأعضاء
+    Explain:
+
+* pending member review
+* activation
+* role/status management
+* accessScope management
+* academy specialty management
+* export members by filters or selected members to CSV/PDF
+* ADMIN and SUPER_ADMIN management conceptually
+* Do not show Super Admin-only sensitive controls
+
+15. الصفحات القانونية والمعلوماتية
+    Explain:
+
+* من نحن
+* سياسة الخصوصية
+* الشروط والأحكام
+* معلومات المطور
+
+16. الإعلانات الخاصة والشراكات
+    Important:
+    Do NOT mention Google Ads or Google AdSense.
+
+Explain only:
+
+* The platform can support private internal advertisement spaces.
+* These may be used for partner companies, sponsors, or organizations cooperating with SGMA.
+* Management can control visibility and content.
+* This can create a future structured sponsorship/partnership channel for the association.
+
+Suggested Arabic wording:
+يوفر التطبيق إمكانية مستقبلية لعرض إعلانات أو مساحات تعريفية خاصة داخل المنصة لشركات أو جهات شريكة تتعاون مع الجمعية، مع إمكانية التحكم بها إدارياً بما يتناسب مع هوية الجمعية ورسالتها.
+
+17. الصلاحيات والأمان
+    Explain:
+
+* role-based access
+* MEMBER / MODERATOR / ADMIN / SUPER_ADMIN
+* backend-enforced permissions
+* pending users blocked
+* Syria Academy limited access
+* no password or secrets shown
+* only active users can log in
+* admin protections
+
+18. الهوية البصرية
+    Explain:
+
+* SGMA blue identity
+* 3D logo
+* medical professional style
+* mobile-first Arabic RTL design
+
+19. جاهزية التطبيق
+    Explain:
+
+* app has completed testing phase
+* tested by board/users
+* known minor improvements can continue
+* ready for board review and approval
+* stable beta / approval candidate
+
+20. قابلية التطوير المستقبلية
+    Mention:
+
+* mobile app packaging for Google Play and Apple App Store
+* push notifications later
+* German-hosted production backend/server later
+* advanced analytics
+* improved video protection
+* certificates for academy
+* expanded reporting
+* improved member management
+
+End with:
+التطبيق قابل للتطوير والتوسع وفق احتياجات الجمعية المستقبلية، مع الحفاظ على بنية تقنية مرنة تسمح بإضافة خدمات جديدة بشكل تدريجي ومنظم.
+
+21. الخاتمة
+    Summarize why SGMA APP is valuable:
+
+* improves communication
+* organizes membership
+* supports education
+* supports volunteer work
+* strengthens SGMA institutional identity
+
+Final line:
+برمجة وتصميم: عمر الحربي
+
+==================================================
+D. SCREENSHOT REQUIREMENTS
+==========================
+
+Take current screenshots from the app, preferably mobile viewport.
+
+Include screenshots for:
+
+1. Login page
+2. Register page
+3. Home / My Account
+4. More page
+5. News list
+6. News detail
+7. Articles list
+8. Article detail
+9. Chat center or public chat without exposing private content
+10. Board of Directors page
+11. Volunteer Delegations page
+12. Task management / My tasks or admin task overview without sensitive data
+13. Academy home
+14. Academy announcements
+15. Academy lecture detail with watermark if possible
+16. Admin dashboard conceptually, but avoid Super Admin-only sensitive screens
+17. Admin users page if safe, with sensitive data blurred or avoided
+18. Static page example: من نحن
+19. Developer Info page if appropriate
+
+If a screenshot cannot be captured safely:
+
+* use a placeholder section with explanation
+* do not expose private member data
+
+==================================================
+E. PRIVACY / SECURITY RULES
+===========================
+
+Do not include:
+
+* passwords
+* tokens
+* DATABASE_URL
+* API secrets
+* private logs
+* raw database information
+* private chat content
+* full personal data of members unless already public/demo and safe
+
+For screenshots:
+
+* blur or avoid sensitive data where possible
+* do not show Super Admin-only sensitive screens
+* do not show security settings
+
+==================================================
+F. DESIGN REQUIREMENTS
+======================
+
+PDF design:
+
+* professional cover page
+* SGMA logo
+* blue gradient headers
+* clean typography
+* Arabic RTL layout
+* page numbers
+* consistent section styling
+* screenshots with captions
+* use SGMA visual identity colors:
+
+  * dark blue
+  * medium blue
+  * light blue
+  * small green accent
+
+Do not make it too crowded.
+
+==================================================
+G. TECHNICAL METHOD
+===================
+
+Use available tools to generate the PDF.
+
+Preferred:
+
+* Generate HTML report with RTL Arabic styling
+* Render to PDF using available browser/PDF tooling
+
+If DOCX is easier:
+
+* Create DOCX and export/convert to PDF if possible
+
+Output must include:
+
+* PDF file
+* Optional editable source file if easy, such as .docx or .html
+
+==================================================
+H. READINESS / APPROVAL SECTION
+===============================
+
+Include a final approval-ready summary:
+
+Suggested title:
+ملخص جاهزية التطبيق للموافقة
+
+Include:
+
+* التطبيق جاهز كنسخة تجريبية مستقرة
+* تم اختبار الوظائف الأساسية
+* يمكن اعتماده كمنصة داخلية للجمعية
+* يمكن تطويره لاحقاً بشكل تدريجي
+* التوصية: الموافقة على اعتماد التطبيق للمرحلة التشغيلية التجريبية الموسعة
+
+Do not claim final public production readiness unless verified.
+Use honest wording:
+النسخة الحالية جاهزة للمراجعة والاعتماد من مجلس الإدارة كنسخة تجريبية مستقرة قابلة للتطوير.
+
+==================================================
+I. FINAL OUTPUT REPORT
+======================
+
+After creating the PDF, provide:
+
+FINAL BOARD PRESENTATION PDF REPORT
+
+1. PDF file name/path
+2. Number of pages
+3. Sections included
+4. Screenshots included
+5. Screenshots skipped and why
+6. Confirmation that Google Ads/AdSense are not mentioned
+7. Confirmation that private internal partner advertisements are mentioned only generically
+8. Confirmation that Super Admin page/screens are not shown
+9. Confirmation no secrets/passwords/tokens exposed
+10. Confirmation:
+
+    * no app logic changed
+    * no backend changed
+    * no database changed
+    * no permissions changed
+11. Known limitations if any
+12. Recommendation text for board approval
+
+Do not report success until the PDF is created and checked.

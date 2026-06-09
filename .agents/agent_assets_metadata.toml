@@ -36,3 +36,9 @@ id = "bSRzskYglx7iF0sFDDQwk"
 uri = "file://SGMA_APP_Final_Readiness_Report.md"
 type = "text"
 title = "SGMA APP — Final Readiness Report (Markdown)"
+
+[[outputs]]
+id = "2gUpkdU1a6vlNepq89z8y"
+uri = "file://docs/SGMA_APP_Board_Presentation_AR.pdf"
+type = "pdf"
+title = "عرض مجلس الإدارة — تطبيق سِجما (PDF)"

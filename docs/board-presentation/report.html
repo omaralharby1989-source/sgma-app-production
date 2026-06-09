@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8"/>
+<title>تطبيق سجما — عرض مجلس الإدارة</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;900&family=Tajawal:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --navy:#0a2a5e; --blue:#1453b8; --blue2:#2f6fd6; --light:#eaf2fd;
+    --light2:#f4f8fe; --green:#16a34a; --ink:#16243a; --muted:#5b6b82; --line:#d8e3f3;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{font-family:'Tajawal','Cairo',sans-serif;color:var(--ink);font-size:13px;line-height:1.9;}
+  h1,h2,h3{font-family:'Cairo','Tajawal',sans-serif;margin:0;}
+  p{margin:0 0 9px;text-align:justify;}
+
+  /* ===== Cover ===== */
+  .cover{
+    position:relative;height:1090px;overflow:hidden;color:#fff;
+    background:radial-gradient(circle at 30% 20%, #1e5fc6 0%, transparent 55%),
+               linear-gradient(160deg,#0a2a5e 0%, #0d367c 45%, #1453b8 100%);
+    display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;
+    page-break-after:always;
+  }
+  .cover::before{content:"";position:absolute;inset:0;
+    background:radial-gradient(circle at 80% 85%, rgba(22,163,74,.18) 0%, transparent 40%);}
+  .cover-inner{position:relative;z-index:2;padding:0 60px;}
+  .cover .logo{width:230px;height:230px;object-fit:contain;
+    filter:drop-shadow(0 18px 40px rgba(0,0,0,.45));margin-bottom:26px;}
+  .cover .brand{font-size:46px;font-weight:900;letter-spacing:.5px;margin-bottom:6px;}
+  .cover .brand-en{font-size:18px;font-weight:600;opacity:.85;letter-spacing:3px;margin-bottom:26px;}
+  .cover .doc-title{font-size:24px;font-weight:700;color:#cfe0fb;margin-bottom:30px;}
+  .cover .slogan{font-size:18px;line-height:1.9;max-width:620px;margin:0 auto 34px;
+    color:#eaf2ff;font-weight:500;}
+  .cover .slogan .accent{color:#7dffa9;font-weight:700;}
+  .cover .chip{display:inline-block;background:rgba(255,255,255,.14);
+    border:1px solid rgba(255,255,255,.35);border-radius:999px;
+    padding:9px 26px;font-size:15px;font-weight:700;margin-bottom:40px;backdrop-filter:blur(4px);}
+  .cover .credit{font-size:16px;font-weight:700;color:#fff;}
+  .cover .credit .lbl{color:#9fc0f5;font-weight:500;}
+  .cover .date{font-size:13px;opacity:.7;margin-top:8px;}
+  .cover .rule{width:90px;height:4px;border-radius:4px;
+    background:linear-gradient(90deg,#7dffa9,#2f6fd6);margin:0 auto 30px;}
+
+  /* ===== TOC ===== */
+  .toc{padding:60px 56px;page-break-after:always;}
+  .toc h2{color:var(--navy);font-size:26px;margin-bottom:8px;}
+  .toc .sub{color:var(--muted);margin-bottom:26px;}
+  .toc ol{list-style:none;counter-reset:t;margin:0;padding:0;}
+  .toc li{counter-increment:t;display:flex;align-items:center;gap:12px;
+    padding:9px 0;border-bottom:1px dashed var(--line);font-size:14px;}
+  .toc li .num{background:var(--light);color:var(--blue);font-weight:700;
+    border-radius:8px;min-width:30px;height:30px;display:flex;align-items:center;justify-content:center;font-size:13px;}
+  .toc li .t{flex:1;font-weight:500;}
+
+  /* ===== Sections ===== */
+  .section{padding:30px 56px 18px;page-break-before:always;}
+  .sec-head{display:flex;align-items:center;gap:14px;margin-bottom:14px;
+    border-bottom:3px solid var(--light);padding-bottom:12px;}
+  .sec-num{background:linear-gradient(135deg,var(--navy),var(--blue));color:#fff;
+    font-family:'Cairo';font-weight:900;font-size:18px;min-width:42px;height:42px;border-radius:12px;
+    display:flex;align-items:center;justify-content:center;box-shadow:0 6px 14px rgba(20,83,184,.3);}
+  .sec-head h2{color:var(--navy);font-size:22px;font-weight:700;}
+  .sec-body{margin-bottom:8px;color:#27384f;}
+
+  /* figures */
+  .figrow{display:flex;gap:20px;justify-content:center;flex-wrap:wrap;margin:14px 0 4px;}
+  figure.shot{margin:10px auto;text-align:center;break-inside:avoid;}
+  .phone{display:inline-block;padding:8px;background:linear-gradient(160deg,#22364f,#0e1c30);
+    border-radius:26px;box-shadow:0 12px 30px rgba(10,42,94,.25);}
+  .phone img{display:block;max-height:430px;width:auto;border-radius:18px;border:1px solid #0a1626;background:#fff;}
+  figure.shot figcaption{margin-top:9px;font-size:11.5px;color:var(--muted);font-weight:500;}
+
+  /* readiness */
+  .ready{padding:30px 56px;page-break-before:always;}
+  .ready .sec-head h2{color:var(--green);}
+  .ready .sec-num{background:linear-gradient(135deg,#0f7a37,#16a34a);box-shadow:0 6px 14px rgba(22,163,74,.3);}
+  .ready ul.check{list-style:none;margin:14px 0;padding:0;}
+  .ready ul.check li{display:flex;align-items:flex-start;gap:10px;padding:8px 0;
+    border-bottom:1px solid var(--line);font-size:14px;font-weight:500;}
+  .ready ul.check li::before{content:"✓";color:#fff;background:var(--green);
+    min-width:22px;height:22px;border-radius:50%;display:flex;align-items:center;justify-content:center;
+    font-size:13px;font-weight:700;margin-top:2px;}
+  .approve{margin-top:30px;background:var(--light2);border:1px solid var(--line);
+    border-radius:16px;padding:24px 26px;}
+  .approve h3{color:var(--navy);font-size:17px;margin-bottom:14px;}
+  .sign-row{display:flex;gap:40px;margin-top:30px;}
+  .sign{flex:1;}
+  .sign .line{border-top:2px solid #98a9c2;margin-bottom:8px;}
+  .sign .lbl{font-size:12.5px;color:var(--muted);}
+  .closing{margin-top:26px;text-align:center;color:var(--muted);font-size:12.5px;}
+  .closing .em{color:var(--green);font-weight:700;}
+</style>
+</head>
+<body>
+
+  <div class="cover">
+    <div class="cover-inner">
+      <img class="logo" src="assets/logo.png" alt="شعار سجما"/>
+      <div class="brand">تطبيق سِجما</div>
+      <div class="brand-en">SGMA&nbsp;&nbsp;APP</div>
+      <div class="rule"></div>
+      <div class="doc-title">عرضٌ تقديميٌّ لمجلس الإدارة</div>
+      <div class="slogan">منصّةٌ تربط الكفاءات الطبية السورية بين ألمانيا وسوريا، <span class="accent">لأنّ سوريا تستحق</span></div>
+      <div class="chip">النسخة التجريبية المستقرة</div>
+      <div class="credit"><span class="lbl">برمجة وتصميم:</span> عمر الحربي</div>
+      <div class="date">يونيو 2026</div>
+    </div>
+  </div>
+
+  <div class="toc">
+    <h2>محتويات العرض</h2>
+    <div class="sub">دليلٌ لأقسام المنصّة المعروضة في هذا التقرير</div>
+    <ol>
+      <li><span class="num">1</span><span class="t">نظرة عامة على المنصة</span></li><li><span class="num">2</span><span class="t">الرؤية والرسالة</span></li><li><span class="num">3</span><span class="t">الهوية البصرية والبنية التقنية</span></li><li><span class="num">4</span><span class="t">الوصول الآمن: تسجيل الدخول وإنشاء الحساب</span></li><li><span class="num">5</span><span class="t">الصفحة الرئيسية والملف الشخصي</span></li><li><span class="num">6</span><span class="t">نظام الأدوار والصلاحيات</span></li><li><span class="num">7</span><span class="t">اعتماد العضوية والموافقة على الحسابات</span></li><li><span class="num">8</span><span class="t">الأخبار</span></li><li><span class="num">9</span><span class="t">المقالات</span></li><li><span class="num">10</span><span class="t">المحادثات</span></li><li><span class="num">11</span><span class="t">مجلس الإدارة</span></li><li><span class="num">12</span><span class="t">الوفود التطوّعية الطبية</span></li><li><span class="num">13</span><span class="t">إدارة المهام والمشاريع</span></li><li><span class="num">14</span><span class="t">أكاديمية سجما الطبية</span></li><li><span class="num">15</span><span class="t">أكاديمية سوريا الطبية والوصول المخصّص</span></li><li><span class="num">16</span><span class="t">الصفحات التعريفية والقانونية</span></li><li><span class="num">17</span><span class="t">معلومات المطوّر</span></li><li><span class="num">18</span><span class="t">لوحة الإدارة</span></li><li><span class="num">19</span><span class="t">إدارة المحتوى: الأكاديمية والأخبار والمقالات</span></li><li><span class="num">20</span><span class="t">إدارة المهام والبثّ الإداري</span></li><li><span class="num">21</span><span class="t">الإعلانات والشراكات</span></li>
+      <li><span class="num">✓</span><span class="t">الجاهزية والاعتماد</span></li>
+    </ol>
+  </div>
+
+  
+<section class="section">
+  <div class="sec-head"><span class="sec-num">1</span><h2>نظرة عامة على المنصة</h2></div>
+  <div class="sec-body"><p>تطبيق سجما (SGMA APP) هو منصّة مجتمعية رقمية موجّهة للكفاءات الطبية السورية، صُمِّمت بأسلوب يركّز على الهاتف المحمول أولاً مع دعمٍ كاملٍ للّغة العربية واتجاه الكتابة من اليمين إلى اليسار. تجمع المنصّة أعضاء المجتمع الطبي في مكانٍ واحدٍ آمن، وتتيح لهم التواصل والاطّلاع على الأخبار والمقالات والمشاركة في الأنشطة العلمية والتطوّعية.</p><p>تتميّز المنصّة بواجهةٍ موحّدةٍ سهلة الاستخدام، وتنقّلٍ سفليٍّ واضح بين الأقسام الرئيسية (الحساب، الإدارة، الأخبار، المحادثات، الأكاديمية)، مع نظام صلاحيّاتٍ دقيق يضمن وصول كل عضوٍ إلى ما يخصّه فقط.</p></div>
+  <div class="figrow"><figure class="shot"><div class="phone"><img src="screenshots/04-more.png" alt="قائمة الخدمات والوصول السريع إلى أقسام المنصّة"/></div><figcaption>قائمة الخدمات والوصول السريع إلى أقسام المنصّة</figcaption></figure><figure class="shot"><div class="phone"><img src="screenshots/03-home.png" alt="الصفحة الرئيسية وبطاقة الملف الشخصي"/></div><figcaption>الصفحة الرئيسية وبطاقة الملف الشخصي</figcaption></figure></div>
+</section>
+<section class="section">
+  <div class="sec-head"><span class="sec-num">2</span><h2>الرؤية والرسالة</h2></div>
+  <div class="sec-body"><p>تنطلق المنصّة من رؤيةٍ واضحة: ربط الكفاءات الطبية السورية بين ألمانيا وسوريا، وبناء جسرٍ معرفيٍّ ومهنيٍّ يخدم المجتمع الطبي ويعزّز التعاون العلمي والإنساني.</p><p>تتمثّل الرسالة في توفير بيئةٍ رقميةٍ موثوقةٍ تجمع الأطباء والكوادر الصحية، وتتيح تبادل الخبرات، ونشر المحتوى العلمي، وتنظيم الوفود التطوّعية الطبية، وإتاحة أكاديميةٍ تعليميةٍ متخصّصة — كل ذلك ضمن إطارٍ يحترم الخصوصية ويصون البيانات.</p></div>
+  
+</section>
+<section class="section">
+  <div class="sec-head"><span class="sec-num">3</span><h2>الهوية البصرية والبنية التقنية</h2></div>
+  <div class="sec-body"><p>اعتمدت المنصّة هويةً بصريةً موحّدةً قوامها اللون الأزرق بدرجاته (الغامق والمتوسط والفاتح) مع لمسةٍ خضراءَ خفيفةٍ كلونٍ مكمّل، بما ينسجم مع طابع القطاع الطبي ويمنح إحساساً بالثقة والاحترافية.</p><p>بُنيت المنصّة على تقنياتٍ حديثةٍ وموثوقة: واجهةٌ تفاعليةٌ سريعة، وخادمٌ آمن، وقاعدة بياناتٍ منظّمة، مع نظام مصادقةٍ يعتمد رموز الدخول المؤمّنة. روعيت في التصميم معايير الأمان وحماية البيانات، إذ لا تُعرَض أيّ كلمات مرور أو مفاتيح أو بياناتٍ حسّاسة في أيّ واجهةٍ من واجهات المستخدم.</p></div>
+  
+</section>
+<section class="section">
+  <div class="sec-head"><span class="sec-num">4</span><h2>الوصول الآمن: تسجيل الدخول وإنشاء الحساب</h2></div>
+  <div class="sec-body"><p>يبدأ المستخدم رحلته من خلال شاشة تسجيل دخولٍ بسيطةٍ وآمنة، تعتمد المُعرِّف (اسم المستخدم أو البريد) مع اختيار الدور المناسب. أمّا الأعضاء الجدد فيسجّلون عبر نموذجٍ يطلب البيانات الأساسية ورقم العضوية الإلزامي.</p><p>تُحفظ جلسة الدخول بشكلٍ آمنٍ وتبقى سارية عبر تحديث الصفحات، مع توجيه المستخدم تلقائياً إلى الوجهة المطلوبة بعد تسجيل الدخول.</p></div>
+  <div class="figrow"><figure class="shot"><div class="phone"><img src="screenshots/01-login.png" alt="شاشة تسجيل الدخول"/></div><figcaption>شاشة تسجيل الدخول</figcaption></figure><figure class="shot"><div class="phone"><img src="screenshots/02-register.png" alt="نموذج إنشاء حسابٍ جديد"/></div><figcaption>نموذج إنشاء حسابٍ جديد</figcaption></figure></div>
+</section>
+<section class="section">
+  <div class="sec-head"><span class="sec-num">5</span><h2>الصفحة الرئيسية والملف الشخصي</h2></div>
+  <div class="sec-body"><p>توفّر الصفحة الرئيسية للعضو نظرةً شاملةً على حسابه: الاسم، رقم العضوية، حالة الحساب، وأيّام النشاط، إضافةً إلى المعلومات الشخصية والمهنية. يستطيع العضو تحديث بياناته وصورته الشخصية بسهولة.</p><p>صُمِّمت البطاقة الشخصية لتكون واضحةً ومرتّبة، مع فصلٍ بين المعلومات القابلة للتعديل وتلك الثابتة (مثل رقم العضوية الذي يُدار من قبل الإدارة).</p></div>
+  <figure class="shot"><div class="phone"><img src="screenshots/03-home.png" alt="بطاقة الملف الشخصي ومعلومات العضو"/></div><figcaption>بطاقة الملف الشخصي ومعلومات العضو</figcaption></figure>
+</section>
+<section class="section">
+  <div class="sec-head"><span class="sec-num">6</span><h2>نظام الأدوار والصلاحيات</h2></div>
+  <div class="sec-body"><p>تعتمد المنصّة نظام أدوارٍ متدرّجٍ يضمن أن يصل كل مستخدمٍ إلى ما يخصّه فقط: العضو، والمشرف، والمدير، إضافةً إلى صلاحياتٍ إداريةٍ عُليا محصورةٍ بأضيق نطاق.</p><p>الخادم هو المرجع الوحيد في التحقّق من الصلاحيات؛ فأيّ محاولةٍ للوصول إلى وظيفةٍ غير مصرّحٍ بها تُرفَض من جهة الخادم بصرف النظر عن الواجهة. كما تتضمّن المنصّة قيوداً وقائيةً تمنع أيّ خللٍ إداري، مثل منع تعطيل آخر حسابٍ إداريٍّ فعّال.</p></div>
+  
+</section>
+<section class="section">
+  <div class="sec-head"><span class="sec-num">7</span><h2>اعتماد العضوية والموافقة على الحسابات</h2></div>
+  <div class="sec-body"><p>لا يتم تفعيل الحسابات الجديدة تلقائياً؛ فبعد التسجيل يدخل الحساب في حالة «قيد المراجعة» إلى أن تعتمده الإدارة بعد التحقّق من رقم العضوية. هذه الآلية تضمن أنّ أعضاء المجتمع موثوقون فعلاً.</p><p>تتيح لوحة الإدارة فرز الحسابات حسب حالتها (قيد المراجعة / مفعّل / موقوف) وتفعيلها بضغطةٍ واحدة، مع رسائل واضحةٍ توضّح للعضو حالة طلبه.</p></div>
+  
+</section>
+<section class="section">
+  <div class="sec-head"><span class="sec-num">8</span><h2>الأخبار</h2></div>
+  <div class="sec-body"><p>يعرض قسم الأخبار آخر المستجدّات بترتيبٍ زمنيٍّ من الأحدث، ببطاقاتٍ مصوّرةٍ جذّابة. وعند فتح الخبر تظهر التفاصيل الكاملة مع الصورة والتصنيف والتاريخ والمحتوى.</p><p>يُدار نشر الأخبار من قبل الطاقم المختصّ فقط، بينما يطّلع الأعضاء على الأخبار المنشورة دون إمكانية التعديل.</p></div>
+  <div class="figrow"><figure class="shot"><div class="phone"><img src="screenshots/05-news.png" alt="قائمة الأخبار المنشورة"/></div><figcaption>قائمة الأخبار المنشورة</figcaption></figure><figure class="shot"><div class="phone"><img src="screenshots/06-news-detail.png" alt="تفاصيل الخبر"/></div><figcaption>تفاصيل الخبر</figcaption></figure></div>
+</section>
+<section class="section">
+  <div class="sec-head"><span class="sec-num">9</span><h2>المقالات</h2></div>
+  <div class="sec-body"><p>يتيح قسم المقالات للأعضاء كتابة مقالاتهم وإرسالها للمراجعة قبل النشر، ضمن مسار اعتمادٍ واضح (مسودّة، قيد المراجعة، منشور). ويعرض القسم العام المقالات المعتمدة فقط.</p><p>يستطيع العضو متابعة حالة مقالاته الخاصة، وتعديل ما لم يُعتمد بعد، بينما يتولّى الطاقم المختصّ مراجعة المقالات واعتمادها.</p></div>
+  <div class="figrow"><figure class="shot"><div class="phone"><img src="screenshots/07-articles.png" alt="قائمة المقالات المعتمدة"/></div><figcaption>قائمة المقالات المعتمدة</figcaption></figure><figure class="shot"><div class="phone"><img src="screenshots/08-article-detail.png" alt="صفحة المقال"/></div><figcaption>صفحة المقال</figcaption></figure></div>
+</section>
+<section class="section">
+  <div class="sec-head"><span class="sec-num">10</span><h2>المحادثات</h2></div>
+  <div class="sec-body"><p>توفّر المنصّة مساحتَي تواصل: محادثةً عامةً تجمع جميع الأعضاء، وقناةً مباشرةً بين العضو وفريق الإدارة للاستفسارات الخاصة.</p><p>تتيح المحادثات إرسال الرسائل وتعديلها وحذفها وفق الصلاحيات، مع تحديثٍ دوريٍّ سلسٍ للرسائل الجديدة، ما يجعل التواصل عمليّاً وفوريّاً.</p></div>
+  <div class="figrow"><figure class="shot"><div class="phone"><img src="screenshots/09-chat.png" alt="مركز المحادثات"/></div><figcaption>مركز المحادثات</figcaption></figure><figure class="shot"><div class="phone"><img src="screenshots/10-chat-public.png" alt="غرفة المحادثة العامة"/></div><figcaption>غرفة المحادثة العامة</figcaption></figure></div>
+</section>
+<section class="section">
+  <div class="sec-head"><span class="sec-num">11</span><h2>مجلس الإدارة</h2></div>
+  <div class="sec-body"><p>يعرّف هذا القسم بأعضاء مجلس الإدارة عبر بطاقاتٍ تتضمّن الاسم والمنصب ونبذةً تعريفية، مع إمكانية الاطّلاع على المجلس الحالي والمجالس السابقة وتاريخ المجلس.</p><p>إدارة بيانات المجلس (إضافة/تعديل) محصورةٌ بالصلاحيات الإدارية العليا، بينما يطّلع جميع الأعضاء على المعلومات للقراءة فقط.</p></div>
+  <div class="figrow"><figure class="shot"><div class="phone"><img src="screenshots/11-board.png" alt="صفحة مجلس الإدارة"/></div><figcaption>صفحة مجلس الإدارة</figcaption></figure><figure class="shot"><div class="phone"><img src="screenshots/12-board-current.png" alt="أعضاء المجلس الحالي"/></div><figcaption>أعضاء المجلس الحالي</figcaption></figure></div>
+</section>
+<section class="section">
+  <div class="sec-head"><span class="sec-num">12</span><h2>الوفود التطوّعية الطبية</h2></div>
+  <div class="sec-body"><p>يتيح هذا القسم للأعضاء الفاعلين التسجيل في الوفود الطبية التطوّعية عبر نموذجٍ مفصّلٍ يجمع البيانات اللازمة، مع إمكانية إرفاق مستنداتٍ بصيغة PDF.</p><p>يتابع الطاقم المختصّ الطلبات الواردة ويحدّث حالتها (مُستلَم، قيد المراجعة، مقبول…)، ضمن مسارٍ منظّمٍ يضمن سرعة التواصل وترتيب الإجراءات.</p></div>
+  <figure class="shot"><div class="phone"><img src="screenshots/13-volunteer.png" alt="نموذج التسجيل في الوفود التطوّعية"/></div><figcaption>نموذج التسجيل في الوفود التطوّعية</figcaption></figure>
+</section>
+<section class="section">
+  <div class="sec-head"><span class="sec-num">13</span><h2>إدارة المهام والمشاريع</h2></div>
+  <div class="sec-body"><p>تضمّ المنصّة وحدةً متكاملةً لإدارة المهام تشبه لوحات العمل التعاونية، حيث يُكلَّف المشاركون بأدوارٍ متعدّدة (مشرف، مكلّف، مساعد)، ويُتابَع تقدّم العمل وتُرفَع التقارير مع المرفقات.</p><p>يرى كل مشاركٍ المهامّ المسندة إليه فقط، ويستطيع رفع تقاريره، بينما يدير الطاقم المختصّ المهامّ بالكامل ويصدّر تقاريرها عند الحاجة.</p></div>
+  <figure class="shot"><div class="phone"><img src="screenshots/14-tasks.png" alt="قائمة المهام الخاصة بالعضو"/></div><figcaption>قائمة المهام الخاصة بالعضو</figcaption></figure>
+</section>
+<section class="section">
+  <div class="sec-head"><span class="sec-num">14</span><h2>أكاديمية سجما الطبية</h2></div>
+  <div class="sec-body"><p>تقدّم الأكاديمية محتوىً علميّاً متخصّصاً عبر المحاضرات المسجّلة والمباشرة والإعلانات الأكاديمية. صُمِّمت لتكون مرجعاً تعليميّاً مستمرّاً لأعضاء المجتمع الطبي.</p><p>يتصفّح العضو المحاضرات حسب اختصاصه، ويطّلع على الإعلانات والمواعيد القادمة، ضمن واجهةٍ مرتّبةٍ تسهّل الوصول إلى المحتوى المناسب.</p></div>
+  <div class="figrow"><figure class="shot"><div class="phone"><img src="screenshots/15-academy.png" alt="الصفحة الرئيسية للأكاديمية"/></div><figcaption>الصفحة الرئيسية للأكاديمية</figcaption></figure><figure class="shot"><div class="phone"><img src="screenshots/16-academy-announcements.png" alt="إعلانات الأكاديمية"/></div><figcaption>إعلانات الأكاديمية</figcaption></figure></div><div class="figrow"><figure class="shot"><div class="phone"><img src="screenshots/17-academy-lectures.png" alt="قائمة المحاضرات"/></div><figcaption>قائمة المحاضرات</figcaption></figure><figure class="shot"><div class="phone"><img src="screenshots/18-academy-lecture-detail.png" alt="صفحة المحاضرة"/></div><figcaption>صفحة المحاضرة</figcaption></figure></div>
+</section>
+<section class="section">
+  <div class="sec-head"><span class="sec-num">15</span><h2>أكاديمية سوريا الطبية والوصول المخصّص</h2></div>
+  <div class="sec-body"><p>توفّر المنصّة مساراً مخصّصاً لأعضاء أكاديمية سوريا الطبية، حيث يُعرَض لكل عضوٍ المحتوى المرتبط باختصاصه فقط (مثل التمريض)، بما يضمن تجربةً موجّهةً ودقيقة.</p><p>يعكس هذا النموذج مرونة نظام الصلاحيات في المنصّة وقدرته على تقديم تجاربَ مخصّصةٍ بحسب نطاق وصول كل عضو.</p></div>
+  <figure class="shot"><div class="phone"><img src="screenshots/28-academy-syria.png" alt="أكاديمية سوريا الطبية بعرضٍ مخصّصٍ حسب الاختصاص"/></div><figcaption>أكاديمية سوريا الطبية بعرضٍ مخصّصٍ حسب الاختصاص</figcaption></figure>
+</section>
+<section class="section">
+  <div class="sec-head"><span class="sec-num">16</span><h2>الصفحات التعريفية والقانونية</h2></div>
+  <div class="sec-body"><p>تتضمّن المنصّة صفحاتٍ تعريفيةً وقانونيةً واضحة: «من نحن»، و«سياسة الخصوصية»، و«الشروط والأحكام»، متاحةً للجميع للقراءة، وتُحدَّث بمسؤوليةٍ من الجهة المعنيّة.</p><p>تعزّز هذه الصفحات الشفافية والثقة، وتوضّح للأعضاء حقوقهم والتزامات المنصّة تجاه بياناتهم.</p></div>
+  <div class="figrow"><figure class="shot"><div class="phone"><img src="screenshots/19-about.png" alt="صفحة من نحن"/></div><figcaption>صفحة من نحن</figcaption></figure><figure class="shot"><div class="phone"><img src="screenshots/20-privacy.png" alt="سياسة الخصوصية"/></div><figcaption>سياسة الخصوصية</figcaption></figure></div>
+</section>
+<section class="section">
+  <div class="sec-head"><span class="sec-num">17</span><h2>معلومات المطوّر</h2></div>
+  <div class="sec-body"><p>توفّر المنصّة بطاقةً تعريفيةً بمطوّر التطبيق، تتضمّن بيانات التواصل المهنية ووصفاً للدور، مع إمكانية الاتصال المباشر أو إرسال بريدٍ إلكتروني.</p><p>تُدار هذه البطاقة بصلاحيةٍ خاصةٍ بالمطوّر وحده، ما يضمن دقّة المعلومات وحصر تعديلها بالجهة المعنيّة.</p></div>
+  <figure class="shot"><div class="phone"><img src="screenshots/21-developer-info.png" alt="بطاقة معلومات المطوّر"/></div><figcaption>بطاقة معلومات المطوّر</figcaption></figure>
+</section>
+<section class="section">
+  <div class="sec-head"><span class="sec-num">18</span><h2>لوحة الإدارة</h2></div>
+  <div class="sec-body"><p>تمنح لوحة الإدارة الطاقم المختصّ نظرةً شاملةً على المنصّة عبر بطاقات إحصائيةٍ (عدد الأخبار المنشورة، المقالات قيد المراجعة، الأعضاء النشطين، إجمالي الأعضاء)، مع روابطَ مباشرةٍ لأقسام الإدارة.</p><p>صُمِّمت اللوحة لتكون مركز التحكّم الرئيسي، مع إظهار كل قسمٍ إداريٍّ وفق صلاحيات المستخدم.</p></div>
+  <figure class="shot"><div class="phone"><img src="screenshots/22-admin.png" alt="لوحة الإدارة والإحصاءات"/></div><figcaption>لوحة الإدارة والإحصاءات</figcaption></figure>
+</section>
+<section class="section">
+  <div class="sec-head"><span class="sec-num">19</span><h2>إدارة المحتوى: الأكاديمية والأخبار والمقالات</h2></div>
+  <div class="sec-body"><p>يدير الطاقم المختصّ محتوى المنصّة من مكانٍ واحد: إدارة محاضرات الأكاديمية وإعلاناتها، ونشر الأخبار وتعديلها، ومراجعة المقالات واعتمادها أو رفضها مع إبداء السبب.</p><p>تتيح هذه الأدوات تحكّماً كاملاً في دورة حياة المحتوى مع فرزٍ حسب الحالة، بما يحافظ على جودة ما يُنشَر للأعضاء.</p></div>
+  <div class="figrow"><figure class="shot"><div class="phone"><img src="screenshots/23-admin-academy.png" alt="إدارة الأكاديمية"/></div><figcaption>إدارة الأكاديمية</figcaption></figure><figure class="shot"><div class="phone"><img src="screenshots/25-admin-news.png" alt="إدارة الأخبار"/></div><figcaption>إدارة الأخبار</figcaption></figure></div><figure class="shot"><div class="phone"><img src="screenshots/26-admin-articles.png" alt="إدارة المقالات ومراجعتها"/></div><figcaption>إدارة المقالات ومراجعتها</figcaption></figure>
+</section>
+<section class="section">
+  <div class="sec-head"><span class="sec-num">20</span><h2>إدارة المهام والبثّ الإداري</h2></div>
+  <div class="sec-body"><p>يستطيع الطاقم المختصّ إنشاء المهامّ وإسنادها ومتابعتها وتصدير تقاريرها، إضافةً إلى إرسال رسائل البثّ التي تظهر للأعضاء كإشعاراتٍ بارزةٍ ضمن المنصّة.</p><p>تتيح هذه الأدوات تنظيم العمل الداخلي والتواصل الجماعي الفعّال مع الأعضاء عند الحاجة.</p></div>
+  <div class="figrow"><figure class="shot"><div class="phone"><img src="screenshots/24-admin-tasks.png" alt="إدارة المهام"/></div><figcaption>إدارة المهام</figcaption></figure><figure class="shot"><div class="phone"><img src="screenshots/27-admin-broadcasts.png" alt="إدارة رسائل البثّ"/></div><figcaption>إدارة رسائل البثّ</figcaption></figure></div>
+</section>
+<section class="section">
+  <div class="sec-head"><span class="sec-num">21</span><h2>الإعلانات والشراكات</h2></div>
+  <div class="sec-body"><p>تتيح المنصّة مساحاتٍ إعلانيةً مخصّصةً لشركاءَ خاصّين فقط، تُدار داخليّاً من قبل الإدارة وتُعرَض ضمن سياق المنصّة بما يناسب طبيعة المجتمع الطبي.</p><p>تُمنَح هذه المساحات لشركاءَ موثوقين بترتيبٍ مباشرٍ مع الإدارة، بما يحفظ هوية المنصّة ومصداقيّتها ويضمن ملاءمة المحتوى الإعلاني لأعضائها.</p></div>
+  
+</section>
+
+  <div class="ready">
+    <div class="sec-head"><span class="sec-num">✓</span><h2>الجاهزية والاعتماد</h2></div>
+    <div class="sec-body"><p>وصلت المنصّة إلى مرحلة «النسخة التجريبية المستقرة»، وهي جاهزةٌ للعرض على مجلس الإدارة واتخاذ قرار الاعتماد والانطلاق. تعمل جميع الوحدات الأساسية بشكلٍ متكامل، مع أساسٍ متينٍ للأمان وحماية البيانات.</p></div>
+    <ul class="check"><li>تسجيل الدخول وإنشاء الحسابات واعتمادها من الإدارة</li><li>الملف الشخصي وإدارة بيانات العضو</li><li>الأخبار والمقالات مع مسار المراجعة والاعتماد</li><li>المحادثات العامة والمباشرة مع الإدارة</li><li>مجلس الإدارة والوفود التطوّعية وإدارة المهام</li><li>أكاديمية سجما الطبية وأكاديمية سوريا بالوصول المخصّص</li><li>لوحة الإدارة الشاملة وإدارة المحتوى والبثّ</li><li>نظام صلاحياتٍ يُتحقَّق منه على مستوى الخادم وحماية للبيانات الحسّاسة</li></ul>
+    <div class="approve">
+      <h3>اعتماد مجلس الإدارة</h3>
+      <p>نعرض هذا العمل على مجلسكم الموقّر للاطّلاع والاعتماد والموافقة على الانطلاق بالنسخة التشغيلية.</p>
+      <div class="sign-row">
+        <div class="sign"><div class="line"></div><div class="lbl">رئيس مجلس الإدارة — الاسم والتوقيع</div></div>
+        <div class="sign"><div class="line"></div><div class="lbl">التاريخ</div></div>
+      </div>
+    </div>
+    <div class="closing">برمجة وتصميم: <span class="em">عمر الحربي</span> — منصّة سجما، النسخة التجريبية المستقرة</div>
+  </div>
+
+</body>
+</html>
