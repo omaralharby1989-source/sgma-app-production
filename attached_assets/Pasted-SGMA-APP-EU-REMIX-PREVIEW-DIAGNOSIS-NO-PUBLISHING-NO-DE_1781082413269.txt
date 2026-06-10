@@ -1,0 +1,163 @@
+SGMA APP EU REMIX PREVIEW DIAGNOSIS — NO PUBLISHING / NO DEPLOYMENT CHANGES
+
+Start this diagnosis task now.
+
+Goal:
+Diagnose why the preview of the new remixed/forked project `SGMA-APP-EU-PRODUCTION` is not opening.
+
+This is diagnosis and safe repair only for local preview/workflows.
+
+Do NOT publish.
+Do NOT unpublish.
+Do NOT change deployment geography.
+Do NOT create a deployment.
+Do NOT modify production deployment.
+Do NOT overwrite production database.
+Do NOT expose secrets.
+Do NOT change app features.
+Do NOT change auth logic.
+Do NOT change permissions.
+Do NOT change database schema.
+
+==================================================
+A. CURRENT CONTEXT
+==================
+
+The original SGMA APP deployment is still live and should remain untouched.
+
+A new Replit Remix/Fork was created:
+
+SGMA-APP-EU-PRODUCTION
+
+During remix, the option was selected:
+Copy data from original App
+
+Now the preview inside Replit is not opening / stays blank.
+
+We need to diagnose the new remix project before publishing it to Europe.
+
+==================================================
+B. REQUIRED DIAGNOSIS
+=====================
+
+Check the new remix project only.
+
+Inspect and report:
+
+1. Are all files present after remix?
+2. Are package.json and workspace files present?
+3. Are dependencies installed?
+4. Are workflows present?
+5. Are workflows running?
+6. Is the dev server running?
+7. What command is the preview trying to run?
+8. Is the correct port exposed?
+9. Are required environment variables / secrets present?
+10. Is DATABASE_URL present in the remix environment?
+11. Did the copied database connect successfully?
+12. Does `/api/healthz` respond locally?
+13. Are there build/runtime errors in logs?
+14. Is the frontend failing to load because of BASE_PATH / VITE config?
+15. Is the backend failing because of missing secrets?
+16. Is the database failing because remix did not copy the production DB correctly?
+
+Do not print real secret values.
+
+==================================================
+C. SAFE ACTIONS ALLOWED
+=======================
+
+Allowed safe actions:
+
+1. Start/restart local development workflows.
+2. Install dependencies if missing.
+3. Run typecheck.
+4. Run local dev server.
+5. Run health checks.
+6. Fix workflow configuration only if clearly broken by remix.
+7. Fix local preview/start command only if needed.
+8. Add placeholder .env.example documentation if missing.
+9. Report missing secrets without printing values.
+
+==================================================
+D. SAFE ACTIONS NOT ALLOWED
+===========================
+
+Do NOT:
+
+* publish the remix
+* unpublish original app
+* change deployment type
+* create new deployment
+* change geography
+* overwrite production database
+* enable “Copy development database to production database”
+* run destructive database migrations
+* reset database
+* delete data
+* print DATABASE_URL or SESSION_SECRET
+* change app modules
+* change permissions
+* change authentication behavior
+
+==================================================
+E. CHECK COMMANDS
+=================
+
+Run safe checks such as:
+
+* pwd
+* ls
+* pnpm install if dependencies are missing
+* pnpm --filter @workspace/sgma-app2 run typecheck
+* check workflows
+* check logs
+* check /api/healthz locally once server is running
+
+If the app uses a monorepo, verify the correct workspace command.
+
+==================================================
+F. EXPECTED PREVIEW REQUIREMENTS
+================================
+
+The preview should eventually open:
+
+* root `/`
+* `/login`
+* `/api/healthz`
+
+Expected health response:
+{"status":"ok"}
+
+==================================================
+G. REQUIRED REPORT
+==================
+
+After diagnosis, provide:
+
+SGMA EU REMIX PREVIEW DIAGNOSIS REPORT
+
+Include:
+
+1. Root cause of preview not opening
+2. Whether workflows were running
+3. Whether dependencies were installed
+4. Whether secrets/env vars are present
+5. Whether database copied/connected
+6. Whether `/api/healthz` works
+7. Whether `/login` loads
+8. Files changed, if any
+9. Commands run
+10. Typecheck result
+11. Preview status after fix
+12. Remaining blockers before Europe publish
+13. Confirmation:
+
+* original production app not touched
+* no publish/unpublish performed
+* no deployment geography changed
+* no database overwritten
+* no secrets exposed
+* no auth/permissions/features changed
+
+Do not proceed to Europe publishing until preview works and the user confirms.
