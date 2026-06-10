@@ -1,0 +1,194 @@
+FINAL SGMA APP RELEASE BACKUP — BEFORE STORE BUILD
+
+Start this backup task now.
+
+Goal:
+Create a final safe backup of the current SGMA APP stable release candidate before Android/iOS store build, AdMob integration, or any publishing-related changes.
+
+This is backup/documentation only.
+
+Do NOT change app logic.
+Do NOT change frontend behavior.
+Do NOT change backend behavior.
+Do NOT change database schema.
+Do NOT change authentication.
+Do NOT change permissions.
+Do NOT add features.
+Do NOT remove files.
+Do NOT expose secrets.
+
+==================================================
+A. REQUIRED BACKUP FILES
+========================
+
+Create a backup folder:
+
+backups/final-release-candidate/
+
+Inside it, create:
+
+1. Final source code archive:
+   SGMA_APP_FINAL_RELEASE_CANDIDATE_CODE_2026_06_10.zip
+
+2. Database backup:
+   SGMA_APP_FINAL_RELEASE_CANDIDATE_DB_2026_06_10.sql.gz
+
+3. Restore instructions:
+   RESTORE_INSTRUCTIONS.md
+
+4. Release notes:
+   FINAL_RELEASE_NOTES.md
+
+5. Backup verification report:
+   BACKUP_VERIFICATION_REPORT.md
+
+==================================================
+B. CODE BACKUP RULES
+====================
+
+The ZIP must include the full project source code needed to restore the app.
+
+Exclude:
+
+* node_modules
+* .git
+* temporary build folders if not needed
+* cache folders
+* log files
+* secrets
+* .env files containing real secrets
+* database dump if separately saved
+* large unnecessary temp files
+
+Important:
+Do not include:
+
+* DATABASE_URL
+* JWT secrets
+* API keys
+* private tokens
+* Replit secrets
+* payment information
+
+If environment templates are needed, create:
+.env.example
+
+The .env.example must contain placeholder names only, not real values.
+
+==================================================
+C. DATABASE BACKUP RULES
+========================
+
+Create a PostgreSQL database backup as:
+
+SGMA_APP_FINAL_RELEASE_CANDIDATE_DB_2026_06_10.sql.gz
+
+Important:
+This backup may contain real member data and password hashes.
+Do not expose it publicly.
+Do not print database content in logs.
+Do not include it inside public documentation.
+Mention clearly that it is private and must be stored securely.
+
+==================================================
+D. RESTORE INSTRUCTIONS
+=======================
+
+Create RESTORE_INSTRUCTIONS.md with:
+
+1. How to unzip the source code.
+2. Required Node version if known.
+3. Install commands.
+4. Environment variables required, with placeholders only.
+5. Database restore command.
+6. How to run migrations if needed.
+7. How to start the app.
+8. How to run typecheck/build.
+9. Important warning:
+
+   * do not commit secrets
+   * keep DB backup private
+   * restore only in a trusted environment
+
+==================================================
+E. RELEASE NOTES
+================
+
+Create FINAL_RELEASE_NOTES.md summarizing:
+
+* Stable release candidate status
+* Major modules included:
+
+  * authentication and membership approval
+  * news
+  * articles
+  * chat
+  * board of directors
+  * volunteer delegations
+  * tasks
+  * SGMA Academy Syria
+  * admin/member management
+  * internal broadcasts
+  * private partner advertisements support
+  * legal/static pages
+* Visual identity:
+
+  * SGMA blue identity
+  * transparent 3D logo
+* Store preparation status:
+
+  * ready for Android/iOS packaging
+  * AdMob not yet integrated
+  * store build not yet finalized
+
+Do NOT mention Google Ads or AdSense in public release notes.
+If ads are mentioned, write only:
+private partner/sponsor advertisement spaces controlled by SGMA administration.
+
+==================================================
+F. VERIFICATION
+===============
+
+After creating backups, verify:
+
+1. ZIP file exists.
+2. ZIP file can be listed/opened.
+3. ZIP does not include node_modules.
+4. ZIP does not include .git.
+5. ZIP does not include real .env secrets.
+6. DB backup exists.
+7. DB backup file size is reasonable.
+8. Restore instructions exist.
+9. Release notes exist.
+10. Typecheck still passes after backup.
+11. No app files were changed except backup/docs files.
+
+==================================================
+G. REQUIRED REPORT
+==================
+
+After completion, provide:
+
+FINAL RELEASE BACKUP REPORT
+
+Include:
+
+1. Code ZIP path
+2. Code ZIP size
+3. Database backup path
+4. Database backup size
+5. Restore instructions path
+6. Release notes path
+7. Backup verification report path
+8. Confirmation:
+
+   * no backend changed
+   * no frontend logic changed
+   * no database schema changed
+   * no auth changed
+   * no permissions changed
+   * no secrets exposed in code ZIP
+   * DB backup contains private data and must be stored securely
+9. Any warnings or blockers
+
+Do not continue with Android/Capacitor build until this backup is completed and verified.
