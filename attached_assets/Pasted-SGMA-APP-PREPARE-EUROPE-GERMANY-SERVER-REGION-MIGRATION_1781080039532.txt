@@ -1,0 +1,265 @@
+SGMA APP — PREPARE EUROPE / GERMANY SERVER REGION MIGRATION
+
+Start this infrastructure-preparation task now.
+
+Goal:
+Prepare SGMA APP to run from a Europe/Germany-based production environment instead of a US-based region, if technically available in the current hosting setup.
+
+This task is infrastructure preparation and verification only.
+
+Important:
+Do NOT break the current working app.
+Do NOT change app features.
+Do NOT change database schema.
+Do NOT change auth logic.
+Do NOT change permissions.
+Do NOT change routes.
+Do NOT delete deployments.
+Do NOT reset the project.
+Do NOT change secrets blindly.
+Do NOT hardcode temporary domains.
+
+A final backup already exists, but still be careful.
+
+==================================================
+A. CURRENT CONTEXT
+==================
+
+SGMA APP is being prepared for Google Play / Apple App Store.
+
+Current pending publishing blockers:
+
+1. Production Backend/API URL
+2. Final AAB build
+3. Store screenshots/assets
+4. Demo reviewer credentials
+5. Domain/DNS details from sgma-med.org manager
+
+The user wants the backend/server geography moved from America/US to Germany or Europe if possible.
+
+Preferred future official URLs:
+
+* app.sgma-med.org
+* api.sgma-med.org
+
+But DNS details are not available yet.
+
+==================================================
+B. PHASE 1 — RECONNAISSANCE ONLY
+================================
+
+First inspect and report:
+
+1. Where is the app currently hosted?
+2. Is it using Replit Deployments?
+3. Is there any region setting available?
+4. Is the current region shown as US/America?
+5. Is the database hosted separately?
+6. Where is the PostgreSQL database located, if visible?
+7. Are there environment variables tied to current host URLs?
+8. Is VITE_API_BASE_URL currently set anywhere?
+9. Are mobile build files tied to a temporary backend URL?
+10. Is there any risk if region is changed now?
+
+Do not change anything before this report.
+
+==================================================
+C. REGION MIGRATION OPTIONS
+===========================
+
+Check if the current platform allows selecting one of:
+
+* Germany
+* Frankfurt
+* EU Central
+* Europe
+* Amsterdam
+* Ireland
+* London
+* EU region generally
+
+If Replit supports an EU/Germany region for this project/deployment:
+
+* report the available option clearly
+* prepare the safest migration steps
+* do not execute destructive migration without confirmation unless it is a simple deployment setting change with no data risk
+
+If Replit does NOT support EU/Germany region:
+
+* report this clearly
+* recommend alternatives
+
+Recommended alternatives to evaluate conceptually:
+
+1. Keep Replit temporarily for first release.
+2. Move later to a European hosting provider.
+3. Use a Germany/EU VPS.
+4. Use Render/Railway/Fly.io/Hetzner/IONOS/Strato or similar EU hosting.
+5. Keep PostgreSQL in EU region if database can be provisioned separately.
+
+Do not purchase anything.
+Do not create external accounts.
+Do not migrate database without explicit confirmation.
+
+==================================================
+D. DATABASE SAFETY
+==================
+
+Database is sensitive and may contain:
+
+* real member data
+* password hashes
+* membership information
+* academy users
+* private app data
+
+Rules:
+
+* Do not dump database unless explicitly needed.
+* Do not print database content.
+* Do not move database without confirmation.
+* Do not expose DATABASE_URL.
+* Do not change database connection strings unless migration is explicitly confirmed.
+* If database region cannot be changed safely, report it as a future migration item.
+
+==================================================
+E. PRODUCTION BACKEND URL PREPARATION
+=====================================
+
+Prepare the app configuration conceptually for future production API URL:
+
+Expected future:
+VITE_API_BASE_URL=https://api.sgma-med.org
+
+But do NOT set this value yet unless the domain is live and confirmed.
+
+For now:
+
+* confirm the native app already supports VITE_API_BASE_URL from the previous Capacitor preparation.
+* confirm where this env var must be set during Android/iOS build.
+* confirm that without a real production URL, mobile store submission remains blocked.
+
+==================================================
+F. IF A SAFE REGION CHANGE IS AVAILABLE NOW
+===========================================
+
+If there is a simple, safe region/deployment setting to switch to EU/Germany without affecting data:
+
+Before applying:
+
+1. Explain what will change.
+2. Confirm no database data loss risk.
+3. Confirm rollback path.
+4. Confirm downtime expectation.
+
+If the tool/process allows immediate safe update and does not require user confirmation:
+
+* only apply it if it does not touch database or secrets.
+* otherwise report exact manual steps and wait.
+
+==================================================
+G. IF REGION CHANGE IS NOT AVAILABLE NOW
+========================================
+
+If region cannot be changed from the current environment:
+
+Create a migration plan document:
+
+docs/deployment/EU_GERMANY_MIGRATION_PLAN.md
+
+Include:
+
+1. Current hosting status
+2. Current database status
+3. Why EU/Germany hosting is recommended
+4. Recommended target architecture:
+
+   * app.sgma-med.org frontend
+   * api.sgma-med.org backend
+   * PostgreSQL in EU/Germany
+   * HTTPS
+   * backups
+5. Safe migration steps
+6. Rollback plan
+7. Required DNS records
+8. Required environment variables
+9. Required testing checklist
+10. Estimated blockers
+
+==================================================
+H. DO NOT CHANGE
+================
+
+Do not change:
+
+* backend logic
+* frontend logic
+* database schema
+* auth
+* permissions
+* app roles
+* Android package name
+* Capacitor config unless only documenting env usage
+* AdMob
+* internal ads
+* app content
+* user data
+
+==================================================
+I. TESTING / VERIFICATION
+=========================
+
+After reconnaissance or any safe update, verify:
+
+1. App still starts.
+2. Login page still loads.
+3. API still responds.
+4. Typecheck passes if any files changed.
+5. No secrets exposed.
+6. No database changes.
+7. No broken environment variables.
+
+==================================================
+J. REQUIRED REPORT
+==================
+
+After completion, provide:
+
+SGMA EU / GERMANY HOSTING PREPARATION REPORT
+
+Include:
+
+1. Current hosting platform
+2. Current visible region
+3. Current database hosting/region status if known
+4. Whether EU/Germany region is available now
+5. Whether anything was changed
+6. If changed:
+
+   * what changed
+   * downtime
+   * rollback method
+7. If not changed:
+
+   * why not
+   * recommended next hosting option
+8. Production API URL status
+9. VITE_API_BASE_URL status for mobile builds
+10. Remaining blockers before store submission
+11. Files created/changed
+12. Typecheck result if applicable
+13. Confirmation:
+
+* no backend logic changed
+* no frontend feature logic changed
+* no database schema changed
+* no auth changed
+* no permissions changed
+* no secrets exposed
+
+14. Clear next recommendation:
+
+* continue temporary hosting for first release
+* or migrate to EU/Germany before final store submission
+
+Do not report success unless the current hosting/region situation is clearly documented.
