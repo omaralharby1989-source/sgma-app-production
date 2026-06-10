@@ -1,0 +1,111 @@
+ADD OFFICIAL PRIVACY POLICY URL FOR GOOGLE PLAY STORE SUBMISSION
+
+Start this small publishing-preparation task now.
+
+Scope:
+Add the official public Privacy Policy URL to the Android store preparation files.
+
+This is a documentation/store-metadata update only.
+
+Do NOT change app logic.
+Do NOT change frontend behavior.
+Do NOT change backend.
+Do NOT change database.
+Do NOT change authentication.
+Do NOT change permissions.
+Do NOT change routes.
+Do NOT modify Android build files unless strictly required for metadata documentation.
+Do NOT expose secrets.
+
+==================================================
+A. OFFICIAL PRIVACY POLICY URL
+==============================
+
+Use this URL as the official privacy policy link:
+
+PASTE_PRIVACY_POLICY_URL_HERE
+
+Important:
+The URL must be publicly accessible without login.
+It must not require member account access.
+It must be suitable for Google Play privacy policy requirements.
+
+==================================================
+B. FILES TO UPDATE
+==================
+
+Update:
+
+1. docs/store/android/privacy-policy-url.txt
+
+Content should be exactly the official privacy policy URL, with no extra text.
+
+2. docs/store/android/store-checklist.md
+
+Update the Privacy Policy item from blocker/pending to ready if the URL is valid and public.
+
+3. Any Android store metadata file that currently mentions privacy policy as missing/blocker.
+
+4. If there is a Google Play readiness document, update it too.
+
+Do not update app code unless there is a store metadata reference that requires it.
+
+==================================================
+C. VALIDATION
+=============
+
+Check that:
+
+1. The privacy policy URL is present.
+2. The URL is public.
+3. The URL is not localhost.
+4. The URL is not a Replit preview-only URL unless explicitly approved.
+5. The URL uses HTTPS.
+6. The checklist no longer lists privacy policy as a blocker.
+7. No unrelated files changed.
+
+==================================================
+D. DO NOT CHANGE
+================
+
+Do not change:
+
+* backend
+* database
+* auth
+* permissions
+* Capacitor config
+* Android package name
+* app icon
+* splash screen
+* app routes
+* AdMob
+* internal ads
+* any feature logic
+
+==================================================
+E. REQUIRED REPORT
+==================
+
+After completion, provide:
+
+PRIVACY POLICY URL UPDATE REPORT
+
+Include:
+
+1. Privacy policy URL used
+2. Files changed
+3. Confirmation the URL is HTTPS
+4. Confirmation the URL is public/no login required if verified
+5. Google Play checklist status
+6. Remaining Google Play blockers, if any
+7. Confirmation:
+
+   * no backend changed
+   * no database changed
+   * no auth changed
+   * no permissions changed
+   * no app logic changed
+   * no secrets exposed
+
+Do not report success until the privacy policy URL is added to the store metadata files.
