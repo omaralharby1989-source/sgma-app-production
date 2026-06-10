@@ -1,17 +1,1 @@
-PRIVACY POLICY URL — STATUS: ACTION REQUIRED (BLOCKER for store submission)
-
-The app contains an in-app privacy policy page (public, no login required) at the route:
-    /privacy-policy
-(Arabic). Sibling pages: /terms and /about-sgma.
-
-Google Play requires a PUBLICLY REACHABLE HTTPS URL to the privacy policy.
-
-What is needed before submission:
-- A public production domain for the SGMA web app must be confirmed/deployed.
-- The final privacy policy URL will then be:
-      https://<PRODUCTION_DOMAIN>/privacy-policy
-
-Current development preview (NOT acceptable for store submission — unstable/temporary):
-      https://<replit-dev-domain>/privacy-policy
-
-ACTION: Provide/confirm the public production domain, then paste the final URL here.
+https://sgma-med.org/de/privacy-policy

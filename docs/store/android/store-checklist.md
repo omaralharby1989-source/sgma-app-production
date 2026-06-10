@@ -26,7 +26,7 @@ Legend: ✅ ready · ⚠️ needs input/manual step · ⛔ blocker before submis
 ## 3. Policy & compliance
 | Item | Status | Notes |
 |---|---|---|
-| Privacy policy URL | ⛔ | `privacy-policy-url.txt` — in-app `/privacy-policy` exists, but a PUBLIC production HTTPS URL is required. |
+| Privacy policy URL | ✅ | `privacy-policy-url.txt` — public HTTPS URL provided: https://sgma-med.org/de/privacy-policy (verified reachable, HTTP 200, no login). |
 | Data safety form | ⚠️ | Declare: account data (name, email, membership number), user content (messages, articles), photos (avatar). Data is collected, transmitted to the app's own backend over HTTPS, used for app functionality. No third-party ad SDK. |
 | Content rating questionnaire | ⚠️ | Complete in console. App has user-generated content + chat → rating likely Teen/PEGI 12; answer honestly. |
 | Target audience & content | ⚠️ | Target adults (members). Not directed at children. |
@@ -61,6 +61,6 @@ For a signed release, configure a keystore (or use Play App Signing) before `bun
 
 ## Blockers summary
 - ⛔ Public production **backend/API URL** — set `VITE_API_BASE_URL` at build time (the app is wired for it; value not provided).
-- ⛔ Public **privacy policy URL** — needs production domain.
+- ✅ Public **privacy policy URL** — provided: https://sgma-med.org/de/privacy-policy (HTTPS, public, verified HTTP 200).
 - ⛔ **AAB** — must be built where Android tooling exists.
 - ⚠️ Feature graphic, screenshots, demo reviewer credentials, closed-testing run.
