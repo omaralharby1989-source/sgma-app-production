@@ -1,0 +1,151 @@
+REPLIT EUROPE REGION DEPLOYMENT INVESTIGATION — NO CHANGES
+
+Start this investigation task now.
+
+Goal:
+Find the exact safe way to move the current SGMA APP Replit Deployment from North America to Europe, or create a new Europe deployment if direct change is not possible.
+
+This is investigation only.
+
+Do NOT unpublish.
+Do NOT republish.
+Do NOT pause.
+Do NOT shut down.
+Do NOT change deployment type.
+Do NOT change database.
+Do NOT change secrets.
+Do NOT change app code.
+Do NOT change backend.
+Do NOT change frontend.
+Do NOT change permissions.
+Do NOT run destructive commands.
+
+==================================================
+A. CURRENT CONTEXT
+==================
+
+The current SGMA APP deployment is:
+
+* Platform: Replit Deployments
+* Type: Autoscale
+* Current visible Geography: North America
+* App is live and healthy
+* Production database is connected
+* User has Replit Core plan
+* Core plan screen says: “Publish projects in any region”
+
+The user wants to move the deployment geography to Europe before store publishing.
+
+A video/screen review showed:
+
+* Republish → Adjust settings does NOT show Geography/Region.
+* Manage → Change deployment type warns that it will unpublish and publish again.
+* The user should not click dangerous options without a confirmed plan.
+
+==================================================
+B. REQUIRED INVESTIGATION
+=========================
+
+Please inspect Replit project/deployment configuration and answer:
+
+1. Is there any way to change Publishing Geography on an existing published app?
+2. If not, is the only way to unpublish and publish again?
+3. After unpublish, where exactly does the Geography/Region option appear?
+4. Is Europe selectable with the current Replit Core plan?
+5. Does changing deployment type affect geography, or only deployment type?
+6. Can a second/new deployment be created for the same project without unpublishing the current one?
+7. If a second deployment is possible, how?
+8. If not possible, what is the safest unpublish/republish sequence?
+9. Will the existing production database remain connected after unpublish/republish?
+10. Is there a risk that the production database will be replaced if “Copy development database to production database” is selected?
+11. Should that copy option remain OFF?
+12. How can we verify after publishing that the new deployment is Europe?
+13. How can we verify app/API health after migration?
+14. What is the rollback method if the Europe deployment fails?
+
+==================================================
+C. DATABASE SAFETY REQUIREMENTS
+===============================
+
+The current production database contains real user/member data.
+
+Rules:
+
+* Do not modify database.
+* Do not copy development database over production.
+* Do not reset database.
+* Do not migrate database.
+* Do not print DATABASE_URL.
+* Do not expose secrets.
+
+Important question:
+If we unpublish and republish, will the same production database remain, or does Replit create a new one?
+
+If unknown, say unknown clearly and recommend confirmation before action.
+
+==================================================
+D. WHAT TO CHECK IN UI / DOCS
+=============================
+
+Use available Replit project context and documentation if available.
+
+Specifically verify:
+
+* Publishing Geography behavior
+* Whether geography is permanent after first publish
+* Whether Core plan supports Europe
+* Whether Autoscale supports geography selection
+* Whether unpublish/republish is required
+* Whether production database remains safe
+
+==================================================
+E. REQUIRED OUTPUT
+==================
+
+Provide a clear step-by-step guide titled:
+
+SAFE STEPS TO MOVE SGMA APP REPLIT DEPLOYMENT TO EUROPE
+
+The guide must include:
+
+1. Current state summary
+2. Whether current deployment can be changed in-place
+3. Whether unpublish is required
+4. Exact UI steps the user should follow
+5. What buttons NOT to press
+6. How to choose Europe
+7. What to do with Production database options
+8. What to do with Secrets
+9. Verification after publish:
+
+   * open app root
+   * open /login
+   * open /api/healthz
+   * test admin login
+   * test member login
+10. Rollback plan
+11. Downtime warning
+12. Final recommendation:
+
+* proceed now
+* or wait until custom domain/DNS is ready
+
+==================================================
+F. REQUIRED SAFETY REPORT
+=========================
+
+Also include:
+
+REPLIT EUROPE REGION SAFETY REPORT
+
+With:
+
+1. Files changed: should be none
+2. Deployment changed: should be no
+3. Database changed: should be no
+4. Secrets exposed: should be no
+5. App health before action
+6. Remaining unknowns
+7. Whether user confirmation is required before unpublish
+
+Do not perform the migration. Only provide the exact safe instructions.
