@@ -1,0 +1,7 @@
+First release of SGMA APP.
+
+• Modern Arabic, right-to-left (RTL) interface, designed mobile-first.
+• News, articles, and academy content.
+• Chat and direct communication with the administration.
+• Board of Directors, volunteer delegations, and tasks.
+• Profile and membership management.

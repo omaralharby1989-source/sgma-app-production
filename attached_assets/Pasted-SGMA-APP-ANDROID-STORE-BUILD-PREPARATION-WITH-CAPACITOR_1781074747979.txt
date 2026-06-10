@@ -1,0 +1,381 @@
+SGMA APP — ANDROID STORE BUILD PREPARATION WITH CAPACITOR
+
+Start this task now.
+
+Goal:
+Prepare SGMA APP for Android publication on Google Play using Capacitor, and generate a complete readiness report.
+
+Important:
+This is a publishing/build preparation task, not a feature-development task.
+
+Do NOT add new app features.
+Do NOT change business logic.
+Do NOT change backend behavior.
+Do NOT change database schema.
+Do NOT change authentication.
+Do NOT change role permissions.
+Do NOT change existing app routes.
+Do NOT remove any existing functionality.
+
+Current project:
+
+* SGMA APP is a React/Vite frontend with Node/Express backend.
+* PostgreSQL + Drizzle.
+* JWT authentication.
+* Arabic RTL.
+* Mobile-first.
+* App is already tested as a stable release candidate.
+* Google Play Developer account is ready.
+* Apple Developer payment is done but may still be pending activation.
+* Android build should be prepared first.
+
+==================================================
+A. REQUIRED PHASE 1 — RECONNAISSANCE ONLY
+=========================================
+
+First, inspect the project and report the current status before changing anything.
+
+Check:
+
+1. Is Capacitor already installed?
+2. Is there an existing Android project folder?
+3. Current package.json scripts.
+4. Current Vite build output directory.
+5. Current public assets:
+
+   * app icon
+   * favicon
+   * splash/logo
+   * 3D SGMA logo
+6. Current environment configuration.
+7. Whether the app currently depends on the Replit preview URL or a configurable backend URL.
+8. Whether PWA/meta tags exist.
+9. Whether app routing works in production build.
+10. Whether any mobile wrapper setup already exists.
+
+Do not modify files until this reconnaissance is complete.
+
+==================================================
+B. ANDROID APP ID / PACKAGE NAME
+================================
+
+Use this Android package name unless technically blocked:
+
+org.sgma.app
+
+App display name:
+SGMA APP
+
+Arabic display name if supported:
+تطبيق سِجما
+
+Do not use:
+
+* com.example
+* test package names
+* personal package names
+* temporary package names
+
+==================================================
+C. CAPACITOR SETUP
+==================
+
+If Capacitor is not installed, add and configure it properly.
+
+Required:
+
+* @capacitor/core
+* @capacitor/cli
+* @capacitor/android
+
+Create/update:
+capacitor.config.ts
+
+Required config:
+
+* appId: org.sgma.app
+* appName: SGMA APP
+* webDir: correct Vite build output, usually dist/public or dist depending on project
+* bundledWebRuntime: false if applicable
+
+Make sure the build uses the actual frontend production build.
+
+==================================================
+D. ANDROID PROJECT
+==================
+
+Add Android platform if not already present:
+
+npx cap add android
+
+If Android already exists:
+
+* do not recreate destructively
+* inspect and update safely
+
+Then run:
+
+* frontend build
+* npx cap sync android
+
+Do not run destructive commands.
+Do not reset the repository.
+Do not delete existing app files.
+Do not change backend logic.
+
+==================================================
+E. PRODUCTION BACKEND / API URL CHECK
+=====================================
+
+Critical:
+The mobile app must not be hardcoded to a temporary localhost URL.
+
+Check how the frontend calls API routes.
+
+If the app uses relative API paths like /api/...:
+
+* verify whether this works inside Capacitor.
+* If not, propose a safe configuration using a production backend base URL.
+
+Do NOT invent or hardcode a production domain unless provided.
+If a production backend URL is missing, report this as a blocker.
+
+Expected report wording:
+“Production backend URL is required before final store submission.”
+
+If the app is still using Replit preview URL:
+
+* report this clearly.
+* do not silently lock the app to an unstable preview URL unless explicitly approved.
+
+==================================================
+F. APP ICON AND SPLASH
+======================
+
+Use the final transparent 3D SGMA logo assets.
+
+Required:
+
+* Android adaptive icon generated from the final SGMA logo.
+* App icon must be clean and not cropped.
+* No square background behind the logo unless Android adaptive icon requires a safe background.
+* Splash screen should use SGMA branding professionally.
+
+If asset generation tooling exists, use it.
+If not, create correctly sized assets manually or report exactly what is needed.
+
+Check:
+
+* mipmap icons
+* adaptive icon foreground/background
+* launcher icon
+* splash screen configuration if applicable
+
+Do not use old logo files.
+
+==================================================
+G. STORE ASSETS PREPARATION
+===========================
+
+Prepare a folder:
+
+docs/store/android/
+
+Inside it, create:
+
+1. app-name-ar.txt
+2. app-name-en.txt
+3. short-description-ar.txt
+4. full-description-ar.txt
+5. full-description-en.txt
+6. privacy-policy-url.txt
+7. release-notes-ar.txt
+8. release-notes-en.txt
+9. store-checklist.md
+10. screenshots/ folder if screenshots can be exported safely
+
+Important:
+Do NOT mention Google Ads or AdSense in store description.
+For advertisements, only mention private partner/sponsor spaces if needed, and keep it general.
+
+Suggested Arabic short description:
+منصة رقمية لأعضاء الجمعية الطبية السورية الألمانية، تجمع الأخبار والمقالات والأكاديمية والتواصل والخدمات الإدارية.
+
+Suggested English short description:
+A digital platform for SGMA members, combining news, articles, academy content, communication, and member services.
+
+Privacy policy:
+Use the existing SGMA APP privacy policy route/link if available.
+If a public URL is missing, report it as a blocker for store submission.
+
+==================================================
+H. ADMOB STATUS
+===============
+
+Do NOT integrate real AdMob yet unless IDs are provided.
+
+For now:
+
+* check where ads are currently managed internally.
+* confirm that current internal/private ad system remains unchanged.
+* prepare a placeholder section in the report for future AdMob integration.
+
+Do not add Google Mobile Ads SDK yet unless explicitly instructed in a separate task with real App ID and test IDs.
+
+Important:
+No real ads.
+No production AdMob IDs.
+No ad SDK integration in this task unless explicitly approved later.
+
+==================================================
+I. ANDROID BUILD
+================
+
+After setup and sync, attempt to produce an Android build readiness state.
+
+If Gradle/Android tooling is available:
+
+* attempt debug build first.
+* then report what is needed for release AAB.
+
+Preferred:
+
+* Generate or verify ability to generate Android App Bundle AAB for Google Play.
+
+If local environment cannot build AAB:
+
+* still complete Capacitor setup
+* sync Android
+* provide exact commands to build in Android Studio or CI
+
+Expected commands may include:
+
+* npm run build
+* npx cap sync android
+* cd android
+* ./gradlew assembleDebug
+* ./gradlew bundleRelease
+
+But only run commands that are safe and available.
+
+==================================================
+J. GOOGLE PLAY REQUIREMENTS CHECK
+=================================
+
+Create a Google Play checklist covering:
+
+1. App name
+2. Package name
+3. Category
+4. Short description
+5. Full description
+6. App icon
+7. Feature graphic if needed
+8. Screenshots
+9. Privacy policy URL
+10. Data safety form preparation
+11. Content rating questionnaire
+12. Target audience
+13. Ads declaration
+14. App access instructions for reviewer
+15. Login credentials for reviewer if needed
+16. Closed testing requirement
+17. 12 testers / 14 days note for new personal developer accounts
+18. AAB build status
+19. Signing key / Play App Signing status
+
+For reviewer access:
+Prepare safe demo login credentials only if available.
+Do not expose real admin/super-admin accounts.
+If demo credentials are missing, report that demo credentials must be created before review.
+
+==================================================
+K. SECURITY RULES
+=================
+
+Do not expose:
+
+* passwords
+* tokens
+* JWT secrets
+* DATABASE_URL
+* API keys
+* private member data
+* production secrets
+* database dumps
+
+Do not print secrets in logs.
+Do not commit secrets.
+Do not add credentials to frontend code.
+
+==================================================
+L. TESTING REQUIRED
+===================
+
+Run and report:
+
+1. Typecheck.
+2. Frontend production build.
+3. Capacitor sync.
+4. Android project created/updated.
+5. Android debug build if possible.
+6. Confirm login/register route loads in mobile wrapper if possible.
+7. Confirm Arabic RTL layout is preserved.
+8. Confirm app icon exists.
+9. Confirm splash branding exists or report blocker.
+10. Confirm no backend/database/auth/permission changes.
+11. Confirm no old logo is used for launcher icon.
+12. Confirm store documentation files created.
+
+==================================================
+M. REQUIRED FINAL REPORT
+========================
+
+After completion, provide:
+
+SGMA ANDROID STORE BUILD PREPARATION REPORT
+
+Include:
+
+1. Summary of work completed
+2. Files created
+3. Files modified
+4. Capacitor installation status
+5. Android platform status
+6. Package name used
+7. App name used
+8. Build output directory used
+9. API/backend URL status
+10. Production backend blocker, if any
+11. App icon status
+12. Splash screen status
+13. Android build result
+14. AAB release build status
+15. Google Play checklist status
+16. Store metadata files created
+17. Screenshots/store assets status
+18. AdMob status:
+
+* not integrated yet
+* waiting for official IDs
+* internal/private ads remain unchanged
+
+19. Typecheck result
+20. Production build result
+21. Any blockers before Google Play upload
+22. Exact next commands for creating final AAB
+23. Confirmation:
+
+* no backend changed
+* no database changed
+* no auth logic changed
+* no permissions changed
+* no unrelated modules changed
+* no secrets exposed
+
+Do not report success unless:
+
+* Capacitor config exists
+* Android platform is ready or exact blocker is documented
+* store metadata folder exists
+* typecheck/build status is clearly reported

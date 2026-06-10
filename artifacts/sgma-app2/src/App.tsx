@@ -3,7 +3,8 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import NotFound from "@/pages/not-found";
-import { setAuthTokenGetter } from "@workspace/api-client-react";
+import { setAuthTokenGetter, setBaseUrl } from "@workspace/api-client-react";
+import { Capacitor } from "@capacitor/core";
 import { useEffect, useState } from "react";
 import { Loader2 } from "lucide-react";
 
@@ -50,6 +51,19 @@ import AdminBroadcasts from "./pages/admin/broadcasts";
 import AdminAds from "./pages/admin/ads";
 
 setAuthTokenGetter(() => localStorage.getItem("sgma_auth_token"));
+
+// When running inside a native (Capacitor) wrapper, relative `/api` paths cannot
+// reach the backend because the WebView origin is the bundled app, not the API
+// host. A production backend base URL must be supplied at build time via
+// VITE_API_BASE_URL. On the web (env unset) the base URL stays null and requests
+// remain relative, preserving existing browser behavior unchanged.
+const apiBaseUrl = import.meta.env.VITE_API_BASE_URL as string | undefined;
+if (apiBaseUrl) {
+  setBaseUrl(apiBaseUrl);
+}
+
+const isNative = Capacitor.isNativePlatform();
+const routerBase = isNative ? "" : import.meta.env.BASE_URL.replace(/\/$/, "");
 
 const queryClient = new QueryClient();
 
@@ -249,7 +263,7 @@ function App() {
   return (
     <QueryClientProvider client={queryClient}>
       <TooltipProvider>
-        <WouterRouter base={import.meta.env.BASE_URL.replace(/\/$/, "")}>
+        <WouterRouter base={routerBase}>
           <div dir="rtl" className="min-h-[100dvh] w-full bg-background font-sans text-foreground">
             <Router />
           </div>

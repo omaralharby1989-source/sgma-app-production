@@ -4,30 +4,35 @@ import tailwindcss from "@tailwindcss/vite";
 import path from "path";
 import runtimeErrorOverlay from "@replit/vite-plugin-runtime-error-modal";
 
+// Capacitor (native Android/iOS) build: assets are served from the bundled app
+// (file://-style origin), so the base must be relative and the dev-server env
+// vars (PORT/BASE_PATH) are not required. Triggered by `CAP_BUILD=1`.
+const isCapBuild = process.env.CAP_BUILD === "1";
+
 const rawPort = process.env.PORT;
 
-if (!rawPort) {
+if (!isCapBuild && !rawPort) {
   throw new Error(
     "PORT environment variable is required but was not provided.",
   );
 }
 
-const port = Number(rawPort);
+const port = rawPort ? Number(rawPort) : 0;
 
-if (Number.isNaN(port) || port <= 0) {
+if (!isCapBuild && (Number.isNaN(port) || port <= 0)) {
   throw new Error(`Invalid PORT value: "${rawPort}"`);
 }
 
 const basePath = process.env.BASE_PATH;
 
-if (!basePath) {
+if (!isCapBuild && !basePath) {
   throw new Error(
     "BASE_PATH environment variable is required but was not provided.",
   );
 }
 
 export default defineConfig({
-  base: basePath,
+  base: isCapBuild ? "./" : basePath,
   plugins: [
     react(),
     tailwindcss(),
@@ -65,6 +70,9 @@ export default defineConfig({
     allowedHosts: true,
     fs: {
       strict: true,
+    },
+    watch: {
+      ignored: ["**/android/**", "**/ios/**"],
     },
   },
   preview: {

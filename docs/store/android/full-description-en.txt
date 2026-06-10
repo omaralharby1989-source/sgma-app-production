@@ -1,0 +1,19 @@
+SGMA APP — the official digital platform for members of the Syrian-German Medical Association (SGMA).
+
+A digital platform for SGMA members, combining news, articles, academy content, communication, and member services in one place. The app features a modern Arabic, right-to-left (RTL) interface and is designed mobile-first.
+
+Key features:
+• News: the association's latest news and official announcements.
+• Articles: medical and professional articles authored by members and published after review.
+• Academy: lectures and academic announcements for members.
+• Chat: member-to-member communication and a direct channel with the administration team.
+• Board of Directors: information about the current board members.
+• Volunteer delegations: register for voluntary medical delegations.
+• Tasks: follow and participate in tasks assigned to members.
+• Profile: manage membership details, membership number, and profile photo.
+• Administrative broadcasts: notices and announcements from the administration.
+
+A note on advertising spaces:
+The app may include informational spaces for private partners or sponsors within dedicated sections, kept separate from the core member content.
+
+Access to the app requires a membership account approved by the association's administration.
