@@ -42,3 +42,33 @@ id = "2gUpkdU1a6vlNepq89z8y"
 uri = "file://docs/SGMA_APP_Board_Presentation_AR.pdf"
 type = "pdf"
 title = "عرض مجلس الإدارة — تطبيق سِجما (PDF)"
+
+[[outputs]]
+id = "V7P4J_jcShNlmL9YzeXzy"
+uri = "file://backups/final-release-candidate/SGMA_APP_FINAL_RELEASE_CANDIDATE_CODE_2026_06_10.zip"
+type = "unspecified"
+title = "Source Code ZIP (~7.9 MB)"
+
+[[outputs]]
+id = "NM5Z4MHVRHvtzChLqwe-f"
+uri = "file://backups/final-release-candidate/SGMA_APP_FINAL_RELEASE_CANDIDATE_DB_2026_06_10.sql.gz"
+type = "unspecified"
+title = "Database Backup — PRIVATE (~4.65 MB)"
+
+[[outputs]]
+id = "4-grvUVa9mr_q4fMNJh45"
+uri = "file://backups/final-release-candidate/RESTORE_INSTRUCTIONS.md"
+type = "text"
+title = "Restore Instructions"
+
+[[outputs]]
+id = "JGYgPEibt7ZRPyD2geB--"
+uri = "file://backups/final-release-candidate/FINAL_RELEASE_NOTES.md"
+type = "text"
+title = "Final Release Notes"
+
+[[outputs]]
+id = "ERrItIY0q_3mjEON5CZLb"
+uri = "file://backups/final-release-candidate/BACKUP_VERIFICATION_REPORT.md"
+type = "text"
+title = "Backup Verification Report"
