@@ -1,0 +1,161 @@
+SGMA APP — SET FINAL PRODUCTION DOMAIN FOR STORE / MOBILE BUILD
+
+Start this small publishing-preparation task now.
+
+Goal:
+Update SGMA APP store/mobile preparation files to use the final production domain:
+
+https://sgma-app.org
+
+This domain is now verified and working.
+Health check works:
+https://sgma-app.org/api/healthz
+
+Expected mobile API base URL:
+VITE_API_BASE_URL=https://sgma-app.org
+
+Important:
+This is metadata/build-preparation only.
+
+Do NOT change app features.
+Do NOT change backend logic.
+Do NOT change database.
+Do NOT change authentication.
+Do NOT change permissions.
+Do NOT change routes.
+Do NOT change deployment geography.
+Do NOT publish/unpublish.
+Do NOT modify secrets.
+Do NOT expose secrets.
+Do NOT integrate AdMob yet.
+
+==================================================
+A. FINAL PRODUCTION URLS
+========================
+
+Use:
+
+Production app URL:
+https://sgma-app.org
+
+Production API base URL for mobile builds:
+https://sgma-app.org
+
+Health check:
+https://sgma-app.org/api/healthz
+
+Privacy policy URL remains:
+https://sgma-med.org/de/privacy-policy
+
+Do not replace the privacy policy URL.
+
+==================================================
+B. FILES TO CHECK / UPDATE
+==========================
+
+Search the project for old temporary production URLs, especially:
+
+https://sgma-app-eu-production.replit.app
+sgma-app-eu-production.replit.app
+https://secure-mobile-gateway.replit.app
+secure-mobile-gateway.replit.app
+
+Update only store/build preparation files where appropriate.
+
+Likely files:
+
+1. docs/store/android/store-checklist.md
+2. docs/store/android/privacy-policy-url.txt
+
+   * should remain https://sgma-med.org/de/privacy-policy
+3. docs/store/android/full-description-ar.txt
+4. docs/store/android/full-description-en.txt
+5. docs/store/android/release-notes-ar.txt
+6. docs/store/android/release-notes-en.txt
+7. docs/store/android/GOOGLE_PLAY_READINESS.md or similar if exists
+8. docs/deployment/EU_GERMANY_MIGRATION_PLAN.md if it mentions the temporary Replit URL as final
+9. Android build preparation notes if present
+10. Any mobile build README/checklist files
+
+Do not update source code unless there is a documentation constant for store build only.
+
+==================================================
+C. REQUIRED BUILD COMMAND DOCUMENTATION
+=======================================
+
+Add or update the final Android build command documentation:
+
+VITE_API_BASE_URL=https://sgma-app.org pnpm --filter @workspace/sgma-app2 run build:cap
+pnpm --filter @workspace/sgma-app2 exec cap sync android
+
+For final AAB build in Android tooling:
+
+cd artifacts/sgma-app2/android
+./gradlew bundleRelease
+
+Clearly mark that Android Studio / JDK / Gradle / Android SDK may be required if Replit cannot build AAB.
+
+==================================================
+D. VALIDATION
+=============
+
+Verify:
+
+1. https://sgma-app.org opens.
+2. https://sgma-app.org/login opens.
+3. https://sgma-app.org/api/healthz returns {"status":"ok"}.
+4. Privacy policy URL still remains:
+   https://sgma-med.org/de/privacy-policy
+5. No store metadata uses the old Replit URL as the final production URL.
+6. Any old Replit URL may remain only as historical/backup note if clearly labeled as backup, not final.
+7. No backend/database/auth/permissions changed.
+8. No secrets exposed.
+
+==================================================
+E. DO NOT CHANGE
+================
+
+Do not change:
+
+* backend code
+* frontend feature logic
+* database schema
+* auth/session/JWT logic
+* user roles/permissions
+* admin logic
+* academy logic
+* ads logic
+* AdMob integration
+* deployment settings
+* production database
+* secrets
+
+==================================================
+F. REQUIRED REPORT
+==================
+
+After completion, provide:
+
+FINAL PRODUCTION DOMAIN UPDATE REPORT
+
+Include:
+
+1. Final production app URL
+2. Final mobile API base URL
+3. Health check result
+4. Files changed
+5. Old Replit URLs found and updated
+6. Privacy policy URL confirmation
+7. Android build command now documented
+8. Remaining blockers before Google Play upload
+9. Confirmation:
+
+   * no backend changed
+   * no frontend feature logic changed
+   * no database changed
+   * no auth changed
+   * no permissions changed
+   * no deployment changed
+   * no secrets exposed
+
+Do not report success until the final domain is documented and the health check is verified.

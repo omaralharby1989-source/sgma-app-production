@@ -11,7 +11,8 @@ auth, or secrets were changed to produce this document.
 - **Platform:** Replit Deployments.
 - **Deployment type:** `autoscale` (stateless web + API; scales with traffic).
 - **Live:** Yes — published, public, healthy build.
-  - Current production URL: `https://secure-mobile-gateway.replit.app`
+  - Current production URL: `https://sgma-app.org` (custom domain, verified 2026-06-12)
+  - Former temporary Replit URL (backup/historical only): `https://secure-mobile-gateway.replit.app`
 - **Topology:** Single monorepo (pnpm workspaces). The frontend (`@workspace/sgma-app2`,
   React+Vite) and the API (`@workspace/api-server`, Express, served under `/api`) run
   behind one path-routing reverse proxy. `/api/healthz` returns `{"status":"ok"}`.
@@ -127,7 +128,7 @@ auth, or secrets were changed to produce this document.
 | `JWT_SECRET` (or `SESSION_SECRET` fallback) | JWT signing | Reuse existing secret so existing sessions/tokens remain valid, or rotate intentionally. |
 | `PORT` / `BASE_PATH` | Server bind / base path | Provided by the platform/workflow. |
 | `NODE_ENV=production` | Runtime mode | |
-| `VITE_API_BASE_URL` | **Native (Android/iOS) builds only** | Set to `https://api.sgma-med.org` at mobile build time once the domain is live. Leave UNSET for same-origin web. |
+| `VITE_API_BASE_URL` | **Native (Android/iOS) builds only** | Current final value: `https://sgma-app.org`. Set to `https://api.sgma-med.org` if/when a dedicated API subdomain is configured. Leave UNSET for same-origin web. |
 
 > The web app calls the API same-origin (`/api`) and needs **no** base-URL env var.
 > Only the Capacitor native build needs `VITE_API_BASE_URL` (see §"Production API URL").
@@ -156,14 +157,19 @@ auth, or secrets were changed to produce this document.
 
 ## Production API URL — current readiness
 
+- **✅ Final production domain confirmed:** `https://sgma-app.org` (custom domain, verified 2026-06-12).
+  Health check `https://sgma-app.org/api/healthz` returns `{"status":"ok"}`.
 - The native app **already supports** `VITE_API_BASE_URL` (added during Capacitor prep):
   `artifacts/sgma-app2/src/App.tsx` reads `import.meta.env.VITE_API_BASE_URL` and, when
   set, calls `setBaseUrl(...)`. When unset (web), requests stay same-origin/relative.
-- **Where to set it:** at **mobile build time** for the Android/iOS build
-  (e.g. `VITE_API_BASE_URL=https://api.sgma-med.org pnpm --filter @workspace/sgma-app2 run build:cap`),
-  then `cap sync`. It must NOT be hardcoded in committed files.
+- **Where to set it:** at **mobile build time** for the Android/iOS build:
+  ```
+  VITE_API_BASE_URL=https://sgma-app.org pnpm --filter @workspace/sgma-app2 run build:cap
+  pnpm --filter @workspace/sgma-app2 exec cap sync android
+  ```
+  It must NOT be hardcoded in committed files.
 - **Capacitor config** has no hardcoded backend URL (only `androidScheme: "https"`).
-- Until a real, public production API URL exists, **mobile store submission remains blocked.**
+- **Mobile store submission is no longer blocked by the API URL** — the final domain is set.
 
 ## Recommendation
 

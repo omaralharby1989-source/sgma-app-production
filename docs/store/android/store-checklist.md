@@ -49,18 +49,25 @@ Legend: ✅ ready · ⚠️ needs input/manual step · ⛔ blocker before submis
 | Play App Signing | ⚠️ | Recommended: enroll in Play App Signing; upload key generated at first AAB build (`keytool`/Android Studio). Keep keystore secret — never commit it. |
 
 ## Exact build commands (Android Studio / CI with JDK 17 + Android SDK)
+
+Final production API base URL: **`https://sgma-app.org`** (custom domain, verified 2026-06-12 — health check `https://sgma-app.org/api/healthz` returns `{"status":"ok"}`).
+
 ```bash
-# from repo root
-pnpm --filter @workspace/sgma-app2 run build:cap   # production web build (relative base)
+# from repo root — use the final production domain at build time
+VITE_API_BASE_URL=https://sgma-app.org pnpm --filter @workspace/sgma-app2 run build:cap
 pnpm --filter @workspace/sgma-app2 exec cap sync android
 cd artifacts/sgma-app2/android
 ./gradlew assembleDebug      # debug APK (sanity check)
 ./gradlew bundleRelease      # release AAB for Google Play  -> app/build/outputs/bundle/release/
 ```
+
+> **Note:** Android Studio / JDK 17 / Gradle / Android SDK are required for the AAB build step.
+> The Replit environment does not have these tools — build the AAB on a machine with Android Studio or in CI.
+
 For a signed release, configure a keystore (or use Play App Signing) before `bundleRelease`.
 
 ## Blockers summary
-- ⛔ Public production **backend/API URL** — set `VITE_API_BASE_URL` at build time (the app is wired for it; value not provided).
+- ✅ Public production **backend/API URL** — `VITE_API_BASE_URL=https://sgma-app.org` (final domain verified 2026-06-12).
 - ✅ Public **privacy policy URL** — provided: https://sgma-med.org/de/privacy-policy (HTTPS, public, verified HTTP 200).
-- ⛔ **AAB** — must be built where Android tooling exists.
+- ⛔ **AAB** — must be built where Android tooling exists (Android Studio / JDK 17 / Gradle / Android SDK — not available in Replit).
 - ⚠️ Feature graphic, screenshots, demo reviewer credentials, closed-testing run.
