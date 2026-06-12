@@ -1,0 +1,168 @@
+SGMA APP — CREATE GOOGLE PLAY REVIEWER DEMO ACCOUNT SAFELY
+
+Start a small, isolated task.
+
+Goal:
+Create or prepare a safe demo reviewer account for Google Play review so the Play review team can log in and inspect the app without accessing admin/private data.
+
+Production domain:
+https://sgma-app.org
+
+Mobile API base URL:
+VITE_API_BASE_URL=https://sgma-app.org
+
+Important current status:
+AdMob test ads are integrated for Android native builds only.
+Do not modify AdMob in this task.
+Do not enable real ads.
+Do not change VITE_ADMOB_TEST_MODE.
+
+==================================================
+A. DEMO REVIEWER ACCOUNT
+========================
+
+Create or prepare one dedicated review account:
+
+Email:
+[playreviewer@sgma-app.org](mailto:playreviewer@sgma-app.org)
+
+Role:
+MEMBER
+
+Status:
+Approved / Active
+
+Access:
+Normal member access only.
+
+The account must NOT be:
+
+* ADMIN
+* SUPER_ADMIN
+* MODERATOR
+* Academy admin
+* Staff/admin user
+* Connected to real member private data
+
+If the system requires a password, generate a temporary strong password and include it only in the final report section titled "Google Play reviewer credentials".
+
+Do not expose any real user passwords.
+Do not reuse any real member account.
+Do not modify real member accounts.
+
+==================================================
+B. ACCOUNT REQUIREMENTS
+=======================
+
+The reviewer account should be able to:
+
+1. Log in successfully.
+2. Open the home page.
+3. View public news.
+4. View public articles.
+5. Open More/About/Privacy/Terms pages.
+6. Use normal MEMBER-only access.
+7. Be blocked from admin/moderator/super-admin screens.
+8. Be blocked from protected academy/admin-only areas unless public member access is intended.
+
+==================================================
+C. GOOGLE PLAY APP ACCESS INSTRUCTIONS
+======================================
+
+Create or update a documentation file for Google Play review instructions, for example:
+
+docs/store/android/app-access-instructions.txt
+
+Include this text in English:
+
+App access for Google Play review:
+
+This app requires login for some member features.
+
+Reviewer demo account:
+Email: [playreviewer@sgma-app.org](mailto:playreviewer@sgma-app.org)
+Password: [TEMP_PASSWORD_HERE]
+
+Role: MEMBER
+
+The reviewer can use this account to test normal member access, including home, news, articles, public information pages, and profile/member areas.
+
+Admin, moderator, and super-admin areas are intentionally restricted and are not available to this reviewer account.
+
+Production URL:
+https://sgma-app.org
+
+Privacy Policy:
+https://sgma-med.org/de/privacy-policy
+
+Ads note:
+The current Android build uses Google AdMob test ads only. Real ads are not enabled yet.
+
+==================================================
+D. DO NOT CHANGE
+================
+
+Do NOT change backend logic.
+Do NOT change database schema.
+Do NOT change authentication logic.
+Do NOT change permissions logic.
+Do NOT change admin logic.
+Do NOT change academy logic.
+Do NOT change AdMob logic.
+Do NOT enable real ads.
+Do NOT change deployment.
+Do NOT expose secrets.
+Do NOT modify real users.
+
+Only create/prep the demo reviewer account and documentation.
+
+==================================================
+E. TESTING REQUIREMENTS
+=======================
+
+Test or verify:
+
+1. Demo account login works.
+2. Demo account role is MEMBER.
+3. Demo account is approved/active.
+4. Demo account cannot access admin pages.
+5. Demo account cannot access moderator/super-admin pages.
+6. Public/member pages open correctly.
+7. Production domain remains:
+   https://sgma-app.org
+8. Privacy policy remains:
+   https://sgma-med.org/de/privacy-policy
+
+If account creation cannot be performed automatically because it requires manual admin action, provide exact manual steps instead and do not fake success.
+
+==================================================
+F. REQUIRED REPORT
+==================
+
+After completion, provide:
+
+GOOGLE PLAY REVIEWER ACCOUNT REPORT
+
+Include:
+
+1. Demo reviewer email
+2. Demo reviewer temporary password, if created
+3. Role/status confirmation
+4. Pages tested successfully
+5. Admin/restricted pages confirmed blocked
+6. Documentation file created/updated
+7. Exact Google Play App Access Instructions text
+8. Remaining blockers before Google Play upload
+9. Confirmation:
+
+   * no backend logic changed
+   * no database schema changed
+   * no auth logic changed
+   * no permissions logic changed
+   * no admin logic changed
+   * no academy logic changed
+   * no AdMob logic changed
+   * no real ads enabled
+   * no deployment changed
+   * no secrets exposed
+   * no real users modified

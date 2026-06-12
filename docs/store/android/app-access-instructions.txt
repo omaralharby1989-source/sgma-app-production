@@ -1,0 +1,65 @@
+App access for Google Play review:
+
+This app requires login for some member features.
+
+Reviewer demo account:
+Email: playreviewer@sgma-app.org
+Password: PlayReview2026!Sgma
+
+Role: MEMBER
+
+The reviewer can use this account to test normal member access, including home,
+news, articles, public information pages, board of directors, and profile/member areas.
+
+Admin, moderator, and super-admin areas are intentionally restricted and are not
+available to this reviewer account. Any attempt to navigate to /admin will be
+redirected to an "Unauthorised" page — this is the correct and expected behaviour.
+
+Production URL:
+https://sgma-app.org
+
+Health check (returns {"status":"ok"}):
+https://sgma-app.org/api/healthz
+
+Privacy Policy:
+https://sgma-med.org/de/privacy-policy
+
+Ads note:
+The current Android build uses Google AdMob test ads only.
+Real ads are not enabled yet.
+
+---
+Pages accessible with the reviewer account:
+- /login              — login page (no auth required)
+- /home               — home / member dashboard
+- /news               — news listing
+- /news/:id           — news article detail
+- /articles           — articles listing
+- /articles/:id       — article detail
+- /articles/new       — write a new article (member feature)
+- /articles/my        — own articles
+- /board              — board of directors landing
+- /board/current      — current board members
+- /chat               — chat centre
+- /chat/public        — public member chat room
+- /chat/admin         — direct message to admin team
+- /more               — more / links page
+- /about-sgma         — about SGMA (public informational)
+- /privacy-policy     — privacy policy page
+- /terms              — terms and conditions
+- /developer-info     — developer info (public)
+- /member/profile     — member profile (own only)
+- /volunteer-delegations — volunteer delegation registration form
+- /tasks              — member tasks list
+
+Pages intentionally blocked (redirect to /unauthorized or /login):
+- /admin and all sub-pages (admin dashboard, user management, etc.)
+- /broadcast (staff-only broadcast tool)
+- Academy admin and staff-only screens
+
+---
+Account details:
+Membership number: DEMO-PLAY-001
+Account username:  playreviewer
+Status:            ACTIVE (approved)
+Created:           2026-06-12 (demo only, not a real member)
