@@ -1,0 +1,217 @@
+SGMA APP — FINAL ANDROID AAB BUILD ATTEMPT FOR GOOGLE PLAY CLOSED TESTING
+
+Start this task carefully.
+
+Goal:
+Prepare and attempt to build the final Android App Bundle (.aab) for Google Play Closed Testing.
+
+Production domain:
+https://sgma-app.org
+
+Mobile API base URL:
+VITE_API_BASE_URL=https://sgma-app.org
+
+AdMob mode:
+VITE_ADMOB_TEST_MODE=true
+
+Important:
+Google AdMob real ads must NOT be enabled.
+Use TEST ADS only.
+
+Current status already completed:
+
+* Production domain ready: https://sgma-app.org
+* Health check ready: https://sgma-app.org/api/healthz
+* Google Play graphics ready
+* Screenshots ready
+* Reviewer demo account ready
+* AdMob test banner integration verified
+* Store checklist updated
+
+==================================================
+A. STRICT SCOPE
+===============
+
+This task is ONLY for Android mobile build preparation and AAB build attempt.
+
+Do NOT change backend logic.
+Do NOT change database.
+Do NOT change authentication.
+Do NOT change permissions.
+Do NOT change roles.
+Do NOT change admin logic.
+Do NOT change academy logic.
+Do NOT change AdMob logic.
+Do NOT enable real ads.
+Do NOT change deployment.
+Do NOT change production data.
+Do NOT expose secrets.
+Do NOT delete backups.
+Do NOT modify real users.
+
+==================================================
+B. REQUIRED ENVIRONMENT FOR FINAL BUILD
+=======================================
+
+The Android mobile build must use:
+
+VITE_API_BASE_URL=https://sgma-app.org
+VITE_ADMOB_TEST_MODE=true
+
+This means:
+
+* The app connects to the final production domain.
+* AdMob stays in test mode.
+* Real ads remain disabled.
+
+==================================================
+C. BUILD STEPS TO ATTEMPT
+=========================
+
+First run:
+
+pnpm --filter @workspace/sgma-app2 run typecheck
+
+Then run:
+
+VITE_API_BASE_URL=https://sgma-app.org VITE_ADMOB_TEST_MODE=true pnpm --filter @workspace/sgma-app2 run build:cap
+
+Then run:
+
+pnpm --filter @workspace/sgma-app2 exec cap sync android
+
+Then try:
+
+cd artifacts/sgma-app2/android
+./gradlew bundleRelease
+
+If gradle wrapper is missing, check whether the Android project has the correct Gradle files.
+If Android SDK/JDK/Gradle is unavailable in Replit, do not fake success. Stop and report the exact blocker.
+
+==================================================
+D. KEYSTORE / SIGNING
+=====================
+
+Check whether release signing is already configured.
+
+If release signing is NOT configured:
+
+* Do NOT create an insecure throwaway keystore silently.
+* Do NOT expose keystore passwords in logs.
+* Do NOT commit secrets.
+* Report that Play App Signing keystore/release signing must be created manually or via secure local Android Studio environment.
+
+If a keystore is generated only for local testing:
+
+* Place it outside source control if possible.
+* Add/confirm .gitignore protection.
+* Do not print passwords.
+* Clearly say it is not production-safe unless the owner securely stores it.
+
+Preferred:
+If signing cannot be safely completed in Replit, prepare the project and provide exact Android Studio manual build steps.
+
+==================================================
+E. OUTPUT EXPECTATION
+=====================
+
+If build succeeds, locate the final .aab file, usually:
+
+artifacts/sgma-app2/android/app/build/outputs/bundle/release/app-release.aab
+
+or similar.
+
+Verify:
+
+* File exists
+* File size is reasonable
+* Build used VITE_API_BASE_URL=https://sgma-app.org
+* Build used VITE_ADMOB_TEST_MODE=true
+* No real ads enabled
+
+If build fails:
+
+* Provide exact reason
+* Provide exact manual steps to complete in Android Studio
+* Confirm all web/mobile prep before the native build is complete
+
+==================================================
+F. GOOGLE PLAY READINESS CHECK
+==============================
+
+Verify these files exist:
+
+1. docs/store/android/graphics/feature-graphic-1024x500.png
+2. docs/store/android/screenshots/01-login.png
+3. docs/store/android/screenshots/02-home.png
+4. docs/store/android/screenshots/03-news.png
+5. docs/store/android/screenshots/04-articles.png
+6. docs/store/android/screenshots/05-board.png
+7. docs/store/android/screenshots/06-more.png
+8. docs/store/android/app-access-instructions.txt
+9. docs/store/android/privacy-policy-url.txt
+10. docs/store/android/store-checklist.md
+
+Verify production URL:
+https://sgma-app.org
+
+Verify privacy policy:
+https://sgma-med.org/de/privacy-policy
+
+==================================================
+G. DO NOT CHANGE
+================
+
+Do not change:
+
+* source app features
+* API/backend
+* database/schema
+* auth/JWT/session
+* role permissions
+* admin screens
+* academy module
+* AdMob test/real ID logic
+* deployment settings
+* production data
+* real user accounts
+* backup files
+
+==================================================
+H. REQUIRED REPORT
+==================
+
+After completion, provide:
+
+ANDROID AAB BUILD REPORT
+
+Include:
+
+1. Typecheck result
+2. build:cap result
+3. cap sync android result
+4. Gradle bundleRelease result
+5. Whether AAB was created
+6. AAB file path if created
+7. AAB file size if created
+8. Final API base URL used
+9. AdMob mode used
+10. Confirmation that real ads are not enabled
+11. Release signing / keystore status
+12. Google Play assets readiness status
+13. Remaining blockers before upload
+14. If failed, exact manual Android Studio steps
+15. Confirmation:
+
+* no backend changed
+* no database changed
+* no auth changed
+* no permissions changed
+* no admin logic changed
+* no academy logic changed
+* no AdMob logic changed
+* no real ads enabled
+* no deployment changed
+* no secrets exposed
+
+Do not report success unless the .aab file actually exists.
