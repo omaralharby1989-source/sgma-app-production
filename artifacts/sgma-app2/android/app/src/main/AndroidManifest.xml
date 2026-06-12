@@ -7,6 +7,12 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
+
+        <!-- Google AdMob App ID (REQUIRED — app crashes at startup without this) -->
+        <!-- App ID: ca-app-pub-5363888403943121~7695424704 -->
+        <meta-data
+            android:name="com.google.android.gms.ads.APPLICATION_ID"
+            android:value="ca-app-pub-5363888403943121~7695424704" />
         <activity
             android:configChanges="orientation|keyboardHidden|keyboard|screenSize|locale|smallestScreenSize|screenLayout|uiMode|navigation|density"
             android:name=".MainActivity"
@@ -32,4 +38,6 @@
     <!-- Permissions -->
 
     <uses-permission android:name="android.permission.INTERNET" />
+    <!-- Required by Google AdMob for ad personalisation and fraud prevention -->
+    <uses-permission android:name="com.google.android.gms.permission.AD_ID" />
 </manifest>

@@ -53,12 +53,17 @@ Legend: ✅ ready · ⚠️ needs input/manual step · ⛔ blocker before submis
 Final production API base URL: **`https://sgma-app.org`** (custom domain, verified 2026-06-12 — health check `https://sgma-app.org/api/healthz` returns `{"status":"ok"}`).
 
 ```bash
-# from repo root — use the final production domain at build time
-VITE_API_BASE_URL=https://sgma-app.org pnpm --filter @workspace/sgma-app2 run build:cap
+# from repo root — production build with real ads DISABLED (test mode, default)
+VITE_API_BASE_URL=https://sgma-app.org VITE_ADMOB_TEST_MODE=true \
+  pnpm --filter @workspace/sgma-app2 run build:cap
 pnpm --filter @workspace/sgma-app2 exec cap sync android
 cd artifacts/sgma-app2/android
 ./gradlew assembleDebug      # debug APK (sanity check)
 ./gradlew bundleRelease      # release AAB for Google Play  -> app/build/outputs/bundle/release/
+
+# To enable real ads (only after GDPR/consent review is complete):
+# VITE_API_BASE_URL=https://sgma-app.org VITE_ADMOB_TEST_MODE=false \
+#   pnpm --filter @workspace/sgma-app2 run build:cap
 ```
 
 > **Note:** Android Studio / JDK 17 / Gradle / Android SDK are required for the AAB build step.

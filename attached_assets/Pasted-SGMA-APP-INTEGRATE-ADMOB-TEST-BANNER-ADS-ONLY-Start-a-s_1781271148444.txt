@@ -1,0 +1,200 @@
+SGMA APP — INTEGRATE ADMOB TEST BANNER ADS ONLY
+
+Start a small, isolated AdMob integration task.
+
+Goal:
+Integrate Google AdMob banner ads into the Android/Capacitor mobile app preparation, but ONLY in test mode for now.
+
+Final production domain is already confirmed:
+https://sgma-app.org
+
+Mobile API base URL:
+VITE_API_BASE_URL=https://sgma-app.org
+
+AdMob IDs provided by owner:
+
+AdMob Android App ID:
+ca-app-pub-5363888403943121~7695424704
+
+Real Banner Ad Unit ID created in AdMob:
+ca-app-pub-5363888403943121/7308411896
+
+IMPORTANT:
+Do NOT show real ads yet.
+Use Google official TEST banner ad unit during development/testing:
+ca-app-pub-3940256099942544/6300978111
+
+Keep the real Banner Ad Unit ID documented/configured for future production switch, but do not activate it in the app UI yet.
+
+==================================================
+A. STRICT SCOPE
+===============
+
+This task is ONLY for AdMob test banner integration.
+
+Do NOT change backend.
+Do NOT change database.
+Do NOT change authentication.
+Do NOT change permissions.
+Do NOT change user roles.
+Do NOT change app content logic.
+Do NOT change SGMA Academy logic.
+Do NOT change admin logic.
+Do NOT change private partner/internal ads logic.
+Do NOT change production deployment.
+Do NOT expose secrets.
+Do NOT add interstitial ads.
+Do NOT add rewarded ads.
+Do NOT add app open ads.
+Do NOT add real ads.
+
+==================================================
+B. REQUIRED BEHAVIOR
+====================
+
+1. Add AdMob/Google Mobile Ads support in the Capacitor Android app only if it is not already installed.
+
+2. Configure Android with this AdMob App ID:
+
+ca-app-pub-5363888403943121~7695424704
+
+3. Add one reusable mobile banner ad component.
+
+4. The banner must use TEST ad unit ID by default:
+
+ca-app-pub-3940256099942544/6300978111
+
+5. The real ad unit ID must be documented and safely stored/configured for later production activation:
+
+ca-app-pub-5363888403943121/7308411896
+
+6. Add a clear environment flag or config switch, for example:
+
+VITE_ADMOB_TEST_MODE=true
+
+When VITE_ADMOB_TEST_MODE=true:
+
+* use Google test banner ID only.
+
+When later changed to false:
+
+* use the real SGMA banner ID.
+
+But keep default as TEST MODE.
+
+==================================================
+C. WHERE ADS ARE ALLOWED
+========================
+
+Show the banner only on safe general content pages, for example:
+
+* Home / main content area
+* News listing/detail pages
+* Articles listing/detail pages
+* Public informational pages if appropriate
+
+Banner should be at the bottom area and should not cover navigation, forms, or content.
+
+==================================================
+D. WHERE ADS ARE FORBIDDEN
+==========================
+
+Do NOT show ads on:
+
+* Login page
+* Register page
+* Password reset page
+* Admin dashboard
+* Moderator dashboard
+* Super Admin screens
+* Member management
+* User profile/private data pages
+* SGMA Academy video pages
+* SGMA Academy protected course/lesson pages
+* Payment/donation forms if any
+* Chat input area where it breaks usability
+* Any medical/privacy-sensitive screen
+
+==================================================
+E. UX REQUIREMENTS
+==================
+
+1. Banner must not break Arabic RTL layout.
+2. Banner must not overlap bottom navigation.
+3. Banner must not hide buttons or input fields.
+4. Banner must not cause horizontal scrolling.
+5. If AdMob fails to load, the app must continue normally.
+6. In web browser/PWA mode, do not crash. Hide native AdMob banner or use a safe placeholder only in development if needed.
+7. Keep the app professional and non-intrusive.
+
+==================================================
+F. PRIVACY / COMPLIANCE
+=======================
+
+1. Add a clear TODO/blocker note that real production ads require privacy/consent review before enabling real ads.
+2. Do not enable personalized ads until consent/GDPR handling is confirmed.
+3. Keep test mode active for now.
+4. Do not change the public privacy policy automatically unless a separate privacy-policy update task is requested.
+
+==================================================
+G. BUILD / SYNC REQUIREMENTS
+============================
+
+After integration, run or document the required commands:
+
+VITE_API_BASE_URL=https://sgma-app.org VITE_ADMOB_TEST_MODE=true pnpm --filter @workspace/sgma-app2 run build:cap
+
+pnpm --filter @workspace/sgma-app2 exec cap sync android
+
+If Android build cannot run in Replit because JDK/Android SDK/Gradle is unavailable, state that clearly.
+
+==================================================
+H. TESTING REQUIREMENTS
+=======================
+
+Test/verify:
+
+1. Web app still opens without crashing.
+2. Android/Capacitor build sync succeeds or blocker is clearly documented.
+3. Login/register pages do NOT show ads.
+4. Admin pages do NOT show ads.
+5. Academy video/protected pages do NOT show ads.
+6. Allowed content pages can initialize the banner in test mode.
+7. No real ads are requested.
+8. App still uses:
+   VITE_API_BASE_URL=https://sgma-app.org
+9. No secrets are exposed.
+
+==================================================
+I. REQUIRED REPORT
+==================
+
+After completion, provide:
+
+ADMOB TEST ADS INTEGRATION REPORT
+
+Include:
+
+1. Files changed
+2. Package/dependency added, if any
+3. Android AdMob App ID configured
+4. Test Banner Ad Unit ID used
+5. Real Banner Ad Unit ID documented for later use
+6. Where banner appears
+7. Where banner is blocked/hidden
+8. Test/build results
+9. Remaining blockers before enabling real ads
+10. Confirmation:
+
+* test ads only
+* no real ads enabled
+* no backend changed
+* no database changed
+* no auth changed
+* no permissions changed
+* no admin logic changed
+* no academy logic changed
+* no deployment changed
+* no secrets exposed
+
+Do not report success unless test mode is the default and no real ads are enabled.

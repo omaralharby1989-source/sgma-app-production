@@ -81,5 +81,8 @@
     "vite": "catalog:",
     "wouter": "^3.3.5",
     "zod": "catalog:"
+  },
+  "dependencies": {
+    "@capacitor-community/admob": "^8.0.0"
   }
 }

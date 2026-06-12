@@ -20,6 +20,12 @@ const config: CapacitorConfig = {
       splashFullScreen: true,
       splashImmersive: false,
     },
+    AdMob: {
+      // Android App ID — must match AndroidManifest.xml meta-data.
+      // Real ads are disabled by default; enable only after GDPR/consent review.
+      // Test mode is controlled at build time via VITE_ADMOB_TEST_MODE (default: true).
+      appId: "ca-app-pub-5363888403943121~7695424704",
+    },
   },
 };
 
