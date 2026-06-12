@@ -72,3 +72,9 @@ id = "ERrItIY0q_3mjEON5CZLb"
 uri = "file://backups/final-release-candidate/BACKUP_VERIFICATION_REPORT.md"
 type = "text"
 title = "Backup Verification Report"
+
+[[outputs]]
+id = "0uBf40ybsNMqOMkP8hKdz"
+uri = "file://docs/store/android/sgma-app-android-studio.zip"
+type = "unspecified"
+title = "SGMA APP — Android Studio Build Package"
