@@ -1,0 +1,117 @@
+SGMA APP — VERIFY ADMOB IDS ARE CORRECTLY WIRED BEFORE DEMO ACCOUNT STEP
+
+Start a small verification-only task.
+
+Goal:
+Verify that the AdMob Android App ID and Banner Ad Unit IDs are correctly added, documented, and safely wired in the mobile app.
+
+Do not add new features unless something is missing or wrong.
+
+Current required IDs:
+
+AdMob Android App ID:
+ca-app-pub-5363888403943121~7695424704
+
+Real SGMA Banner Ad Unit ID:
+ca-app-pub-5363888403943121/7308411896
+
+Google official TEST Banner Ad Unit ID:
+ca-app-pub-3940256099942544/6300978111
+
+Important:
+The app must still use TEST ads only by default.
+
+==================================================
+A. VERIFY AND FIX ONLY IF NEEDED
+================================
+
+Check the following:
+
+1. AndroidManifest.xml must include the AdMob Android App ID:
+   ca-app-pub-5363888403943121~7695424704
+
+2. capacitor.config.ts must include AdMob plugin configuration if required by the installed plugin.
+
+3. src/lib/admob.ts or equivalent config file must include:
+
+* TEST_BANNER_UNIT_ID = ca-app-pub-3940256099942544/6300978111
+* REAL_BANNER_UNIT_ID = ca-app-pub-5363888403943121/7308411896
+* APP_ID documentation = ca-app-pub-5363888403943121~7695424704
+
+4. The banner component must use:
+
+* TEST_BANNER_UNIT_ID when VITE_ADMOB_TEST_MODE=true or unset
+* REAL_BANNER_UNIT_ID only when VITE_ADMOB_TEST_MODE=false
+
+5. Default behavior must be TEST MODE.
+
+6. .env.example must document:
+   VITE_ADMOB_TEST_MODE=true
+
+7. Android build/store docs must include:
+   VITE_API_BASE_URL=https://sgma-app.org
+   VITE_ADMOB_TEST_MODE=true
+
+==================================================
+B. DO NOT CHANGE
+================
+
+Do NOT enable real ads.
+Do NOT set VITE_ADMOB_TEST_MODE=false.
+Do NOT add interstitial ads.
+Do NOT add rewarded ads.
+Do NOT add app-open ads.
+Do NOT modify backend.
+Do NOT modify database.
+Do NOT modify auth.
+Do NOT modify permissions.
+Do NOT modify admin logic.
+Do NOT modify academy logic.
+Do NOT modify deployment.
+Do NOT expose secrets.
+
+==================================================
+C. TESTING
+==========
+
+Run:
+
+pnpm --filter @workspace/sgma-app2 run typecheck
+
+If possible, verify web still loads without AdMob crash.
+
+If Android SDK/Gradle is unavailable in Replit, do not attempt unsupported Android build; just report that Android native build must be done later in Android Studio/CI.
+
+==================================================
+D. REQUIRED REPORT
+==================
+
+After completion, provide:
+
+ADMOB IDS VERIFICATION REPORT
+
+Include:
+
+1. Android App ID location and confirmation
+2. Test Banner ID location and confirmation
+3. Real Banner ID location and confirmation
+4. Which ID is active by default
+5. Confirmation that real ads are not enabled
+6. Files checked
+7. Files changed, if any
+8. Typecheck result
+9. Remaining blocker before real ads:
+
+   * GDPR/consent
+   * privacy policy AdMob update
+   * Android AAB build
+10. Confirmation:
+
+* no backend changed
+* no database changed
+* no auth changed
+* no permissions changed
+* no admin logic changed
+* no academy logic changed
+* no deployment changed
+* no secrets exposed
