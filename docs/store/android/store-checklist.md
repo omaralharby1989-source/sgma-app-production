@@ -19,8 +19,8 @@ Legend: ✅ ready · ⚠️ needs input/manual step · ⛔ blocker before submis
 | Item | Status | Notes |
 |---|---|---|
 | App icon (512×512) | ✅ | Adaptive icon generated from final 3D SGMA logo (foreground + brand-blue background, 16.7% safe inset). For the Play listing 512×512 PNG you can reuse `public/sgma-app-icon.png` or export from the logo. |
-| Feature graphic (1024×500) | ⚠️ | Not generated — create a 1024×500 banner with SGMA branding before submission. |
-| Phone screenshots (≥2, up to 8) | ⚠️ | See `screenshots/` — add real device screenshots (login + main screens). Min 2 required. |
+| Feature graphic (1024×500) | ✅ | `graphics/feature-graphic-1024x500.png` — SGMA branded, blue gradient, Arabic headline, exact 1024×500 px PNG. |
+| Phone screenshots (≥2, up to 8) | ✅ | 6 PNG screenshots captured (780×1688 px): login, home, news, articles, board, more. See `screenshots/`. |
 | Tablet screenshots | ⚠️ | Optional but recommended. |
 
 ## 3. Policy & compliance
@@ -30,13 +30,13 @@ Legend: ✅ ready · ⚠️ needs input/manual step · ⛔ blocker before submis
 | Data safety form | ⚠️ | Declare: account data (name, email, membership number), user content (messages, articles), photos (avatar). Data is collected, transmitted to the app's own backend over HTTPS, used for app functionality. No third-party ad SDK. |
 | Content rating questionnaire | ⚠️ | Complete in console. App has user-generated content + chat → rating likely Teen/PEGI 12; answer honestly. |
 | Target audience & content | ⚠️ | Target adults (members). Not directed at children. |
-| Ads declaration | ✅ (decision) | Declare **No ads** for this build — no ad SDK integrated. Internal/private partner spaces are app content, not an ad network. Revisit if/when AdMob is added. |
+| Ads declaration | ⚠️ (update needed) | AdMob SDK (`@capacitor-community/admob` v8) is now integrated. **Update data safety form** to declare Google AdMob. Current build uses **test ads only** (`VITE_ADMOB_TEST_MODE=true`). Real ads blocked until GDPR/consent review. |
 
 ## 4. Access for review
 | Item | Status | Notes |
 |---|---|---|
-| App access instructions | ⚠️ | App requires an approved membership login. Provide reviewer instructions + demo credentials. |
-| Reviewer login credentials | ⚠️ | Use DEMO accounts only (never real admin/super-admin or member PII). Create/confirm a dedicated demo MEMBER (and optionally demo staff) account before review and paste here. |
+| App access instructions | ✅ | `app-access-instructions.txt` — full English instructions with demo credentials, accessible pages, blocked pages, production URL, privacy policy. |
+| Reviewer login credentials | ✅ | Demo MEMBER account created: `playreviewer@sgma-app.org` / `PlayReview2026!Sgma` — ACTIVE, role=MEMBER, no admin access (verified 403 on all /admin endpoints). |
 | Closed testing | ⚠️ | New personal developer accounts: **12 testers opted-in for 14 continuous days** required before production access. Set up a closed test track. |
 
 ## 5. Build & signing
@@ -73,6 +73,15 @@ For a signed release, configure a keystore (or use Play App Signing) before `bun
 
 ## Blockers summary
 - ✅ Public production **backend/API URL** — `VITE_API_BASE_URL=https://sgma-app.org` (final domain verified 2026-06-12).
-- ✅ Public **privacy policy URL** — provided: https://sgma-med.org/de/privacy-policy (HTTPS, public, verified HTTP 200).
-- ⛔ **AAB** — must be built where Android tooling exists (Android Studio / JDK 17 / Gradle / Android SDK — not available in Replit).
-- ⚠️ Feature graphic, screenshots, demo reviewer credentials, closed-testing run.
+- ✅ Public **privacy policy URL** — https://sgma-med.org/de/privacy-policy (HTTPS, HTTP 200).
+- ✅ **Feature graphic** — `graphics/feature-graphic-1024x500.png` (exact 1024×500 px PNG).
+- ✅ **Phone screenshots** — 6 PNG files in `screenshots/` (780×1688 px, no private data).
+- ✅ **Demo reviewer account** — `playreviewer@sgma-app.org`, MEMBER, ACTIVE (verified login + admin blocked).
+- ✅ **App access instructions** — `app-access-instructions.txt` (English, ready to paste into Play console).
+- ✅ **AdMob** — test banner integrated; real ads blocked by default until GDPR/consent review.
+- ⛔ **AAB build** — must be built in Android Studio / CI (JDK 17 + Gradle + Android SDK — not in Replit).
+- ⚠️ **GDPR / consent dialog** — required before enabling real AdMob ads (`VITE_ADMOB_TEST_MODE=false`).
+- ⚠️ **Data safety form** — update in Play console to declare AdMob SDK.
+- ⚠️ **Closed testing run** — 12 testers opted-in for 14 continuous days (new developer account requirement).
+- ⚠️ **Play App Signing keystore** — generate and keep private before `bundleRelease`.
+- ⚠️ **Tablet screenshots** — optional but recommended for higher quality listing.

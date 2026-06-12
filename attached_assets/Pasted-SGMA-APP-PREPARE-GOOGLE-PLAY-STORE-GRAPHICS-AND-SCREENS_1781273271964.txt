@@ -1,0 +1,206 @@
+SGMA APP — PREPARE GOOGLE PLAY STORE GRAPHICS AND SCREENSHOT PACKAGE
+
+Start a small Google Play store-assets preparation task.
+
+Goal:
+Prepare the required Google Play visual assets package for SGMA APP before Android AAB upload.
+
+Current production app URL:
+https://sgma-app.org
+
+Privacy Policy:
+https://sgma-med.org/de/privacy-policy
+
+Google Play reviewer account already exists:
+Email: [playreviewer@sgma-app.org](mailto:playreviewer@sgma-app.org)
+Role: MEMBER
+Status: ACTIVE
+
+Important:
+This task is only for Google Play store graphics/screenshots preparation.
+Do NOT change app features or backend logic.
+
+==================================================
+A. REQUIRED STORE ASSETS
+========================
+
+Prepare the following Google Play assets:
+
+1. Feature Graphic
+   Required size:
+   1024 × 500 px
+
+Suggested filename:
+docs/store/android/graphics/feature-graphic-1024x500.png
+
+Style:
+
+* Professional medical association style
+* Use SGMA APP branding
+* Arabic-friendly / RTL-friendly design
+* Clean blue/white/medical identity
+* Include app name:
+  تطبيق سِجما
+* Include optional subtitle:
+  منصة الجمعية الطبية السورية الألمانية
+* Do not include fake store badges.
+* Do not include Google Play / Apple logos.
+* Do not include personal/private data.
+* Do not include screenshots with real member data.
+
+2. Phone Screenshots
+   Prepare a folder:
+
+docs/store/android/screenshots/
+
+Required:
+At least 4 screenshots if possible.
+
+Recommended screenshots:
+
+* 01-home.png
+* 02-news.png
+* 03-articles.png
+* 04-more.png
+* 05-member-profile.png
+* 06-academy-public-or-safe.png
+
+Screenshots must:
+
+* Be taken from the production domain or production-equivalent build.
+* Avoid real private member data.
+* Avoid admin/super-admin sensitive screens.
+* Avoid database/private data.
+* Avoid internal reports or user management pages.
+* Use safe public/member views only.
+
+If automated screenshots cannot be captured in Replit, create a clear checklist/instructions file explaining exactly which screenshots the owner must capture manually from phone/browser.
+
+==================================================
+B. OPTIONAL BUT USEFUL FILES
+============================
+
+Create or update:
+
+1. docs/store/android/graphics/README.md
+
+Include:
+
+* Required image sizes
+* Final filenames
+* Which assets are ready
+* Which screenshots still need manual capture if any
+
+2. docs/store/android/screenshots/README.md
+
+Include:
+
+* Screenshot list
+* Recommended device orientation: portrait
+* Avoid private/admin data
+* Recommended pages and URLs
+
+3. docs/store/android/store-checklist.md
+
+Update status for:
+
+* Feature graphic
+* Phone screenshots
+* App access instructions
+* Production URL
+* Privacy policy URL
+* AdMob test mode
+* Remaining AAB blocker
+
+==================================================
+C. DESIGN REQUIREMENTS FOR FEATURE GRAPHIC
+==========================================
+
+The 1024×500 feature graphic should be polished and suitable for Google Play.
+
+Use:
+
+* SGMA logo if available in the project assets
+* Blue medical gradient or clean light background
+* Subtle medical/technology visual feeling
+* Arabic headline:
+  تطبيق سِجما
+* Arabic subtitle:
+  منصة رقمية للتواصل والخدمات والمحتوى الطبي
+
+Do NOT include:
+
+* patient images
+* private user photos
+* real names
+* admin screenshots
+* misleading claims
+* “official Google Play” badges
+* fake awards
+* ad screenshots
+
+==================================================
+D. DO NOT CHANGE
+================
+
+Do NOT change:
+
+* backend code
+* database
+* auth/session logic
+* permissions
+* roles
+* admin logic
+* academy logic
+* AdMob logic
+* deployment
+* production data
+* reviewer account
+* secrets
+
+==================================================
+E. TESTING / VERIFICATION
+=========================
+
+Verify:
+
+1. Feature graphic file exists and is exactly 1024×500 px.
+2. Feature graphic is PNG.
+3. Screenshots folder exists.
+4. README/checklist clearly says which screenshots are ready and which must be captured manually.
+5. No sensitive/private/admin data is included.
+6. Store checklist updated.
+7. No source logic changed.
+
+If image generation is not possible in this environment, do not fake the file. Instead create clear manual instructions and report the blocker.
+
+==================================================
+F. REQUIRED REPORT
+==================
+
+After completion, provide:
+
+GOOGLE PLAY STORE GRAPHICS REPORT
+
+Include:
+
+1. Feature graphic status
+2. Feature graphic file path
+3. Confirmed dimensions 1024×500
+4. Screenshots folder path
+5. Screenshots prepared or still needed
+6. Manual screenshot instructions, if needed
+7. Files changed
+8. Remaining blockers before AAB upload
+9. Confirmation:
+
+   * no backend changed
+   * no database changed
+   * no auth changed
+   * no permissions changed
+   * no admin logic changed
+   * no academy logic changed
+   * no AdMob logic changed
+   * no deployment changed
+   * no secrets exposed
+   * no private user data included
