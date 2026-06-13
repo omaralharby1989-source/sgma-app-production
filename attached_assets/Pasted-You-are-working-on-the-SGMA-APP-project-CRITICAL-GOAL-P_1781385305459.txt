@@ -1,0 +1,182 @@
+You are working on the SGMA APP project.
+
+CRITICAL GOAL:
+Prepare the project for iOS App Store build submission. The Apple App Store Connect app already exists with:
+- App name: SGMA APP
+- Bundle ID: org.sgma.app
+- SKU: SGMA-APP-IOS-001
+- Apple App Store listing, screenshots, privacy, pricing, and reviewer account are already prepared.
+- The only remaining App Store Connect blocker is: "Choose a Build".
+
+DO NOT modify unrelated app features.
+DO NOT redesign UI.
+DO NOT change backend logic.
+DO NOT enable real ads unless explicitly instructed.
+DO NOT break the existing Android/Google Play setup.
+
+Current production backend/domain:
+- Production URL: https://sgma-app.org
+- API base URL must be: https://sgma-app.org
+- Privacy policy: https://sgma-med.org/de/privacy-policy
+
+Android package name already used:
+- org.sgma.app
+
+iOS Bundle ID required:
+- org.sgma.app
+
+TASK 1 — Inspect current project
+First inspect the repository and report:
+1. Is this Capacitor project already configured for iOS?
+2. Does an `ios/` folder exist?
+3. Does `capacitor.config.*` contain correct appId/name/server config?
+4. Are iOS build files present:
+   - ios/App/App.xcodeproj
+   - ios/App/App.xcworkspace if CocoaPods is used
+5. Are dependencies installed and build scripts valid?
+6. Is the production web build configured correctly?
+
+TASK 2 — Prepare Capacitor iOS project
+If the iOS project does not exist or is incomplete, create/fix it properly.
+
+Expected commands may include, but are not limited to:
+- npm install
+- npm run build
+- npx cap sync
+- npx cap add ios if missing
+- npx cap sync ios
+
+Use the correct Capacitor app ID:
+- org.sgma.app
+
+Use the correct app name:
+- SGMA APP
+
+Use the correct production API base:
+- VITE_API_BASE_URL=https://sgma-app.org
+
+Make sure the web build output path matches the actual project configuration.
+
+TASK 3 — Configure iOS app identity
+Ensure iOS settings are consistent:
+- Bundle Identifier: org.sgma.app
+- Display Name: SGMA APP
+- Version: 1.0.0
+- Build number: 1 or higher
+- Deployment target reasonable for App Store
+- App uses production domain https://sgma-app.org
+
+TASK 4 — App icon preparation
+Prepare the iOS AppIcon asset correctly.
+
+Requirements:
+- Use the existing SGMA app icon/logo from the project if available.
+- If multiple icons exist, choose the official SGMA blue logo/icon used by the app.
+- Generate all required iOS AppIcon sizes inside:
+  ios/App/App/Assets.xcassets/AppIcon.appiconset
+- Include the required 1024x1024 App Store icon.
+- PNG files must have no alpha transparency.
+- Do not use rounded corners; Apple applies rounding automatically.
+
+If no suitable icon exists, report clearly where the missing icon should be placed and what size/type is required.
+
+TASK 5 — AdMob / privacy-safe configuration
+The app currently uses AdMob test mode by default.
+
+Known AdMob data:
+- AdMob App ID: ca-app-pub-5363888403943121~7695424704
+- Real Banner Unit ID: ca-app-pub-5363888403943121/7308411896
+- Test Banner Unit ID: ca-app-pub-3940256099942544/6300978111
+
+For this iOS preparation:
+- Keep test ads enabled unless already configured otherwise.
+- Do NOT enable real ads automatically.
+- Make sure any iOS AdMob configuration is not broken.
+- If iOS requires additional plist configuration, add it only if safe and necessary, then document it.
+
+TASK 6 — Xcode Cloud readiness
+Prepare the repository so it can be built by Xcode Cloud or by a Mac/Xcode machine.
+
+Report exactly:
+1. Which Xcode file should be opened/selected:
+   - `.xcodeproj` or `.xcworkspace`
+2. Exact path to the iOS project.
+3. Exact scheme name to use.
+4. Whether CocoaPods is required.
+5. Whether `pod install` is required.
+6. Whether signing can be handled automatically by Apple/Xcode Cloud.
+7. Whether the repository must be pushed to GitHub before Xcode Cloud can build it.
+
+TASK 7 — Do a local validation where possible
+Run all checks possible in this environment:
+- npm install if needed
+- npm run build
+- npx cap sync ios
+- verify generated iOS files
+- verify config values
+- verify no TypeScript/build errors
+
+If actual iOS compilation cannot be done because the environment is not macOS, state clearly:
+"iOS native build cannot be compiled in this environment because Xcode/macOS is required."
+
+Do not pretend the IPA/build was created if it was not.
+
+TASK 8 — Required final report
+After all changes, provide a clear report with these sections:
+
+1. SUMMARY
+- What was completed.
+- Whether the iOS project is ready for Xcode Cloud / Mac build.
+
+2. FILES CHANGED
+List every modified/created file.
+
+3. IOS CONFIGURATION
+Include:
+- Bundle ID
+- App name
+- Version
+- Build number
+- iOS project path
+- Xcode project/workspace path
+- Scheme name if detectable
+
+4. APP ICON STATUS
+- Whether AppIcon was generated.
+- Source icon used.
+- Any missing requirements.
+
+5. BUILD / QA RESULTS
+Include exact commands run and results:
+- npm install
+- npm run build
+- npx cap sync ios
+- any errors/warnings
+
+6. REMAINING ACTIONS FOR OMAR
+Give exact next steps for App Store:
+- Push code to GitHub if needed.
+- Go to App Store Connect > SGMA APP > Xcode Cloud.
+- Create Workflow.
+- Select repository.
+- Select scheme.
+- Build archive.
+- After successful build, go to iOS-App Version 1.0 and choose the build.
+- Then submit for review.
+
+7. BLOCKERS
+List anything still blocking iOS submission, especially:
+- No macOS/Xcode access
+- Missing icon
+- Missing GitHub repository
+- Signing issue
+- Missing iOS folder
+- Build error
+
+IMPORTANT:
+Do not make broad unrelated changes.
+Do not remove Android configuration.
+Do not remove Google Play settings.
+Do not enable production ads.
+Do not change backend production domain.
+Only prepare iOS build readiness and report clearly.

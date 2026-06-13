@@ -10,7 +10,11 @@
     "serve": "vite preview --config vite.config.ts --host 0.0.0.0",
     "typecheck": "tsc -p tsconfig.json --noEmit",
     "cap:sync": "pnpm run build:cap && cap sync android",
-    "cap:assets": "capacitor-assets generate --android"
+    "cap:sync:ios": "pnpm run build:cap && cap sync ios",
+    "cap:sync:all": "pnpm run build:cap && cap sync",
+    "cap:assets": "capacitor-assets generate --android",
+    "cap:assets:ios": "capacitor-assets generate --ios",
+    "cap:assets:all": "capacitor-assets generate"
   },
   "devDependencies": {
     "@capacitor/android": "^8.4.0",
@@ -83,6 +87,7 @@
     "zod": "catalog:"
   },
   "dependencies": {
-    "@capacitor-community/admob": "^8.0.0"
+    "@capacitor-community/admob": "^8.0.0",
+    "@capacitor/ios": "^8.4.0"
   }
 }

@@ -78,3 +78,9 @@ id = "0uBf40ybsNMqOMkP8hKdz"
 uri = "file://docs/store/android/sgma-app-android-studio.zip"
 type = "unspecified"
 title = "SGMA APP — Android Studio Build Package"
+
+[[outputs]]
+id = "bhEUOXtOmqe48ShOqV-AZ"
+uri = "file://docs/store/ios/sgma-app-ios-xcode.zip"
+type = "unspecified"
+title = "SGMA APP — iOS Xcode Build Package"
