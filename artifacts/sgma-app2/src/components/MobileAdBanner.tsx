@@ -105,11 +105,15 @@ export function MobileAdBanner() {
         setBannerHeight(50);
       }
 
+      // margin: 64 = h-16 MobileNav height. This positions the native overlay
+      // banner immediately above the bottom nav bar so they do not overlap.
+      // The ProtectedLayout's pb-16 + the spacer div together reserve exactly
+      // (64 + bannerHeight) px at the bottom of the scroll area, matching this.
       const options: BannerAdOptions = {
         adId: BANNER_UNIT_ID,
         adSize: BannerAdSize.ADAPTIVE_BANNER,
         position: BannerAdPosition.BOTTOM_CENTER,
-        margin: 0,
+        margin: 64,
         isTesting: isAdMobTestMode,
       };
 
@@ -130,7 +134,12 @@ export function MobileAdBanner() {
       AdMob.removeBanner().catch(() => {});
       setBannerHeight(0);
     };
-  }, [isNative, allowed, location]);
+    // NOTE: `location` is intentionally omitted from deps.
+    // Both allowed states and the location that affects them (isBannerAllowed)
+    // are captured via `allowed`. Re-running on every navigation between two
+    // allowed routes (e.g. /news → /news/1) would call removeBanner() +
+    // showBanner() in rapid succession, crashing the AdMob SDK on Android.
+  }, [isNative, allowed]);
 
   // Web/PWA: render nothing
   if (!isNative) return null;

@@ -16,11 +16,13 @@ export function isSuperAdmin(role: string): boolean {
 
 /**
  * Roles an actor is allowed to ASSIGN to other users.
- * - SUPER_ADMIN may assign MEMBER/MODERATOR/ADMIN (never mints a new SUPER_ADMIN via UI).
+ * - SUPER_ADMIN may assign any role including SUPER_ADMIN.
+ *   The last-active-super-admin guard in the route layer prevents demotions
+ *   that would leave zero login-eligible super admins.
  * - ADMIN may assign only MEMBER/MODERATOR.
  */
 export function assignableRoles(actorRole: string): Role[] {
-  if (actorRole === "SUPER_ADMIN") return ["MEMBER", "MODERATOR", "ADMIN"];
+  if (actorRole === "SUPER_ADMIN") return ["MEMBER", "MODERATOR", "ADMIN", "SUPER_ADMIN"];
   if (actorRole === "ADMIN") return ["MEMBER", "MODERATOR"];
   return [];
 }
