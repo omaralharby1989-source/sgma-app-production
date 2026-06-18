@@ -2,6 +2,14 @@ export type Role = "MEMBER" | "MODERATOR" | "ADMIN" | "SUPER_ADMIN";
 
 export const STAFF_ROLES: Role[] = ["MODERATOR", "ADMIN", "SUPER_ADMIN"];
 
+/**
+ * The one protected owner account. Only this email may:
+ *   - assign the SUPER_ADMIN role to another user
+ * And NO account (including another SUPER_ADMIN) may modify this account
+ * via the admin API (role, status, isActive, email, or any field).
+ */
+export const PROTECTED_OWNER_EMAIL = "lordhygm@gmail.com";
+
 export function isStaff(role: string): boolean {
   return (STAFF_ROLES as string[]).includes(role);
 }
@@ -16,15 +24,24 @@ export function isSuperAdmin(role: string): boolean {
 
 /**
  * Roles an actor is allowed to ASSIGN to other users.
- * - SUPER_ADMIN may assign any role including SUPER_ADMIN.
- *   The last-active-super-admin guard in the route layer prevents demotions
- *   that would leave zero login-eligible super admins.
+ * - SUPER_ADMIN may assign MEMBER/MODERATOR/ADMIN.
+ *   Assigning SUPER_ADMIN is additionally gated on the actor's email
+ *   being PROTECTED_OWNER_EMAIL — enforced at the route layer via
+ *   canAssignSuperAdmin().
  * - ADMIN may assign only MEMBER/MODERATOR.
  */
 export function assignableRoles(actorRole: string): Role[] {
   if (actorRole === "SUPER_ADMIN") return ["MEMBER", "MODERATOR", "ADMIN", "SUPER_ADMIN"];
   if (actorRole === "ADMIN") return ["MEMBER", "MODERATOR"];
   return [];
+}
+
+/**
+ * Whether the actor (identified by email) is allowed to assign the SUPER_ADMIN
+ * role. Only the protected owner account may do this.
+ */
+export function canAssignSuperAdmin(actorEmail: string): boolean {
+  return actorEmail === PROTECTED_OWNER_EMAIL;
 }
 
 /**
@@ -43,6 +60,7 @@ export function canActOnUser(actorRole: string, targetRole: string): boolean {
 /**
  * Whether the actor may change the target's role from its current value to newRole.
  * Requires both the current target role and the new role to be within the actor's authority.
+ * Note: assigning SUPER_ADMIN also requires canAssignSuperAdmin() to pass at the route layer.
  */
 export function canChangeRole(
   actorRole: string,
