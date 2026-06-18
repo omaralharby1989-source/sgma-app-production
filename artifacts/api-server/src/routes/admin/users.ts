@@ -17,6 +17,8 @@ import {
   isAdminOrSuper,
   canActOnUser,
   canChangeRole,
+  canAssignSuperAdmin,
+  PROTECTED_OWNER_EMAIL,
   type Role,
 } from "../../lib/permissions";
 import { parseSpecialties, serializeSpecialties } from "../../lib/academy";
@@ -455,6 +457,27 @@ router.patch("/admin/users/:id", requireAuth, async (req, res): Promise<void> =>
       return;
     }
 
+    // ── Protected owner guard ────────────────────────────────────────────────
+    // No admin API call — from any account including another SUPER_ADMIN — may
+    // modify the protected owner account's role, status, isActive, email, or
+    // any other field. Profile changes for lordhygm go through the member
+    // self-edit route only.
+    if (target.email === PROTECTED_OWNER_EMAIL) {
+      res.status(403).json({
+        error: "لا يمكن تعديل أو إزالة حساب المدير العام الرئيسي المحمي",
+      });
+      return;
+    }
+
+    // Resolve actor email from DB (needed for protected-owner-level permission
+    // checks such as SUPER_ADMIN role assignment). JWT only carries role/userId.
+    const [actorRow] = await db
+      .select({ email: usersTable.email })
+      .from(usersTable)
+      .where(eq(usersTable.id, actorId))
+      .limit(1);
+    const actorEmail = actorRow?.email ?? "";
+
     if (!canActOnUser(actorRole, target.role)) {
       res.status(403).json({ error: "ليس لديك صلاحية لإدارة هذا المستخدم" });
       return;
@@ -507,6 +530,11 @@ router.patch("/admin/users/:id", requireAuth, async (req, res): Promise<void> =>
     if (d.role !== undefined && d.role !== target.role) {
       if (target.id === actorId) {
         res.status(403).json({ error: "لا يمكنك تغيير صلاحيتك الخاصة" });
+        return;
+      }
+      // Only the protected owner email may assign SUPER_ADMIN to anyone.
+      if (d.role === "SUPER_ADMIN" && !canAssignSuperAdmin(actorEmail)) {
+        res.status(403).json({ error: "ليس لديك صلاحية لتعيين هذه الصلاحية" });
         return;
       }
       if (!canChangeRole(actorRole, target.role, d.role)) {
