@@ -1,4 +1,5 @@
 export * from "./users";
+export * from "./passwordResetTokens";
 export * from "./articles";
 export * from "./news";
 export * from "./chat";

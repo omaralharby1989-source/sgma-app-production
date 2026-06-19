@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { Link, useLocation } from "wouter";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -43,6 +44,7 @@ export default function Register() {
   const [, setLocation] = useLocation();
   const { toast } = useToast();
   const signupMutation = useSignup();
+  const [showDuplicateHelp, setShowDuplicateHelp] = useState(false);
 
   const form = useForm<RegisterForm>({
     resolver: zodResolver(registerSchema),
@@ -90,11 +92,17 @@ export default function Register() {
           setLocation("/login");
         },
         onError: (error: any) => {
-          toast({
-            title: "خطأ في التسجيل",
-            description: error?.data?.error || "الرجاء المحاولة مرة أخرى",
-            variant: "destructive",
-          });
+          const msg: string = error?.data?.error || "الرجاء المحاولة مرة أخرى";
+          const isDuplicate = msg.includes("يوجد حساب") || msg.includes("اسم المستخدم أو البريد");
+          if (isDuplicate) {
+            setShowDuplicateHelp(true);
+          } else {
+            toast({
+              title: "خطأ في التسجيل",
+              description: msg,
+              variant: "destructive",
+            });
+          }
         },
       },
     );
@@ -297,6 +305,22 @@ export default function Register() {
             <Button type="submit" className="w-full h-11 text-base font-semibold" disabled={isPending}>
               {isPending ? <Loader2 className="mr-2 h-5 w-5 animate-spin" /> : "تسجيل"}
             </Button>
+
+            {showDuplicateHelp && (
+              <div className="rounded-xl border border-amber-300 bg-amber-50 p-4 text-sm text-amber-900 leading-relaxed space-y-3">
+                <p className="font-medium">
+                  يوجد حساب مسجل بهذا البريد أو اسم المستخدم. جرّب تسجيل الدخول أو استخدم خيار نسيت كلمة المرور.
+                </p>
+                <div className="flex flex-col gap-2">
+                  <Link href="/login" className="inline-block text-center rounded-lg border border-amber-400 bg-white px-3 py-2 text-sm font-medium text-amber-900 hover:bg-amber-50 transition-colors">
+                    تسجيل الدخول
+                  </Link>
+                  <Link href="/login" onClick={() => {}} className="inline-block text-center text-sm font-medium text-primary underline">
+                    نسيت كلمة المرور؟
+                  </Link>
+                </div>
+              </div>
+            )}
           </form>
 
           <div className="mt-6 text-center">

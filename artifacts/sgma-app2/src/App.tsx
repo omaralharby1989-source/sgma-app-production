@@ -10,6 +10,7 @@ import { Loader2 } from "lucide-react";
 
 import Login from "./pages/login";
 import Register from "./pages/register";
+import ResetPassword from "./pages/reset-password";
 import Home from "./pages/home";
 import More from "./pages/more";
 import Chat from "./pages/chat";
@@ -136,6 +137,7 @@ function Router() {
       <Route path="/" component={RootRedirect} />
       <Route path="/login" component={Login} />
       <Route path="/register" component={Register} />
+      <Route path="/reset-password" component={ResetPassword} />
       <Route path="/developer-info" component={DeveloperInfo} />
       <Route path="/privacy-policy">
         <StaticPage slug="privacy-policy" />
