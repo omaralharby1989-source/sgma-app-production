@@ -2,6 +2,8 @@
 import PackageDescription
 
 // DO NOT MODIFY THIS FILE - managed by Capacitor CLI commands
+// Plugin sources are vendored into ../Vendors/ so Xcode can Archive without running pnpm/npm.
+// GoogleMobileAds, UMP and Capacitor framework are resolved from GitHub automatically by Xcode SPM.
 let package = Package(
     name: "CapApp-SPM",
     platforms: [.iOS(.v15)],
@@ -12,8 +14,8 @@ let package = Package(
     ],
     dependencies: [
         .package(url: "https://github.com/ionic-team/capacitor-swift-pm.git", exact: "8.4.0"),
-        .package(name: "CapacitorCommunityAdmob", path: "../../../../../node_modules/.pnpm/@capacitor-community+admob@8.0.0/node_modules/@capacitor-community/admob"),
-        .package(name: "CapacitorSplashScreen", path: "../../../../../node_modules/.pnpm/@capacitor+splash-screen@8.0.1_@capacitor+core@8.4.0/node_modules/@capacitor/splash-screen")
+        .package(name: "CapacitorCommunityAdmob", path: "../Vendors/admob"),
+        .package(name: "CapacitorSplashScreen", path: "../Vendors/splash-screen")
     ],
     targets: [
         .target(

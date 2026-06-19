@@ -2,67 +2,78 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
-	<key>CAPACITOR_DEBUG</key>
-	<string>$(CAPACITOR_DEBUG)</string>
-	<key>CFBundleDevelopmentRegion</key>
-	<string>en</string>
-	<key>CFBundleDisplayName</key>
-	<string>SGMA APP</string>
-	<key>CFBundleExecutable</key>
-	<string>$(EXECUTABLE_NAME)</string>
-	<key>CFBundleIdentifier</key>
-	<string>$(PRODUCT_BUNDLE_IDENTIFIER)</string>
-	<key>CFBundleInfoDictionaryVersion</key>
-	<string>6.0</string>
-	<key>CFBundleName</key>
-	<string>$(PRODUCT_NAME)</string>
-	<key>CFBundlePackageType</key>
-	<string>APPL</string>
-	<key>CFBundleShortVersionString</key>
-	<string>$(MARKETING_VERSION)</string>
-	<key>CFBundleVersion</key>
-	<string>$(CURRENT_PROJECT_VERSION)</string>
-	<key>LSRequiresIPhoneOS</key>
-	<true/>
-	<key>UILaunchStoryboardName</key>
-	<string>LaunchScreen</string>
-	<key>UIMainStoryboardFile</key>
-	<string>Main</string>
-	<key>UIRequiredDeviceCapabilities</key>
-	<array>
-		<string>armv7</string>
-	</array>
-	<key>UISupportedInterfaceOrientations</key>
-	<array>
-		<string>UIInterfaceOrientationPortrait</string>
-		<string>UIInterfaceOrientationLandscapeLeft</string>
-		<string>UIInterfaceOrientationLandscapeRight</string>
-	</array>
-	<key>UISupportedInterfaceOrientations~ipad</key>
-	<array>
-		<string>UIInterfaceOrientationPortrait</string>
-		<string>UIInterfaceOrientationPortraitUpsideDown</string>
-		<string>UIInterfaceOrientationLandscapeLeft</string>
-		<string>UIInterfaceOrientationLandscapeRight</string>
-	</array>
-	<key>UIViewControllerBasedStatusBarAppearance</key>
-	<true/>
+        <key>CAPACITOR_DEBUG</key>
+        <string>$(CAPACITOR_DEBUG)</string>
+        <key>CFBundleDevelopmentRegion</key>
+        <string>en</string>
+        <key>CFBundleDisplayName</key>
+        <string>SGMA APP</string>
+        <key>CFBundleExecutable</key>
+        <string>$(EXECUTABLE_NAME)</string>
+        <key>CFBundleIdentifier</key>
+        <string>$(PRODUCT_BUNDLE_IDENTIFIER)</string>
+        <key>CFBundleInfoDictionaryVersion</key>
+        <string>6.0</string>
+        <key>CFBundleName</key>
+        <string>$(PRODUCT_NAME)</string>
+        <key>CFBundlePackageType</key>
+        <string>APPL</string>
+        <key>CFBundleShortVersionString</key>
+        <string>$(MARKETING_VERSION)</string>
+        <key>CFBundleVersion</key>
+        <string>$(CURRENT_PROJECT_VERSION)</string>
+        <key>LSRequiresIPhoneOS</key>
+        <true/>
+        <key>UILaunchStoryboardName</key>
+        <string>LaunchScreen</string>
+        <key>UIMainStoryboardFile</key>
+        <string>Main</string>
+        <key>UIRequiredDeviceCapabilities</key>
+        <array>
+                <string>armv7</string>
+        </array>
+        <key>UISupportedInterfaceOrientations</key>
+        <array>
+                <string>UIInterfaceOrientationPortrait</string>
+                <string>UIInterfaceOrientationLandscapeLeft</string>
+                <string>UIInterfaceOrientationLandscapeRight</string>
+        </array>
+        <key>UISupportedInterfaceOrientations~ipad</key>
+        <array>
+                <string>UIInterfaceOrientationPortrait</string>
+                <string>UIInterfaceOrientationPortraitUpsideDown</string>
+                <string>UIInterfaceOrientationLandscapeLeft</string>
+                <string>UIInterfaceOrientationLandscapeRight</string>
+        </array>
+        <key>UIViewControllerBasedStatusBarAppearance</key>
+        <true/>
 
-	<!-- Google AdMob — REQUIRED: app crashes at launch without this key -->
-	<key>GADApplicationIdentifier</key>
-	<string>ca-app-pub-5363888403943121~7695424704</string>
+        <!-- Google AdMob — REQUIRED: app crashes at launch without this key -->
+        <!-- WARNING: This App ID must be the iOS-specific AdMob App ID, NOT the Android one.       -->
+        <!-- Create a separate iOS app in AdMob console and replace this ID before production ads.  -->
+        <!-- Current value may be the Android App ID reused — verify in AdMob console.             -->
+        <key>GADApplicationIdentifier</key>
+        <string>ca-app-pub-5363888403943121~7695424704</string>
 
-	<!-- App Tracking Transparency — shown before AdMob personalised ads (iOS 14+) -->
-	<key>NSUserTrackingUsageDescription</key>
-	<string>يستخدم هذا التطبيق معرف الإعلان لعرض إعلانات ملائمة لاهتماماتك وتحسين تجربتك داخل التطبيق.</string>
+        <!-- App Tracking Transparency — shown before AdMob personalised ads (iOS 14+) -->
+        <key>NSUserTrackingUsageDescription</key>
+        <string>يستخدم هذا التطبيق معرف الإعلان لعرض إعلانات ملائمة لاهتماماتك وتحسين تجربتك داخل التطبيق.</string>
 
-	<!-- Google SKAdNetwork identifier for iOS 14+ attribution (required by AdMob) -->
-	<key>SKAdNetworkItems</key>
-	<array>
-		<dict>
-			<key>SKAdNetworkIdentifier</key>
-			<string>cstr6suwn9.skadnetwork</string>
-		</dict>
-	</array>
+        <!-- Photo library access — required for avatar and profile image upload (iOS 14+) -->
+        <key>NSPhotoLibraryUsageDescription</key>
+        <string>يحتاج التطبيق إلى الوصول إلى مكتبة الصور لتحديث صورة الملف الشخصي.</string>
+
+        <!-- Camera access — required if user chooses to take a photo for avatar upload -->
+        <key>NSCameraUsageDescription</key>
+        <string>يحتاج التطبيق إلى الوصول إلى الكاميرا لالتقاط صورة للملف الشخصي.</string>
+
+        <!-- Google SKAdNetwork identifier for iOS 14+ attribution (required by AdMob) -->
+        <key>SKAdNetworkItems</key>
+        <array>
+                <dict>
+                        <key>SKAdNetworkIdentifier</key>
+                        <string>cstr6suwn9.skadnetwork</string>
+                </dict>
+        </array>
 </dict>
 </plist>
