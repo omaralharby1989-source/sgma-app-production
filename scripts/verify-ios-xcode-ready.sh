@@ -32,6 +32,11 @@ echo "--- Required files / folders ---"
 [ -f "$IOS/App/public/index.html" ] && pass "App/public/index.html" || fail "MISSING App/public/index.html"
 
 echo ""
+echo "--- SwiftPM workspace metadata (fresh-clone resolution aids) ---"
+[ -f "$IOS/App.xcodeproj/project.xcworkspace/contents.xcworkspacedata" ] && pass "project.xcworkspace/contents.xcworkspacedata" || fail "MISSING contents.xcworkspacedata"
+[ -f "$IOS/App.xcodeproj/project.xcworkspace/xcshareddata/swiftpm/Package.resolved" ] && pass "xcshareddata/swiftpm/Package.resolved" || fail "MISSING Package.resolved"
+
+echo ""
 echo "--- Web bundle (Build 2 assets) ---"
 JS_COUNT=$(find "$IOS/App/public/assets" -maxdepth 1 -name '*.js' 2>/dev/null | wc -l | tr -d ' ')
 CSS_COUNT=$(find "$IOS/App/public/assets" -maxdepth 1 -name '*.css' 2>/dev/null | wc -l | tr -d ' ')
@@ -72,6 +77,24 @@ if grep -q 'isa = XCRemoteSwiftPackageReference' "$IOS/App.xcodeproj/project.pbx
 else
   pass "no stray remote package refs in pbxproj (Capacitor/Cordova/Admob/Splash are transitive)"
 fi
+
+# productRef linkage: every XCSwiftPackageProductDependency declared must be referenced
+# by a build file, and every productRef used must be declared (no orphan/dangling IDs).
+LINK_OK=$(python3 - "$IOS/App.xcodeproj/project.pbxproj" <<'PY'
+import re, sys
+txt = open(sys.argv[1]).read()
+declared = set(re.findall(r'([0-9A-F]{24})\s*/\*[^*]*\*/\s*=\s*\{\s*isa = XCSwiftPackageProductDependency;', txt))
+used = set(re.findall(r'productRef = ([0-9A-F]{24})', txt))
+if not declared:
+    print("FAIL:no XCSwiftPackageProductDependency declared"); sys.exit()
+orphan_decl = declared - used
+missing_used = used - declared
+if orphan_decl: print("FAIL:declared-but-unused productRef(s): " + ",".join(sorted(orphan_decl))); sys.exit()
+if missing_used: print("FAIL:used-but-undeclared productRef(s): " + ",".join(sorted(missing_used))); sys.exit()
+print(f"OK:{len(declared)} product dependency id(s) all consistently declared+used")
+PY
+)
+if [[ "$LINK_OK" == OK:* ]]; then pass "pbxproj productRef linkage — ${LINK_OK#OK:}"; else fail "pbxproj productRef linkage — ${LINK_OK#FAIL:}"; fi
 
 echo ""
 if [ "$FAIL" -eq 0 ]; then
