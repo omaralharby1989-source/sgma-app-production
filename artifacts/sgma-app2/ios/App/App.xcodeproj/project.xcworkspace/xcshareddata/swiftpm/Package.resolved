@@ -1,0 +1,34 @@
+{
+  "object": {
+    "pins": [
+      {
+        "package": "capacitor-swift-pm",
+        "repositoryURL": "https://github.com/ionic-team/capacitor-swift-pm.git",
+        "state": {
+          "branch": null,
+          "revision": "44ae2505f54a80c5e559533950886d0644fc2fca",
+          "version": "8.4.0"
+        }
+      },
+      {
+        "package": "swift-package-manager-google-mobile-ads",
+        "repositoryURL": "https://github.com/googleads/swift-package-manager-google-mobile-ads.git",
+        "state": {
+          "branch": null,
+          "revision": "1239c23464503053c17d37ee5daa70de3455e9c8",
+          "version": "12.14.0"
+        }
+      },
+      {
+        "package": "swift-package-manager-google-user-messaging-platform",
+        "repositoryURL": "https://github.com/googleads/swift-package-manager-google-user-messaging-platform.git",
+        "state": {
+          "branch": null,
+          "revision": "13b248eaa73b7826f0efb1bcf455e251d65ecb1b",
+          "version": "3.1.0"
+        }
+      }
+    ]
+  },
+  "version": 2
+}
