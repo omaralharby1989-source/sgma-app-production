@@ -25,8 +25,7 @@ let package = Package(
                 .product(name: "Cordova", package: "capacitor-swift-pm"),
                 .product(name: "CapacitorCommunityAdmob", package: "CapacitorCommunityAdmob"),
                 .product(name: "CapacitorSplashScreen", package: "CapacitorSplashScreen")
-            ],
-            path: "Sources/Plugin"
+            ]
         )
     ]
 )
